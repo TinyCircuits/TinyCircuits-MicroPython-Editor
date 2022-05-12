@@ -1,0 +1,18 @@
+.contentWindow{
+  position: absolute;
+  background-color: #222222;
+}
+
+.resizer{
+  position: absolute;
+  z-index: 1;
+  background-color: inherit;
+}
+
+.verticalResizer{
+  cursor: ns-resize;
+}
+
+.horizontalResizer{
+  cursor: ew-resize;
+}

@@ -1,0 +1,127 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Thumby Code</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="/dist/tailwind_output.css" rel="stylesheet">
+        <link rel="stylesheet" href="/dist/modules/xterm/css/xterm.css"/>
+        <link rel="stylesheet" type="text/css" href="/dist/modules/Resizable.js/resizable-style.css">
+        <link rel="stylesheet" type="text/css" href="/dist/modules/tabs-handler/css/dark/tabs-handler.css">
+    </head>
+
+    <body class="overflow-hidden">
+        
+        <div class="left-[256px] top-2 group inline-block relative">
+    <button class="rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <span>Project</span>
+    </button>
+    <ul class="z-10 absolute hidden text-gray-700 pt-1 group-hover:block">
+        <li>
+            <button class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Open from</span>
+            </button>
+        </li>
+        <li>
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Save to</span>
+            </button>
+        </li>
+        <li>
+            <button class="rounded-b-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Rename</span>
+            </button>
+        </li>
+    </ul>
+</div>
+        <div class="left-[256px] top-2 group inline-block relative">
+    <button class="rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <span>View</span>
+    </button>
+    <ul class="z-10 absolute hidden text-gray-700 pt-1 group-hover:block">
+        <li>
+            <button id="BtnResetLayout" class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Reset Layout</span>
+            </button>
+        </li>
+        <li>
+            <button class="rounded-b-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Invert Theme</span>
+            </button>
+        </li>
+    </ul>
+</div>
+
+        <div class="flex absolute left-2 top-2 w-[240px] h-8 border border-black bg-white">
+            <input type="text" value="Project Name" class="w-[221px] min-h-full focus:border-0">
+            <button class="bg-black hover:bg-white active:bg-black stroke-white hover:stroke-black active:stroke-white flex justify-center items-center min-w-[35px] min-h-full border-l border-l-black duration-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-2/3 w-2/3" fill="none" viewBox="0 0 24 24" stroke="inherit" stroke-width="1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="DivLayout" class="absolute left-2 top-12 right-2 bottom-2 border border-black bg-white">
+            <div id="main">
+    <div class="resizable-left" id="win1">
+        <div class="min-w-full min-h-full bg-white">
+            <div class="min-w-full h-6 bg-black text-white pl-1">
+                Sprites
+            </div>
+            <div id="DivSpriteList" class="absolute top-6 right-0 bottom-0 left-0 flex flex-col items-center m-2">
+                
+            </div>
+        </div>
+    </div>
+    
+    <div class="resizable-right" id="win2">
+        <div class="resizable-top" id="win5">
+            <div class="resizable-left" id="win7">
+                <div class="min-w-full min-h-full bg-white">
+                    <div id="DivWorkspace" class="absolute top-0 right-0 bottom-0 left-0">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="resizable-right" id="win8">
+                <div class="w-full h-full bg-white flex flex-col">
+                    <div class="w-full h-6 bg-black text-white flex">
+                        <button id="BtnRunInBrowser" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
+                        <button id="BtnRunOnThumby" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
+                    </div>
+                    <div id="DivRunInBrowser" class="absolute top-6 right-0 bottom-0 left-0">
+                        Browser
+                    </div>
+                    <div id="DivRunOnThumby" class="absolute top-6 right-0 bottom-0 left-0 invisible">
+                        Thumby
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="resizable-bottom" id="win6">
+            <div class="min-w-full min-h-full bg-white">
+                <div class="min-w-full h-6 bg-black text-white pl-1">
+                    Console
+                </div>
+                <div id="DivRunInBrowserConsole" class="absolute top-6 right-0 bottom-0 left-0">
+                    
+                </div>
+                <div id="DivRunOnThumbyConsole" class="absolute top-6 right-0 bottom-0 left-0 invisible">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+
+
+        <script src="/dist/modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+        <script src="/dist/modules/xterm/lib/xterm.js"></script>
+        <script src="/dist/modules/ace-1.4.13/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/dist/js/pages/code/run-tabs.js"></script>
+        <script src="/dist/modules/Resizable.js/resizable.js"></script>
+        <script type="module" src="/dist/js/pages/code/code.js"></script>
+    </body>
+</html>

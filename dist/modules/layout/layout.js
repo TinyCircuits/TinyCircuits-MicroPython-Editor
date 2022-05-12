@@ -8,9 +8,8 @@ class Layout{
         
         // Default layout panel sizes
         this.sizes = {
-            "win1" : 0.125,
-            "win5" : 0.75,
-            "win7": 0.80
+            "win1" : 0.85,
+            "win3" : 0.75
         };
 
 

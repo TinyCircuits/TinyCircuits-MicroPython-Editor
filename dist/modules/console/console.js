@@ -1,5 +1,5 @@
 class Console{
-    constructor(consoleDiv){
+    constructor(consoleDiv, message){
         this.consoleDiv = consoleDiv;
         this.consoleDiv.style.display = "grid";
 
@@ -30,6 +30,10 @@ class Console{
                 // this.emulatorTyped(typed);
             }
         })
+
+        if(message != undefined){
+            this.write(message);
+        }
     }
 
 

@@ -2,6 +2,27 @@ import { Layout } from "../../../modules/layout/layout.js";
 import { Editor } from "../../../modules/editor/js/editor.js";
 import { Console } from "../../../modules/console/console.js";
 import { SpriteList } from "../../../modules/sprite-list/sprite-list.js";
+import { WorkspaceSelection } from "../../../modules/workspace-selection/workspace-selection.js";
+
+
+let divLayout = document.getElementById("divLayout");
+let divCode = document.getElementById("divCode");
+
+let layout = new Layout(divLayout);
+let mainWorkspace = new WorkspaceSelection([["btnCode", "divCode"], ["btnSprite", "divSprite"], ["btnMusic", "divMusic"]]);
+let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", "divThumbyConsole"], ["btnBrowserConsole", "divBrowserConsole"]]);
+let editor = new Editor(divCode);
+
+
+
+let thumbyConsole = new Console(document.getElementById("divThumbyConsole"), "Thumby console\r\n");
+let browserConsole = new Console(document.getElementById("divBrowserConsole"), "Browser console\r\n");
+
+
+
+document.getElementById("btnResetLayout").onclick = (event) => {
+    layout.resetLayoutSize();
+}
 
 
 
@@ -44,29 +65,11 @@ import { SpriteList } from "../../../modules/sprite-list/sprite-list.js";
 // }
 
 
+// let DivWorkspace = document.getElementById("DivWorkspace");
+// let DivSpriteList = document.getElementById("DivSpriteList");
 
 
-let DivLayout = document.getElementById("DivLayout")
-let DivWorkspace = document.getElementById("DivWorkspace");
-let DivRunInBrowserConsole = document.getElementById("DivRunInBrowserConsole");
-let DivRunOnThumbyConsole = document.getElementById("DivRunOnThumbyConsole");
-let DivSpriteList = document.getElementById("DivSpriteList");
 
+// let editor = new Editor(DivWorkspace);
 
-let layout = new Layout(DivLayout);
-
-let editor = new Editor(DivWorkspace);
-
-let spriteList = new SpriteList(DivSpriteList);
-
-let runInBrowserConsole = new Console(DivRunInBrowserConsole);
-let runOnThumbyConsole = new Console(DivRunOnThumbyConsole);
-
-runInBrowserConsole.write("Browser console\r\n");
-runOnThumbyConsole.write("Thumby console\r\n");
-
-
-let BtnResetLayout = document.getElementById("BtnResetLayout");
-BtnResetLayout.onclick = (event) => {
-    layout.resetLayoutSize();
-}
+// let spriteList = new SpriteList(DivSpriteList);

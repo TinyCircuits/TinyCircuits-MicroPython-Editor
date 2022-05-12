@@ -17,7 +17,7 @@
     <button class="rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
         <span>Project</span>
     </button>
-    <ul class="z-10 absolute hidden text-gray-700 pt-1 group-hover:block">
+    <ul class="z-20 absolute hidden text-gray-700 pt-1 group-hover:block">
         <li>
             <button class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
                 <span>Open from</span>
@@ -35,22 +35,44 @@
         </li>
     </ul>
 </div>
-        <div class="left-[256px] top-2 group inline-block relative">
+        <div class="left-[260px] top-2 group inline-block relative">
     <button class="rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
         <span>View</span>
     </button>
-    <ul class="z-10 absolute hidden text-gray-700 pt-1 group-hover:block">
+    <ul class="z-20 absolute hidden text-gray-700 pt-1 group-hover:block">
         <li>
-            <button id="BtnResetLayout" class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+            <button id="btnResetLayout" class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
                 <span>Reset Layout</span>
             </button>
         </li>
         <li>
-            <button class="rounded-b-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+            <button id="btnInvertTheme" class="rounded-b-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
                 <span>Invert Theme</span>
             </button>
         </li>
     </ul>
+</div>
+        <!-- <div class="w-60 h-8 bg-green-600 absolute m-auto left-0 right-0 top-2">
+    
+</div> -->
+<div class="rounded-lg border border-black w-60 h-[38px] bg-white absolute left-[498px] xl:left-0 xl:m-auto right-0 top-[6px] flex items-center justify-evenly">
+    <button id="btnCode" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <button id="btnSprite" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <button id="btnMusic" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+        </svg>
+    </button>
 </div>
 
         <div class="flex absolute left-2 top-2 w-[240px] h-8 border border-black bg-white">
@@ -62,54 +84,40 @@
             </button>
         </div>
 
-        <div id="DivLayout" class="absolute left-2 top-12 right-2 bottom-2 border border-black bg-white">
+        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-2 border border-black bg-white">
             <div id="main">
     <div class="resizable-left" id="win1">
-        <div class="min-w-full min-h-full bg-white">
-            <div class="min-w-full h-6 bg-black text-white pl-1">
-                Sprites
-            </div>
-            <div id="DivSpriteList" class="absolute top-6 right-0 bottom-0 left-0 flex flex-col items-center m-2">
+        <div class="resizable-top" id="win3">
+            <div class="min-w-full min-h-full bg-white">
+                <div id="divCode" class="absolute top-0 bottom-0 left-0 right-0">
+                </div>
                 
+                <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                </div>
+
+                <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                </div>
+            </div>
+        </div>
+
+        <div class="resizable-bottom" id="win4">
+            <div class="min-w-full min-h-full bg-white">
+                <div class="min-w-full min-h-full bg-white">
+                    <div id="divThumbyConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                    </div>
+                </div>
+                <div class="min-w-full min-h-full bg-white">
+                    <div id="divBrowserConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
     <div class="resizable-right" id="win2">
-        <div class="resizable-top" id="win5">
-            <div class="resizable-left" id="win7">
-                <div class="min-w-full min-h-full bg-white">
-                    <div id="DivWorkspace" class="absolute top-0 right-0 bottom-0 left-0">
-                        
-                    </div>
-                </div>
-            </div>
-            <div class="resizable-right" id="win8">
-                <div class="w-full h-full bg-white flex flex-col">
-                    <div class="w-full h-6 bg-black text-white flex">
-                        <button id="BtnRunInBrowser" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
-                        <button id="BtnRunOnThumby" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
-                    </div>
-                    <div id="DivRunInBrowser" class="absolute top-6 right-0 bottom-0 left-0">
-                        Browser
-                    </div>
-                    <div id="DivRunOnThumby" class="absolute top-6 right-0 bottom-0 left-0 invisible">
-                        Thumby
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="resizable-bottom" id="win6">
-            <div class="min-w-full min-h-full bg-white">
-                <div class="min-w-full h-6 bg-black text-white pl-1">
-                    Console
-                </div>
-                <div id="DivRunInBrowserConsole" class="absolute top-6 right-0 bottom-0 left-0">
-                    
-                </div>
-                <div id="DivRunOnThumbyConsole" class="absolute top-6 right-0 bottom-0 left-0 invisible">
-                    
-                </div>
+        <div class="min-w-full min-h-full bg-white">
+            <div class="w-full h-6 bg-black text-white flex">
+                <button id="btnThumbyConsole" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
+                <button id="btnBrowserConsole" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
             </div>
         </div>
     </div>
@@ -120,7 +128,6 @@
         <script src="/dist/modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
         <script src="/dist/modules/xterm/lib/xterm.js"></script>
         <script src="/dist/modules/ace-1.4.13/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/dist/js/pages/code/run-tabs.js"></script>
         <script src="/dist/modules/Resizable.js/resizable.js"></script>
         <script type="module" src="/dist/js/pages/code/code.js"></script>
     </body>

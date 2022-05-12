@@ -15,6 +15,7 @@
         <!-- @@include('../../common/header.html') -->
         @@include('./project-dropdown.html')
         @@include('./view-dropdown.html')
+        @@include('./workspace-selection.html')
 
         <div class="flex absolute left-2 top-2 w-[240px] h-8 border border-black bg-white">
             <input type="text" value="Project Name" class="w-[221px] min-h-full focus:border-0">
@@ -25,7 +26,7 @@
             </button>
         </div>
 
-        <div id="DivLayout" class="absolute left-2 top-12 right-2 bottom-2 border border-black bg-white">
+        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-2 border border-black bg-white">
             @@include('./layout.html')
         </div>
 
@@ -33,7 +34,6 @@
         <script src="/dist/modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
         <script src="/dist/modules/xterm/lib/xterm.js"></script>
         <script src="/dist/modules/ace-1.4.13/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/dist/js/pages/code/run-tabs.js"></script>
         <script src="/dist/modules/Resizable.js/resizable.js"></script>
         <script type="module" src="/dist/js/pages/code/code.js"></script>
     </body>

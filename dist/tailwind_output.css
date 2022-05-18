@@ -506,6 +506,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   visibility: visible;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .absolute {
   position: absolute;
 }
@@ -518,16 +522,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 0.5rem;
 }
 
-.right-24 {
-  right: 6rem;
+.right-12 {
+  right: 3rem;
 }
 
-.right-14 {
-  right: 3.5rem;
-}
-
-.right-4 {
-  right: 1rem;
+.right-2 {
+  right: 0.5rem;
 }
 
 .left-2 {
@@ -536,10 +536,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .top-12 {
   top: 3rem;
-}
-
-.right-2 {
-  right: 0.5rem;
 }
 
 .bottom-2 {
@@ -562,6 +558,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   right: 0px;
 }
 
+.top-6 {
+  top: 1.5rem;
+}
+
 .left-\[256px\] {
   left: 256px;
 }
@@ -582,16 +582,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   z-index: 20;
 }
 
-.m-auto {
-  margin: auto;
-}
-
 .m-2 {
   margin: 0.5rem;
 }
 
 .ml-4 {
   margin-left: 1rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
 }
 
 .mr-2 {
@@ -630,8 +630,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 1.5rem;
 }
 
-.h-\[38px\] {
-  height: 38px;
+.h-\[37px\] {
+  height: 37px;
 }
 
 .h-full {
@@ -674,8 +674,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 7rem;
 }
 
-.w-60 {
-  width: 15rem;
+.w-48 {
+  width: 12rem;
 }
 
 .w-4 {
@@ -706,12 +706,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   justify-content: center;
 }
 
-.justify-evenly {
-  justify-content: space-evenly;
+.justify-around {
+  justify-content: space-around;
 }
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
 }
 
 .rounded-full {
@@ -773,11 +777,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-green-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(22 163 74 / var(--tw-bg-opacity));
-}
-
 .fill-white {
   fill: #fff;
 }
@@ -788,10 +787,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .stroke-white {
   stroke: #fff;
-}
-
-.stroke-inherit {
-  stroke: inherit;
 }
 
 .stroke-1 {

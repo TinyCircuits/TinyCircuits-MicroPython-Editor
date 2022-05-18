@@ -9,8 +9,8 @@ let divLayout = document.getElementById("divLayout");
 let divCode = document.getElementById("divCode");
 
 let layout = new Layout(divLayout);
-let mainWorkspace = new WorkspaceSelection([["btnCode", "divCode"], ["btnSprite", "divSprite"], ["btnMusic", "divMusic"]]);
-let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", "divThumbyConsole"], ["btnBrowserConsole", "divBrowserConsole"]]);
+let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], ["btnSprite", ["divSprite"]], ["btnMusic", ["divMusic"]]]);
+let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", ["divThumbyConsole", "divRunOnThumby"]], ["btnBrowserConsole", ["divBrowserConsole", "divRunInBrowser"]]]);
 let editor = new Editor(divCode);
 
 

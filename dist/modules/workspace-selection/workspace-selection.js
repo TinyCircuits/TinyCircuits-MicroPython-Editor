@@ -6,15 +6,19 @@ class WorkspaceSelection{
         // Each index in the list is a list with index 0 being the btn HTML object and index 1 being the div HTML object
         this.entryDictList = [];
 
+        // This key is needed so that this workspace selection instance can auto click the last clicked tab
         this.localStorageKey = "";
 
-        for (let idx=0; idx<this.btnDivNameListList.length; idx++) {
-            let btnID = this.btnDivNameListList[idx][0];
-            let divID = this.btnDivNameListList[idx][1];
-            this.localStorageKey += btnID + divID;
-            let entry = [document.getElementById(btnID), document.getElementById(divID), idx];
+        for (let ibx=0; ibx<this.btnDivNameListList.length; ibx++) {
+            let btn = document.getElementById(this.btnDivNameListList[ibx][0]);
+            this.localStorageKey += this.btnDivNameListList[ibx][0];
 
-            // On btn click
+            let entry = [btn, []];
+            for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
+                this.localStorageKey += this.btnDivNameListList[ibx][1][idx];
+                entry[1].push(document.getElementById(this.btnDivNameListList[ibx][1][idx]));
+            }
+
             entry[0].onclick = (event) => {
                 // Remove style edits to btns and hide all divs
                 for(let iex=0; iex<this.entryDictList.length; iex++){
@@ -22,17 +26,21 @@ class WorkspaceSelection{
                     this.entryDictList[iex][0].style.fill = null;
                     this.entryDictList[iex][0].style.color = null;
 
-                    this.entryDictList[iex][1].classList.add("invisible");
-                    this.entryDictList[iex][1].style.zIndex = null;
+                    for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
+                        this.entryDictList[iex][1][idx].classList.add("invisible");
+                        this.entryDictList[iex][1][idx].style.zIndex = null;
+                    }
                 }
 
-                // Add style edits and show this div
+                // Add style edits and show these divs
                 entry[0].style.backgroundColor = "white";
                 entry[0].style.fill = "black";
                 entry[0].style.color = "black";
 
-                entry[1].classList.remove("invisible");
-                entry[1].style.zIndex = 10;
+                for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
+                    entry[1][idx].classList.remove("invisible");
+                    entry[1][idx].style.zIndex = 10;
+                }
 
                 localStorage.setItem(this.localStorageKey + "lastClickedBtnID", event.currentTarget.id);
             }
@@ -40,6 +48,8 @@ class WorkspaceSelection{
             this.entryDictList.push(entry);
         }
 
+
+        // Auto click the last button clicked by the user on instance instantiation
         let lastClickedBtnID = localStorage.getItem(this.localStorageKey + "lastClickedBtnID");
         if(lastClickedBtnID == null || lastClickedBtnID == ""){
             // By default, click the first btn in the index to show that div

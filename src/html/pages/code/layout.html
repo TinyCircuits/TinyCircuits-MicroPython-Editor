@@ -1,36 +1,58 @@
 <div id="main">
     <div class="resizable-left" id="win1">
-        <div class="resizable-top" id="win3">
+        <div class="resizable-left" id="win3">
             <div class="min-w-full min-h-full bg-white">
-                <div id="divCode" class="absolute top-0 bottom-0 left-0 right-0">
-                </div>
-                
-                <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
-                </div>
-
-                <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                <div class="w-full h-6 bg-black text-white">
+                    <div class="ml-1">
+                        Projects
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="resizable-bottom" id="win4">
-            <div class="min-w-full min-h-full bg-white">
+        <div class="resizable-right" id="win4">
+            <div class="resizable-top" id="win5">
                 <div class="min-w-full min-h-full bg-white">
-                    <div id="divThumbyConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                    <div id="divCode" class="absolute top-0 bottom-0 left-0 right-0">
+                    </div>
+                    
+                    <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                        Sprite Editor
+                    </div>
+    
+                    <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                        Music Editor
                     </div>
                 </div>
+            </div>
+    
+            <div class="resizable-bottom" id="win6">
                 <div class="min-w-full min-h-full bg-white">
-                    <div id="divBrowserConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                    <div class="min-w-full min-h-full bg-white">
+                        <div id="divThumbyConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                        </div>
+                    </div>
+                    <div class="min-w-full min-h-full bg-white">
+                        <div id="divBrowserConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
     <div class="resizable-right" id="win2">
         <div class="min-w-full min-h-full bg-white">
             <div class="w-full h-6 bg-black text-white flex">
-                <button id="btnThumbyConsole" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
-                <button id="btnBrowserConsole" class="w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
+                <button id="btnThumbyConsole" class="whitespace-nowrap w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
+                <button id="btnBrowserConsole" class="whitespace-nowrap w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
+            </div>
+
+            <div id="divRunOnThumby" class="absolute top-6 bottom-0 left-0 right-0">
+                Run on Thumby
+            </div>
+            <div id="divRunInBrowser" class="absolute top-6 bottom-0 left-0 right-0">
+                Run in browser
             </div>
         </div>
     </div>

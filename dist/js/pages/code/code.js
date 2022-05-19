@@ -1,18 +1,19 @@
 import { Layout } from "../../../modules/layout/layout.js";
 import { Editor } from "../../../modules/editor/js/editor.js";
 import { Console } from "../../../modules/console/console.js";
-import { SpriteList } from "../../../modules/sprite-list/sprite-list.js";
 import { WorkspaceSelection } from "../../../modules/workspace-selection/workspace-selection.js";
+import { Projects } from "../../../modules/projects/projects.js";
 
 
 let divLayout = document.getElementById("divLayout");
 let divCode = document.getElementById("divCode");
+let divProjects = document.getElementById("divProjects");
 
 let layout = new Layout(divLayout);
 let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], ["btnSprite", ["divSprite"]], ["btnMusic", ["divMusic"]]]);
 let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", ["divThumbyConsole", "divRunOnThumby"]], ["btnBrowserConsole", ["divBrowserConsole", "divRunInBrowser"]]]);
 let editor = new Editor(divCode);
-
+let projects = new Projects(divProjects)
 
 
 let thumbyConsole = new Console(document.getElementById("divThumbyConsole"), "Thumby console\r\n");

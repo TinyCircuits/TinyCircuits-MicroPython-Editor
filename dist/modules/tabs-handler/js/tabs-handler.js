@@ -12,7 +12,7 @@ class TabsHandler{
 
         this.tabNotSelectedStyle = "flex items-center bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white stroke-white duration-200";
         this.tabSelectedStyle = "flex items-center bg-white hover:bg-white text-black hover:text-black active:bg-black active:text-white stroke-white duration-200";
-        this.tabBtnStyle = "m-2 inline-flex items-center";
+        this.tabBtnStyle = "m-2 inline-flex items-center select-none";
         this.tabCloseBtnStyle = "inline-flex items-center w-4 h-4 mr-2";
         this.addBtnStyle = "flex items-center justify-center w-6 bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200";
 

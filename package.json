@@ -5,11 +5,11 @@
   "main": "index.js",
   "watch": {
     "build": {
-      "patterns": ["src", "index.js", "./dist/js/**/*.js", "./dist/modules/**/*.js"],
+      "patterns": ["src", "index.js", "./dist/js/**/*.js", "./dist/modules/**/*.js", "./dist/css/pages/**/*.css"],
       "extensions": "js,jsx,html,css"
     },
     "start": {
-      "patterns": ["src", "index.js", "./dist/js/**/*.js", "./dist/modules/**/*.js"],
+      "patterns": ["src", "index.js", "./dist/js/**/*.js", "./dist/modules/**/*.js", "./dist/css/pages/**/*.css"],
       "extensions": "js,jsx,html,css"
     }
   },

@@ -578,8 +578,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   left: 256px;
 }
 
-.top-4 {
-  top: 1rem;
+.top-10 {
+  top: 2.5rem;
 }
 
 .bottom-4 {
@@ -592,6 +592,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .right-4 {
   right: 1rem;
+}
+
+.top-\[0px\] {
+  top: 0px;
+}
+
+.left-\[0px\] {
+  left: 0px;
 }
 
 .left-\[260px\] {
@@ -678,6 +686,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 1.25rem;
 }
 
+.h-\[40px\] {
+  height: 40px;
+}
+
 .h-10 {
   height: 2.5rem;
 }
@@ -746,6 +758,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-\[85\%\] {
   width: 85%;
+}
+
+.w-\[72px\] {
+  width: 72px;
 }
 
 .w-0\.5 {
@@ -875,6 +891,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .border-b {
   border-bottom-width: 1px;
+}
+
+.border-dashed {
+  border-style: dashed;
 }
 
 .border-black {

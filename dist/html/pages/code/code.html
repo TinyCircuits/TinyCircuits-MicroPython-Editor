@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="/dist/modules/xterm/css/xterm.css"/>
         <link rel="stylesheet" type="text/css" href="/dist/modules/Resizable.js/resizable-style.css">
         <link rel="stylesheet" type="text/css" href="/dist/modules/tabs-handler/css/dark/tabs-handler.css">
+        <link rel="stylesheet" type="text/css" href="/dist/css/pages/code/code.css">
     </head>
 
     <body class="overflow-hidden">
@@ -25,6 +26,11 @@
         <li>
             <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
                 <span>Save to</span>
+            </button>
+        </li>
+        <li>
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Add File</span>
             </button>
         </li>
         <li>
@@ -104,8 +110,16 @@
                     
                     <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
                         <div class="min-w-full min-h-full">
-    <div class="absolute top-4 bottom-4 left-4 right-4 flex flex-row">
+    <!-- Panel title -->
+    <div class="w-full h-6 bg-black text-white">
+        <div class="ml-1">
+            Sprite Editor
+        </div>
+    </div>
+
+    <div class="absolute top-10 bottom-4 left-4 right-4 flex flex-row">
         <div id="divSpriteListParent" class="flex-auto w-[15%]">
+            <!-- Sprite list -->
             <div id="divSpriteList" class="h-full border border-black rounded-md">
             </div>
         </div>
@@ -116,7 +130,11 @@
         </div>
         <div id="divSpriteEditorParent" class="flex-auto w-[85%] flex flex-col">
             <div class="h-full w-full">
-                <div id="divSpriteEditor" class="h-full border border-black rounded-md">
+                <!-- Sprite Editor -->
+                <div id="divSpriteEditor" class="h-full border border-black rounded-md relative">
+                    <canvas id="canvasSpriteEditor" width="72" height="40" class="w-[72px] h-[40px] border border-black border-dashed absolute top-[0px] left-[0px]">
+
+                    </canvas>
                 </div>
             </div>
             <div class="h-10 w-full">
@@ -211,7 +229,7 @@
 
                     </div>
 
-                    
+
                     <!-- Import image -->
                     <button title="Import image into sprite canvas [keybind: i]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
@@ -226,7 +244,14 @@
                     </div>
     
                     <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
-                        Music Editor
+                        <div class="min-w-full min-h-full">
+    <!-- Panel title -->
+    <div class="w-full h-6 bg-black text-white">
+        <div class="ml-1">
+            Music Editor
+        </div>
+    </div>
+</div>
                     </div>
                 </div>
             </div>

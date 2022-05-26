@@ -1,17 +1,18 @@
 import { TabsHandler } from "../../tabs-handler/js/tabs-handler.js";
-import { PageDB } from "../../page-db/js/page-db.js";
+import { DB } from "../../db/js/db.js";
 
 class Editor{
     constructor(parentElem){
         // Fetch panel HTML and then setup everything up
-        this.pageDB = new PageDB();
+        this.DB = new DB("CODE_EDITOR");
 
-        this.shellTabsHandler = new TabsHandler(parentElem, ["HelloWorld.py"], false, true, true, (tabName, tabDiv) => {this.#initEditor(tabName, tabDiv)}, (tabName, tabDiv) => {this.#deleteEditor(tabName, tabDiv)});
+        // The tabs handler will remember the open tabs, their location, and what was clicked
+        this.shellTabsHandler = new TabsHandler(parentElem, [], false, true, true, (tabName, tabDiv) => {this.#initEditor(tabName, tabDiv)}, (tabName, tabDiv) => {this.#deleteEditor(tabName, tabDiv)});
     }
 
 
     #deleteEditor(tabName, tabDiv){
-        this.pageDB.deleteEditorFile(tabName);
+        this.DB.deleteEditorFile(tabName);
     }
 
 
@@ -21,12 +22,12 @@ class Editor{
         editor.setTheme("ace/theme/chrome");
         editor.session.setMode("ace/mode/python");
 
-        this.pageDB.getEditorFile(tabName, (data) => {
+        this.DB.getEditorFile(tabName, (data) => {
             editor.setValue(data, 1);
         });
 
         editor.session.on('change', (event) => {
-            this.pageDB.addEditorFile(editor.getValue(), tabName);
+            this.DB.addEditorFile(editor.getValue(), tabName);
         });
 
 

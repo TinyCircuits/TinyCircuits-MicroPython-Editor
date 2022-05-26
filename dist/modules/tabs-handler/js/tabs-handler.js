@@ -47,7 +47,9 @@ class TabsHandler{
                 }
 
                 // Click the first tab, could do this a more performant way but this is done once for first page load
-                this.headerDiv.children[0].children[0].click();
+                if(this.headerDiv.children.length > 0){
+                    this.headerDiv.children[0].children[0].click();
+                }
             }
         }
 

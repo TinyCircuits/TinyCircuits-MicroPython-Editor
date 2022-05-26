@@ -12,7 +12,7 @@
             <div id="divSpriteList" class="h-full border border-black rounded-md">
             </div>
         </div>
-        <div id="draggable" class="w-4 h-full flex items-center justify-center">
+        <div id="divSpriteDraggable" class="w-4 h-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hover:cursor-w-resize" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
             </svg>
@@ -20,14 +20,14 @@
         <div id="divSpriteEditorParent" class="flex-auto w-[85%] flex flex-col">
             <div class="h-full w-full">
                 <!-- Sprite Editor -->
-                <div id="divSpriteEditor" class="h-full border border-black rounded-md relative">
-                    <canvas id="canvasSpriteEditor" width="72" height="40" class="w-[72px] h-[40px] border border-black border-dashed absolute top-[0px] left-[0px]">
+                <div id="divSpriteEditor" class="h-full border border-black rounded-md relative overflow-hidden">
+                    <canvas id="canvasSpriteEditor" width="72" height="40" class="w-[72px] h-[40px] border border-black border-dashed absolute top-[0px] left-[0px] crisp-canvas">
 
                     </canvas>
                 </div>
             </div>
             <div class="h-10 w-full">
-                <div class="h-full flex justify-around items-center">
+                <div class="h-full flex justify-around items-center overflow-hidden">
 
                     <!-- Zoom in -->
                     <button title="Zoom in [keybind: ctrl + scroll wheel forwards/up]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">

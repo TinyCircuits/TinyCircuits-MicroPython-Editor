@@ -1,29 +1,18 @@
 
 
-class PageDB{
-    constructor(){
-        this.PAGE_DB_ID = "THUMBY";
-        this.PAGE_DB_VER = 1;
+class DB{
+    constructor(DB_ID){
+        this.DB_ID = DB_ID;
+        this.DB_VER = 1;
 
-        this.EDITOR_STORE_ID = "EDITOR_STORE";
-        this.EDITOR_STORE_INDEX = "EDITOR_FILES_INDEX";
-
-        this.EMULATOR_STORE_ID = "EMULATOR_STORE";
-        this.EMULATOR_STORE_INDEX = "EMULATOR_FLASH_INDEX";
-
-        // this.EDITOR_BUCKET_ID = "EDITOR_BUCKET";
-        // this.EDITOR_BUCKET_VER = 1;
-        // this.EDITOR_FILE_TERM = "EDITOR_TAB_PATH";
-
-        // this.EMULATOR_BUCKET_ID = "EMULATOR_BUCKET";
-        // this.EMULATOR_BUCKET_VER = 1;
-        // this.EMULATOR_FLASH_TERM = "EMULATOR_FLASH";
+        this.STORE_ID = DB_ID + "_STORE";
+        this.STORE_INDEX = DB_ID + "_INDEX";
     }
 
 
     #initDB(successCallback){
         // Open database for files and handle any errors
-        const request = indexedDB.open(this.PAGE_DB_ID, this.PAGE_DB_VER);
+        const request = indexedDB.open(this.DB_ID, this.DB_VER);
         request.onerror = (event) => {
             console.error(`Database error: ${event.target.errorCode}`);
         };
@@ -32,20 +21,12 @@ class PageDB{
         request.onupgradeneeded = (event) => {
             this.DB = event.target.result;
 
-            let editorStore = this.DB.createObjectStore(this.EDITOR_STORE_ID, {
-                autoIncrement: true
-            });
-
-            let emulatorStore = this.DB.createObjectStore(this.EMULATOR_STORE_ID, {
+            let editorStore = this.DB.createObjectStore(this.STORE_ID, {
                 autoIncrement: true
             });
        
 
-            editorStore.createIndex(this.EDITOR_STORE_INDEX, this.EDITOR_STORE_INDEX, {
-                unique: false
-            });
-
-            emulatorStore.createIndex(this.EMULATOR_STORE_INDEX, this.EMULATOR_STORE_INDEX, {
+            editorStore.createIndex(this.STORE_INDEX, this.STORE_INDEX, {
                 unique: false
             });
         };
@@ -162,31 +143,17 @@ class PageDB{
     }
 
 
-    addEditorFile(dataBuffer, term){
-        this.#addDBFile(dataBuffer, this.EDITOR_STORE_ID, this.EDITOR_STORE_INDEX, term);
+    addEditorFile(dataBuffer, name){
+        this.#addDBFile(dataBuffer, this.STORE_ID, this.STORE_INDEX, name);
     }
 
-    getEditorFile(term, successCallback){
-        return this.#getDBFile(successCallback, this.EDITOR_STORE_ID, this.EDITOR_STORE_INDEX, term);
+    getEditorFile(name, successCallback){
+        return this.#getDBFile(successCallback, this.STORE_ID, this.STORE_INDEX, name);
     }
 
-    deleteEditorFile(term){
-        this.#deleteDBFile(this.EDITOR_STORE_ID, this.EDITOR_STORE_INDEX, term);
-    }
-
-
-
-    addEmulatorFlash(dataBuffer, term){
-        this.#addDBFile(dataBuffer, this.EMULATOR_STORE_ID, this.EMULATOR_STORE_INDEX, term);
-    }
-
-    getEmulatorFlash(term, successCallback){
-        return this.#getDBFile(successCallback, this.EMULATOR_STORE_ID, this.EMULATOR_STORE_INDEX, term);
-    }
-
-    deleteEmulatorFlash(term){
-        this.#deleteDBFile(this.EMULATOR_STORE_ID, this.EMULATOR_STORE_INDEX, term);
+    deleteEditorFile(name){
+        this.#deleteDBFile(this.STORE_ID, this.STORE_INDEX, name);
     }
 }
 
-export { PageDB }
+export { DB }

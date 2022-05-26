@@ -3,6 +3,14 @@ import { Editor } from "../../../modules/editor/js/editor.js";
 import { Console } from "../../../modules/console/console.js";
 import { WorkspaceSelection } from "../../../modules/workspace-selection/workspace-selection.js";
 import { Projects } from "../../../modules/projects/projects.js";
+import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
+
+
+// Shows popup on page with error for user to interpret, must be defined at top
+// 'stack' should be a new Error().stack for reference if needed
+window.showError = (errorText) => {
+    console.trace(errorText);
+}
 
 
 let divLayout = document.getElementById("divLayout");
@@ -10,67 +18,26 @@ let divCode = document.getElementById("divCode");
 let divProjects = document.getElementById("divProjects");
 
 let layout = new Layout(divLayout);
-let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], ["btnSprite", ["divSprite"]], ["btnMusic", ["divMusic"]]]);
 let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", ["divThumbyConsole", "divRunOnThumby"]], ["btnBrowserConsole", ["divBrowserConsole", "divRunInBrowser"]]]);
 let editor = new Editor(divCode);
-let projects = new Projects(divProjects)
+let projects = new Projects(divProjects);
+let spriteEditor = new SpriteEditor();
+let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], 
+                                            ["btnSprite", ["divSprite"], () => {spriteEditor.shown = true;}, () => {spriteEditor.shown = false;}],
+                                            ["btnMusic", ["divMusic"]]]);
 
 
 let thumbyConsole = new Console(document.getElementById("divThumbyConsole"), "Thumby console\r\n");
 let browserConsole = new Console(document.getElementById("divBrowserConsole"), "Browser console\r\n");
 
 
+// projects.addProject("1");
+// projects.addProject("2");
+// projects.addProject("3");
+// projects.closeProject("2");
+
 
 document.getElementById("btnResetLayout").onclick = (event) => {
     layout.resetLayoutSize();
+    spriteEditor.resetLayoutSize();
 }
-
-
-
-// document.addEventListener("DOMContentLoaded", () => {
-
-//     document.getElementById("main").style.width = document.getElementById("DivLayout").clientWidth + "px";
-//     document.getElementById("main").style.height = document.getElementById("DivLayout").clientHeight + "px";
-
-//     var sizes = {
-//         "win1" : 0.125,
-//         "win5" : 0.75,
-//         "win7": 0.80
-//     };
-
-//     // Try to restore layout from localstorage
-//     let savedLayoutSizes = localStorage.getItem("LayoutSizes");
-//     if(savedLayoutSizes != null){
-//         Resizable.initialise("main", JSON.parse(savedLayoutSizes), 2);
-//     }else{
-//         Resizable.initialise("main", this.defaultSizes, 2);
-//     }
-
-// });
-
-// window.addEventListener("resize", () => {
-//     Resizable.activeContentWindows[0].changeSize(document.getElementById("DivLayout").clientWidth, document.getElementById("DivLayout").clientHeight);
-//     Resizable.activeContentWindows[0].childrenResize();
-// });
-
-// Resizable.windowResized = () => {
-//     this.thumbyConsole.fit();
-// }
-
-// Resizable.resizingStarted = () => {
-
-// }
-
-// Resizable.resizingEnded = () => {
-//     this.saveLayout();
-// }
-
-
-// let DivWorkspace = document.getElementById("DivWorkspace");
-// let DivSpriteList = document.getElementById("DivSpriteList");
-
-
-
-// let editor = new Editor(DivWorkspace);
-
-// let spriteList = new SpriteList(DivSpriteList);

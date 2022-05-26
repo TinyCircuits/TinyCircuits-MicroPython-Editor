@@ -11,9 +11,11 @@ class WorkspaceSelection{
 
         for (let ibx=0; ibx<this.btnDivNameListList.length; ibx++) {
             let btn = document.getElementById(this.btnDivNameListList[ibx][0]);
+            let shownCallback = this.btnDivNameListList[ibx][2];
+            let hiddenCallback = this.btnDivNameListList[ibx][3];
             this.localStorageKey += this.btnDivNameListList[ibx][0];
 
-            let entry = [btn, []];
+            let entry = [btn, [], shownCallback, hiddenCallback];
             for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
                 this.localStorageKey += this.btnDivNameListList[ibx][1][idx];
                 entry[1].push(document.getElementById(this.btnDivNameListList[ibx][1][idx]));
@@ -25,6 +27,11 @@ class WorkspaceSelection{
                     this.entryDictList[iex][0].style.backgroundColor = null;
                     this.entryDictList[iex][0].style.fill = null;
                     this.entryDictList[iex][0].style.color = null;
+
+                    // Call the hidden callback
+                    if(this.entryDictList[iex][3] != undefined){
+                        this.entryDictList[iex][3]();
+                    }
 
                     for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
                         this.entryDictList[iex][1][idx].classList.add("invisible");
@@ -40,6 +47,11 @@ class WorkspaceSelection{
                 for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
                     entry[1][idx].classList.remove("invisible");
                     entry[1][idx].style.zIndex = 10;
+                }
+
+                // Call the shown callback
+                if(entry[2] != undefined){
+                    entry[2]();
                 }
 
                 localStorage.setItem(this.localStorageKey + "lastClickedBtnID", event.currentTarget.id);

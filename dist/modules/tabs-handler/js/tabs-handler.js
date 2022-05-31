@@ -53,7 +53,7 @@ class TabsHandler{
             }
         }
 
-        this.#AddAddButton();
+        this.#addAddButton();
 
         // Don't let tab handlers that float right to move tabs, simply not setup for it
         if(floatRight == false){
@@ -154,7 +154,7 @@ class TabsHandler{
     }
 
 
-    #AddAddButton(){
+    #addAddButton(){
         if(this.showAddButton){
             this.addButton = document.getElementById(this.parentDiv.id + "AddButton");
 
@@ -170,10 +170,7 @@ class TabsHandler{
                 `;
 
                 this.addButton.onclick = (event) => {
-                    this.#addTabDiv("Untitled");
-                    this.headerDiv.removeChild(this.addButton);
-                    this.headerDiv.children[this.headerDiv.children.length-1].children[0].click();
-                    this.headerDiv.appendChild(this.addButton);
+                    this.addTab("Untitled");
                 }
                 this.headerDiv.appendChild(this.addButton);
             }
@@ -183,14 +180,14 @@ class TabsHandler{
 
     // Brute-force update list of tab names that can be restored
     #updateRestorableTabs(){
-        let tabNames = [];
-        for (let i = 0; i < this.headerDiv.children.length; i++){
-            let tabButton = this.headerDiv.children[i].children[0];
-            if(tabButton != undefined && this.headerDiv.children[i].id != this.parentDiv.id + "AddButton"){
-                tabNames.push(tabButton.textContent);
-            }
-        }
-        localStorage.setItem(this.parentDiv.id + "RestorableTabIDs", JSON.stringify(tabNames));
+        // let tabNames = [];
+        // for (let i = 0; i < this.headerDiv.children.length; i++){
+        //     let tabButton = this.headerDiv.children[i].children[0];
+        //     if(tabButton != undefined && this.headerDiv.children[i].id != this.parentDiv.id + "AddButton"){
+        //         tabNames.push(tabButton.textContent);
+        //     }
+        // }
+        // localStorage.setItem(this.parentDiv.id + "RestorableTabIDs", JSON.stringify(tabNames));
     }
 
 
@@ -228,10 +225,15 @@ class TabsHandler{
     #addTabDiv(name){
         let newTabIndex = 0;
         if(document.getElementById(this.parentDiv.id + "TabButton" + name) != null){
-            while(document.getElementById(this.parentDiv.id + "TabButton" + name + newTabIndex) != null){
-                newTabIndex++;
+            if(name.indexOf("Untitled") != -1){
+                while(document.getElementById(this.parentDiv.id + "TabButton" + name + newTabIndex) != null){
+                    newTabIndex++;
+                }
+                name = name + newTabIndex;
+            }else{
+                window.showError("This tab (" + name + ") is already open");
+                return;
             }
-            name = name + newTabIndex;
         }
 
         // Each tab has a container for the tab and close buttons
@@ -254,7 +256,7 @@ class TabsHandler{
         newTabDiv.id = this.parentDiv.id + "TabDiv" + name;
         this.parentDiv.appendChild(newTabDiv);
 
-        // New tab, update list of tabs that can be restore don page refresh
+        // New tab, update list of tabs that can be restored on page refresh
         this.#updateRestorableTabs();
 
         // If the close button should be shown for this group, setup it each time a tab is added
@@ -268,14 +270,6 @@ class TabsHandler{
             </svg>
             `;
             newTabContainerDiv.appendChild(newTabCloseButton);
-
-            // Change close button opacity on tab container focus
-            // newTabContainerDiv.onmouseover = (event) => {
-            //     newTabCloseButton.style.opacity = 1.0;
-            // }
-            // newTabContainerDiv.onmouseout = (event) => {
-            //     newTabCloseButton.style.opacity = 0.1;
-            // }
 
             // Remove this tab on close and update tabs that can be restored
             newTabCloseButton.onclick = (event) => {
@@ -299,7 +293,7 @@ class TabsHandler{
             newTabDiv.style.visibility = "visible";
         }
 
-        this.onTabCreate(name, newTabDiv);
+        return this.onTabCreate(name, newTabDiv);
     }
 
 
@@ -307,6 +301,16 @@ class TabsHandler{
     getTabDiv(name){
         let tabDivID = this.parentDiv.id + "TabDiv" + name;
         return document.getElementById(tabDivID);
+    }
+
+
+    // Tab tab with specific name
+    addTab(name){
+        let item = this.#addTabDiv(name);
+        this.headerDiv.removeChild(this.addButton);
+        this.headerDiv.children[this.headerDiv.children.length-1].children[0].click();
+        this.headerDiv.appendChild(this.addButton);
+        return item;
     }
 }
 

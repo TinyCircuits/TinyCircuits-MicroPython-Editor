@@ -1,18 +1,17 @@
 import { TabsHandler } from "../../tabs-handler/js/tabs-handler.js";
-import { DB } from "../../db/js/db.js";
 
 class Editor{
     constructor(parentElem){
         // Fetch panel HTML and then setup everything up
-        this.DB = new DB("CODE_EDITOR");
+        // this.DB = new DB("CODE_EDITOR");
 
         // The tabs handler will remember the open tabs, their location, and what was clicked
-        this.shellTabsHandler = new TabsHandler(parentElem, [], false, true, true, (tabName, tabDiv) => {this.#initEditor(tabName, tabDiv)}, (tabName, tabDiv) => {this.#deleteEditor(tabName, tabDiv)});
+        this.shellTabsHandler = new TabsHandler(parentElem, [], false, true, true, (tabName, tabDiv) => {return this.#initEditor(tabName, tabDiv)}, (tabName, tabDiv) => {this.#closeEditor(tabName, tabDiv)});
     }
 
 
-    #deleteEditor(tabName, tabDiv){
-        this.DB.deleteEditorFile(tabName);
+    #closeEditor(tabName, tabDiv){
+        // this.DB.deleteEditorFile(tabName);
     }
 
 
@@ -22,13 +21,15 @@ class Editor{
         editor.setTheme("ace/theme/chrome");
         editor.session.setMode("ace/mode/python");
 
-        this.DB.getEditorFile(tabName, (data) => {
-            editor.setValue(data, 1);
-        });
+        // this.DB.getEditorFile(tabName, (data) => {
+        //     editor.setValue(data, 1);
+        // });
 
-        editor.session.on('change', (event) => {
-            this.DB.addEditorFile(editor.getValue(), tabName);
-        });
+        // editor.session.on('change', (event) => {
+        //     this.DB.addEditorFile(editor.getValue(), tabName);
+        // });
+
+        return editor;
 
 
         // Paste special getting started code if first time loading page
@@ -42,8 +43,8 @@ class Editor{
     }
 
 
-    addTab(){
-        this.shellTabsHandler.addButton.click();
+    addTab(name){
+        return this.shellTabsHandler.addTab(name);
     }
 }
 

@@ -19,7 +19,7 @@ let divProjects = document.getElementById("divProjects");
 
 let layout = new Layout(divLayout);
 let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", ["divThumbyConsole", "divRunOnThumby"]], ["btnBrowserConsole", ["divBrowserConsole", "divRunInBrowser"]]]);
-let editor = new Editor(divCode);
+// let editor = new Editor(divCode);
 let projects = new Projects(divProjects);
 let spriteEditor = new SpriteEditor();
 let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], 

@@ -92,6 +92,8 @@ class DB{
             query.onsuccess = (event) => {
                 if(query.result != undefined){
                     successCallback(query.result.data);
+                }else{
+                    successCallback(undefined);
                 }
             };
 
@@ -143,15 +145,15 @@ class DB{
     }
 
 
-    addEditorFile(dataBuffer, name){
+    addFile(dataBuffer, name){
         this.#addDBFile(dataBuffer, this.STORE_ID, this.STORE_INDEX, name);
     }
 
-    getEditorFile(name, successCallback){
+    getFile(name, successCallback){
         return this.#getDBFile(successCallback, this.STORE_ID, this.STORE_INDEX, name);
     }
 
-    deleteEditorFile(name){
+    deleteFile(name){
         this.#deleteDBFile(this.STORE_ID, this.STORE_INDEX, name);
     }
 }

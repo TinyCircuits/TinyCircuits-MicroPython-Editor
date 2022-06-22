@@ -1,5 +1,5 @@
 class Row{
-    constructor(text, parent, isFolder, isOpened, project, codeEditor){
+    constructor(text, parent, isFolder, isOpened, project, codeEditor, insertBeforeElement){
         // Each row gets text, parent row, flag for being a folder, and children
         this.text = text;
         this.parent = parent;
@@ -57,9 +57,13 @@ class Row{
             this.parentCount = this.parent.parentCount + 1;
             this.isRoot = false;
 
-            // Div that contains the main row being added as well as room to expand as a parent
+            // Div that contains the main row being added as well as room to expand as a parent (make sure file rows are placed before folder rows)
             this.rowExpanderDiv.classList = "min-w-full, min-h-fit flex flex-col";
-            this.parent.rowExpanderDiv.appendChild(this.rowExpanderDiv);
+            if(insertBeforeElement != undefined){
+                this.parent.rowExpanderDiv.insertBefore(this.rowExpanderDiv, insertBeforeElement);
+            }else{
+                this.parent.rowExpanderDiv.appendChild(this.rowExpanderDiv);
+            }
 
             // Setup row and make sure bg changes on hover
             this.rowDiv.classList = "min-w-full h-6 bg-gray-200 cursor-pointer";
@@ -121,20 +125,6 @@ class Row{
             return path;
         }
     }
-
-
-    // #generatePath(text){
-    //     if(!this.isRoot){
-    //         let path = text;
-
-    //         let tempParent = this.parent;
-    //         while(tempParent.parent != undefined){
-    //             path = tempParent.text + "/" + path;
-    //             tempParent = tempParent.parent;
-    //         }
-    //         return path;
-    //     }
-    // }
 
 
     // Opens the file contents if really a file
@@ -220,7 +210,18 @@ class Row{
     // Add a child to this row and make this row into a parent/folder
     // row as long as this is not a file
     addChild(text, isFolder=true, isOpened=false){
-        let child = new Row(text, this, isFolder, isOpened, this.project, this.codeEditor);
+        // Find the first folder element so that file rows can be placed before it
+        let firstFolderElement = undefined;
+        if(isFolder == false){
+            for(let icx=0; icx<this.childRows.length; icx++){
+                if(this.childRows[icx].isFolder){
+                    firstFolderElement = this.childRows[icx].rowExpanderDiv;
+                    break;
+                }
+            }
+        }
+
+        let child = new Row(text, this, isFolder, isOpened, this.project, this.codeEditor, firstFolderElement);
         this.childRows.push(child);
         this.project.saveProjectStructure();
         return child;

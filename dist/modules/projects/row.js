@@ -10,7 +10,7 @@ class Row{
 
         // File contents need to have a unique key to get files from the passed project
         // and its database. Create a key based on the file's path to the project root
-        this.filePath = this.#generateFilePath(text);
+        this.filePath = this.#getPath() + text;
 
         // Only for use on rows that are not folders and is used to fetch
         // this rows file contents and open in external editor
@@ -109,17 +109,32 @@ class Row{
     }
 
 
-    #generateFilePath(text){
-        if(!this.isRoot && !this.parent.isRoot && !this.isFolder){
-            let filePath = text;
+    #getPath(){
+        if(!this.isRoot){
+            let path = "";
+
             let tempParent = this.parent;
             while(tempParent.parent != undefined){
-                filePath = tempParent.text + "/" + filePath;
+                path = tempParent.text + "/" + path;
                 tempParent = tempParent.parent;
             }
-            return filePath;
+            return path;
         }
     }
+
+
+    // #generatePath(text){
+    //     if(!this.isRoot){
+    //         let path = text;
+
+    //         let tempParent = this.parent;
+    //         while(tempParent.parent != undefined){
+    //             path = tempParent.text + "/" + path;
+    //             tempParent = tempParent.parent;
+    //         }
+    //         return path;
+    //     }
+    // }
 
 
     // Opens the file contents if really a file
@@ -277,21 +292,26 @@ class Row{
         `
         this.renameButton.onclick = (event) => {
             window.inputDialog("New name:", this.text, (text) => {
-                let filePath = this.#generateFilePath(text);
+                // Generate a file path based on the new name and check if it exists already in the project
+                let filePath = this.#getPath() + text;
                 if(this.project.doesPathExist(filePath) == false){
+                    // Set this row's text and visible text
                     this.text = text;
                     this.textDiv.textContent = this.text;
 
+                    // Get this file's contents using the old project's file path and replace everything under the new path
                     this.project.DB.getFile(this.filePath, (data) => {
                         this.project.DB.deleteFile(this.filePath);
                         
                         this.filePath = filePath;
                         this.project.DB.addFile(data, this.filePath);
 
+                        // Change the linked code editors path (which in turn changes the code editor tab visible text)
                         if(this.codeEditorTab){
                             this.codeEditorTab.changeFilePath(this.filePath);
                         }
 
+                        // Save all changes to local storage for reconstruction on page reload
                         this.project.saveProjectStructure();
                     });
                 }else{
@@ -310,6 +330,16 @@ class Row{
                 <span>Add File</span>
             </button>
             `
+            this.addFileButton.onclick = (event) => {
+                window.inputDialog("New file name:", "NewFile.py", (text) => {
+                    // Check if path exists, if not, create new file under this folder
+                    if(this.project.doesPathExist(this.#getPath() + this.text + "/" + text) == false){
+                        this.addChild(text, false, false);
+                    }else{
+                        window.showError("This file already exists, did not create");
+                    }
+                });
+            }
             this.divOptionsDropdown.appendChild(this.addFileButton);
 
             this.addFolderButton = document.createElement("button");
@@ -318,6 +348,16 @@ class Row{
                 <span>Add Folder</span>
             </button>
             `
+            this.addFolderButton.onclick = (event) => {
+                window.inputDialog("New folder name:", "NewFolder", (text) => {
+                    // Check if path exists, if not, create new file under this folder
+                    if(this.project.doesPathExist(this.#getPath() + this.text + "/" + text) == false){
+                        this.addChild(text, true, false);
+                    }else{
+                        window.showError("This folder already exists, did not create");
+                    }
+                });
+            }
             this.divOptionsDropdown.appendChild(this.addFolderButton);
         }
 

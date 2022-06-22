@@ -6,13 +6,6 @@ import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
 import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
 
 
-// Shows popup on page with error for user to interpret, must be defined at top
-// 'stack' should be a new Error().stack for reference if needed
-window.showError = (errorText) => {
-    console.trace(errorText);
-}
-
-
 let divLayout = document.getElementById("divLayout");
 
 let layout = new Layout(divLayout);

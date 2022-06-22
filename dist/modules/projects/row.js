@@ -287,7 +287,7 @@ class Row{
 
         this.renameButton = document.createElement("button");
         this.renameButton.innerHTML = `
-        <button class="rounded-t-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
             <span>Rename</span>
         </button>
         `
@@ -362,22 +362,23 @@ class Row{
             this.divOptionsDropdown.appendChild(this.addFolderButton);
         }
 
+        if(this.parent.isRoot == false){
+            this.copyButton = document.createElement("button");
+            this.copyButton.innerHTML = `
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Copy</span>
+            </button>
+            `
+            this.divOptionsDropdown.appendChild(this.copyButton);
 
-        this.copyButton = document.createElement("button");
-        this.copyButton.innerHTML = `
-        <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-            <span>Copy</span>
-        </button>
-        `
-        this.divOptionsDropdown.appendChild(this.copyButton);
-
-        this.cutButton = document.createElement("button");
-        this.cutButton.innerHTML = `
-        <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-            <span>Cut</span>
-        </button>
-        `
-        this.divOptionsDropdown.appendChild(this.cutButton);
+            this.cutButton = document.createElement("button");
+            this.cutButton.innerHTML = `
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Cut</span>
+            </button>
+            `
+            this.divOptionsDropdown.appendChild(this.cutButton);
+        }
 
         this.pasteButton = document.createElement("button");
         this.pasteButton.innerHTML = `
@@ -388,13 +389,18 @@ class Row{
         this.divOptionsDropdown.appendChild(this.pasteButton);
 
 
-        this.deleteButton = document.createElement("button");
-        this.deleteButton.innerHTML = `
-        <button class="rounded-b-md border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-            <span>Delete</span>
-        </button>
-        `
-        this.divOptionsDropdown.appendChild(this.deleteButton);
+        if(this.parent.isRoot == false){
+            this.deleteButton = document.createElement("button");
+            this.deleteButton.innerHTML = `
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Delete</span>
+            </button>
+            `
+            this.deleteButton.onclick = (event) => {
+                this.#delete();
+            }
+            this.divOptionsDropdown.appendChild(this.deleteButton);
+        }
 
         // Set tracking flag used to prohibit removing 
         // a second time if the cursor flies past both
@@ -402,6 +408,32 @@ class Row{
 
         // Keep the row highlighted for now
         this.rowDiv.style.filter = "brightness(85%)";
+    }
+
+
+    // Removes row from parent childRows, removes HTML, remove DB file, and close code editor tab if it exists
+    #delete(){
+        window.confirm("Are you sure you want to delete this? It will not be recoverable in any way", () => {
+            if(this.codeEditorTab){
+                this.codeEditorTab.close();
+            }
+    
+            this.project.DB.deleteFile(this.filePath);
+    
+            this.parent.rowExpanderDiv.removeChild(this.rowExpanderDiv);
+    
+            // Find this row in the parent's childRows and remove it
+            for(let icx=0; icx<this.parent.childRows.length; icx++){
+                if(this.parent.childRows[icx].filePath == this.filePath){
+                    this.parent.childRows.remove(icx);
+                    break;
+                }
+            }
+    
+            this.#hideOptionsDropdown();
+    
+            this.project.saveProjectStructure();
+        });
     }
 
 

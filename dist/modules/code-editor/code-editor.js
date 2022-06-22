@@ -1,9 +1,11 @@
 class Tab{
-    constructor(tabManager, tabHeaderDiv, divCodeEditorParent, filePath, data){
+    constructor(tabManager, tabHeaderDiv, divCodeEditorParent, filePath, data, tabIndex){
         this.tabManager = tabManager;
         this.tabHeaderDiv = tabHeaderDiv;
         this.divCodeEditorParent = divCodeEditorParent;
         this.filePath = filePath;
+
+        this.selected = false;
 
         console.log("File data at tab:", data);
 
@@ -14,10 +16,35 @@ class Tab{
         this.#addTabHTML();
         this.#initEditor(data);
         
+        this.#restoreFromTabData();
+
+        if(this.tabIndex == undefined || this.tabIndex == null){
+            this.tabIndex = tabIndex;
+            this.#saveTabData();
+        }
+    }
+
+
+    #saveTabData(){
+        localStorage.setItem("tabData" + this.filePath, JSON.stringify({
+            selected: this.selected,
+            tabIndex: this.tabIndex
+        }));
+    }
+
+
+    #restoreFromTabData(){
         // Each tab has a unique ID that's the filepath, store persistent data like last selected tab under that
-        let selected = localStorage.getItem("tabSelected" + this.filePath);
-        if(selected != null && selected == "true"){
-            this.select();
+        let tabData = JSON.parse(localStorage.getItem("tabData" + this.filePath));
+        
+        if(tabData != null){
+            this.tabIndex = tabData["tabIndex"];
+
+            if(tabData["selected"] == true){
+                this.select();
+            }else{
+                this.unselect();
+            }
         }else{
             this.unselect();
         }
@@ -44,11 +71,17 @@ class Tab{
             }
         }
 
+        // Destroy ace editor and remove tab HTML
         this.editor.destroy();
         this.tabHeaderDiv.removeChild(this.divTab);
         this.divCodeEditorParent.removeChild(this.divEditor);
 
+        // Call the callback for when a tab closes
         this.onClose();
+
+        // Make sure to save an undefined value so it won't resume position from saved
+        this.tabIndex = undefined;
+        this.#saveTabData();
     }
 
 
@@ -59,9 +92,10 @@ class Tab{
         this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] border border-x-black px-1 flex flex-row justify-center items-center";
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-white duration-100";
         this.divEditor.classList.remove("invisible");
-        localStorage.setItem("tabSelected" + this.filePath, true);
 
         this.selected = true;
+
+        this.#saveTabData();
     }
 
     
@@ -69,9 +103,22 @@ class Tab{
         this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] border border-black px-1 flex flex-row justify-center items-center bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200";
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-black duration-100";
         this.divEditor.classList.add("invisible");
-        localStorage.setItem("tabSelected" + this.filePath, false);
 
         this.selected = false;
+
+        this.#saveTabData();
+    }
+
+
+    // Changing the file path changes the name shown in the tab (used by project rows on rename)
+    changeFilePath(filePath){
+        localStorage.removeItem("tabData" + this.filePath);
+
+        this.filePath = filePath;
+        this.divTab.title = this.filePath;
+        this.divText.innerText = this.filePath.slice(this.filePath.lastIndexOf("/")+1);
+
+        this.#saveTabData();
     }
     
 
@@ -145,6 +192,17 @@ class TabManager{
     }
 
 
+    // Re-sorts tabs from left to right by tabIndex
+    sortTabs(){
+        this.tabs = this.tabs.sort((a, b) => {
+            return a.tabIndex - b.tabIndex;
+        })
+        for(let itx=0; itx<this.tabs.length; itx++){
+            this.tabHeaderDiv.appendChild(this.tabs[itx].divTab);
+        }
+    }
+
+
     addTab(filePath, data){
         for(let itx=0; itx<this.tabs.length; itx++){
             if(this.tabs[itx].filePath == filePath){
@@ -152,8 +210,17 @@ class TabManager{
                 return undefined;
             }
         }
-        let newTab = new Tab(this, this.tabHeaderDiv, this.divCodeEditorParent, filePath, data);
+
+        let tabIndex = 0;
+        if(this.tabs.length > 0){
+            tabIndex = this.tabs[this.tabs.length-1].tabIndex+1;
+        }
+
+        let newTab = new Tab(this, this.tabHeaderDiv, this.divCodeEditorParent, filePath, data, tabIndex);
         this.tabs.push(newTab);
+
+        this.sortTabs();
+
         return newTab;
     }
 }
@@ -166,8 +233,8 @@ class CodeEditor{
         this.tabManager = new TabManager(this.divCodeEditor);
     }
 
-    openFile(filePath, data){
-        return this.tabManager.addTab(filePath, data);
+    openFile(filePath, data, tabIndex){
+        return this.tabManager.addTab(filePath, data, tabIndex);
     }
 }
 

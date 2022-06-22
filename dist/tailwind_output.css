@@ -610,12 +610,32 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 6px;
 }
 
+.right-1 {
+  right: 0.25rem;
+}
+
+.top-1 {
+  top: 0.25rem;
+}
+
 .z-20 {
   z-index: 20;
 }
 
+.z-30 {
+  z-index: 30;
+}
+
+.z-40 {
+  z-index: 40;
+}
+
 .z-\[100000\] {
   z-index: 100000;
+}
+
+.m-auto {
+  margin: auto;
 }
 
 .ml-4 {
@@ -714,18 +734,22 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 37px;
 }
 
-.h-\[23px\] {
-  height: 23px;
+.h-fit {
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.h-\[25px\] {
+  height: 25px;
 }
 
 .h-\[15px\] {
   height: 15px;
 }
 
-.h-fit {
-  height: -webkit-fit-content;
-  height: -moz-fit-content;
-  height: fit-content;
+.h-\[23px\] {
+  height: 23px;
 }
 
 .min-h-full {
@@ -806,14 +830,22 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 12rem;
 }
 
-.w-fit {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
+.w-\[300px\] {
+  width: 300px;
+}
+
+.w-\[100\%\] {
+  width: 100%;
 }
 
 .w-\[15px\] {
   width: 15px;
+}
+
+.w-fit {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
 }
 
 .w-6 {
@@ -917,6 +949,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-width: 1px;
 }
 
+.border-2 {
+  border-width: 2px;
+}
+
 .border-l {
   border-left-width: 1px;
 }
@@ -983,12 +1019,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   fill: inherit;
 }
 
-.fill-stone-400 {
-  fill: #a8a29e;
-}
-
 .fill-black {
   fill: #000;
+}
+
+.fill-stone-400 {
+  fill: #a8a29e;
 }
 
 .stroke-white {
@@ -1001,6 +1037,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .p-1 {
   padding: 0.25rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-\[10px\] {
+  padding: 10px;
 }
 
 .px-1 {
@@ -1025,6 +1069,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .outline {

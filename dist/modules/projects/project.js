@@ -29,8 +29,8 @@ class Project{
     // Recursively get the project structure as a dict of names of folders/files
     #getProjectHierarchy(row, dict){
         for(let icx=0; icx<row.childRows.length; icx++){
-            dict[row.childRows[icx].text] = [row.childRows[icx].isFolder, row.childRows[icx].isOpened, {}];
-            this.#getProjectHierarchy(row.childRows[icx], dict[row.childRows[icx].text][2]);
+            dict[row.childRows[icx].text] = [row.childRows[icx].isFolder, row.childRows[icx].isOpened, {}];    // Persistent project row/tab data gets added here
+            this.#getProjectHierarchy(row.childRows[icx], dict[row.childRows[icx].text][2]);    // Persistent project edit this
         }
     }
 
@@ -38,8 +38,8 @@ class Project{
     // Recursively re-add each row of the project
     #restoreProjectHierarchy(row, dict){
         for (const [name, childrenDict] of Object.entries(dict)) {
-            let newRow = row.addChild(name, childrenDict[0], childrenDict[1]);
-            this.#restoreProjectHierarchy(newRow, childrenDict[2]);
+            let newRow = row.addChild(name, childrenDict[0], childrenDict[1]); // Persistent project edit this
+            this.#restoreProjectHierarchy(newRow, childrenDict[2]);            // Persistent project edit this
         }
     }
 
@@ -62,7 +62,7 @@ class Project{
 
         // Restore from saved if available
         if(hierarchy != null){
-            this.#restoreProjectHierarchy(this.projectRow, hierarchy[this.projectName][2]);
+            this.#restoreProjectHierarchy(this.projectRow, hierarchy[this.projectName][2]); // Persistent project edit this
         }
 
         // Save the project structure even if already saved to
@@ -84,6 +84,23 @@ class Project{
         let newRow = this.projectRow.addChild(fileName);
         this.saveProjectStructure();
         return newRow;
+    }
+
+
+    // Goes through every entry and checks if the passed filePath exists in the project already
+    doesPathExist(filePath, row){
+        if(row == undefined){
+            return this.doesPathExist(filePath, this.rootRow);
+        }else{
+            for(let icx=0; icx<row.childRows.length; icx++){
+                if(filePath == row.childRows[icx].filePath){
+                    return true;
+                }else if(this.doesPathExist(filePath, row.childRows[icx])){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 

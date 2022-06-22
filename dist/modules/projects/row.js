@@ -10,14 +10,7 @@ class Row{
 
         // File contents need to have a unique key to get files from the passed project
         // and its database. Create a key based on the file's path to the project root
-        if(!this.isRoot && !this.parent.isRoot && !this.isFolder){
-            this.filePath = this.text;
-            let tempParent = this.parent;
-            while(tempParent.parent != undefined){
-                this.filePath = tempParent.text + "/" + this.filePath;
-                tempParent = tempParent.parent;
-            }
-        }
+        this.filePath = this.#generateFilePath(text);
 
         // Only for use on rows that are not folders and is used to fetch
         // this rows file contents and open in external editor
@@ -116,6 +109,19 @@ class Row{
     }
 
 
+    #generateFilePath(text){
+        if(!this.isRoot && !this.parent.isRoot && !this.isFolder){
+            let filePath = text;
+            let tempParent = this.parent;
+            while(tempParent.parent != undefined){
+                filePath = tempParent.text + "/" + filePath;
+                tempParent = tempParent.parent;
+            }
+            return filePath;
+        }
+    }
+
+
     // Opens the file contents if really a file
     #openFileContents(select){
         if(!this.isRoot && !this.parent.isRoot && !this.isFolder){
@@ -123,7 +129,6 @@ class Row{
 
             // Set flag and make sure state/structure is saved
             this.isOpened = true;
-            this.project.saveProjectStructure();
 
             this.project.DB.getFile(this.filePath, (data) => {
                 console.log("File data:", data);
@@ -146,6 +151,8 @@ class Row{
                 if(select){
                     this.codeEditorTab.select();
                 }
+
+                this.project.saveProjectStructure();
             });
 
             console.log(this.filePath);
@@ -268,6 +275,30 @@ class Row{
             <span>Rename</span>
         </button>
         `
+        this.renameButton.onclick = (event) => {
+            window.inputDialog("New name:", this.text, (text) => {
+                let filePath = this.#generateFilePath(text);
+                if(this.project.doesPathExist(filePath) == false){
+                    this.text = text;
+                    this.textDiv.textContent = this.text;
+
+                    this.project.DB.getFile(this.filePath, (data) => {
+                        this.project.DB.deleteFile(this.filePath);
+                        
+                        this.filePath = filePath;
+                        this.project.DB.addFile(data, this.filePath);
+
+                        if(this.codeEditorTab){
+                            this.codeEditorTab.changeFilePath(this.filePath);
+                        }
+
+                        this.project.saveProjectStructure();
+                    });
+                }else{
+                    window.showError("Did not rename, that file path already exists");
+                }
+            });
+        }
         this.divOptionsDropdown.appendChild(this.renameButton);
 
 

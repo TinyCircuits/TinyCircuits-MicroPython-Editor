@@ -1087,6 +1087,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   opacity: 0.6;
 }
 
+.opacity-70 {
+  opacity: 0.7;
+}
+
 .outline {
   outline-style: solid;
 }

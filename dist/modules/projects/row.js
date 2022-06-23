@@ -10,7 +10,7 @@ class Row{
 
         // File contents need to have a unique key to get files from the passed project
         // and its database. Create a key based on the file's path to the project root
-        this.filePath = this.#getPath() + text;
+        this.filePath = this.getPath() + text;
 
         // Only for use on rows that are not folders and is used to fetch
         // this rows file contents and open in external editor
@@ -27,6 +27,7 @@ class Row{
 
         // The actual div contained in the expander row
         this.rowDiv = document.createElement("div");
+        this.rowDiv.disabled = false;
         this.rowExpanderDiv.appendChild(this.rowDiv);
 
 
@@ -65,17 +66,21 @@ class Row{
                 this.parent.rowExpanderDiv.appendChild(this.rowExpanderDiv);
             }
 
-            // Setup row and make sure bg changes on hover
+            // Setup row and make sure bg changes on hover (also set when project sets rows to disabled)
             this.rowDiv.classList = "min-w-full h-6 bg-gray-200 cursor-pointer";
             this.rowDiv.onmouseenter = (event) => {
-                this.rowDiv.classList.remove("bg-gray-200");
-                this.rowDiv.classList.add("bg-gray-300");
-                this.optionsDiv.classList.remove("invisible");
+                if(this.rowDiv.disabled == false){
+                    this.rowDiv.classList.remove("bg-gray-200");
+                    this.rowDiv.classList.add("bg-gray-300");
+                    this.optionsDiv.classList.remove("invisible");
+                }
             }
             this.rowDiv.onmouseleave = (event) => {
-                this.rowDiv.classList.remove("bg-gray-300");
-                this.rowDiv.classList.add("bg-gray-200");
-                this.optionsDiv.classList.add("invisible");
+                if(this.rowDiv.disabled == false){
+                    this.rowDiv.classList.remove("bg-gray-300");
+                    this.rowDiv.classList.add("bg-gray-200");
+                    this.optionsDiv.classList.add("invisible");
+                }
             }
 
             // Icon div can be a folder or file depending on flag
@@ -113,7 +118,7 @@ class Row{
     }
 
 
-    #getPath(){
+    getPath(){
         if(!this.isRoot){
             let path = "";
 
@@ -136,28 +141,33 @@ class Row{
             this.isOpened = true;
 
             this.project.DB.getFile(this.filePath, (data) => {
-                console.log("File data:", data);
-                let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);
 
-                // Check that a tab was actually created, if it already existed then it may not have been
-                if(tempCodeEditorTab != undefined){
-                    this.codeEditorTab = tempCodeEditorTab;
+                if(typeof data == "string" || typeof data == "undefined"){
+                    console.log("File data:", data);
+                    let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);
 
-                    this.codeEditorTab.onSave = (data) => {
-                        this.project.DB.addFile(data, this.filePath);
+                    // Check that a tab was actually created, if it already existed then it may not have been
+                    if(tempCodeEditorTab != undefined){
+                        this.codeEditorTab = tempCodeEditorTab;
+
+                        this.codeEditorTab.onSave = (data) => {
+                            this.project.DB.addFile(data, this.filePath);
+                        }
+
+                        this.codeEditorTab.onClose = () => {
+                            this.isOpened = false;
+                            this.project.saveProjectStructure();
+                        }
                     }
 
-                    this.codeEditorTab.onClose = () => {
-                        this.isOpened = false;
-                        this.project.saveProjectStructure();
+                    if(select){
+                        this.codeEditorTab.select();
                     }
-                }
 
-                if(select){
-                    this.codeEditorTab.select();
+                    this.project.saveProjectStructure();
+                }else{
+                    window.showError("Could not open this file in a code editor...");
                 }
-
-                this.project.saveProjectStructure();
             });
 
             console.log(this.filePath);
@@ -241,7 +251,7 @@ class Row{
 
     #rename(text){
         // Generate a file path based on the new name and check if it exists already in the project
-        let filePath = this.#getPath() + text;
+        let filePath = this.getPath() + text;
         if(this.project.doesPathExist(filePath) == false){
             // Set this row's text and visible text
             this.text = text;
@@ -346,41 +356,41 @@ class Row{
 
         // If folder, it gets extra button to add file
         if(this.isFolder){
-            this.addFileButton = document.createElement("button");
-            this.addFileButton.innerHTML = `
+            this.newFileButton = document.createElement("button");
+            this.newFileButton.innerHTML = `
             <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Add File</span>
+                <span>New File</span>
             </button>
             `
-            this.addFileButton.onclick = (event) => {
+            this.newFileButton.onclick = (event) => {
                 window.inputDialog("New file name:", "NewFile.py", (text) => {
                     // Check if path exists, if not, create new file under this folder
-                    if(this.project.doesPathExist(this.#getPath() + this.text + "/" + text) == false){
+                    if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
                         this.addChild(text, false, false);
                     }else{
                         window.showError("This file already exists, did not create");
                     }
                 });
             }
-            this.divOptionsDropdown.appendChild(this.addFileButton);
+            this.divOptionsDropdown.appendChild(this.newFileButton);
 
-            this.addFolderButton = document.createElement("button");
-            this.addFolderButton.innerHTML = `
+            this.newFolderButton = document.createElement("button");
+            this.newFolderButton.innerHTML = `
             <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Add Folder</span>
+                <span>New Folder</span>
             </button>
             `
-            this.addFolderButton.onclick = (event) => {
+            this.newFolderButton.onclick = (event) => {
                 window.inputDialog("New folder name:", "NewFolder", (text) => {
                     // Check if path exists, if not, create new file under this folder
-                    if(this.project.doesPathExist(this.#getPath() + this.text + "/" + text) == false){
+                    if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
                         this.addChild(text, true, false);
                     }else{
                         window.showError("This folder already exists, did not create");
                     }
                 });
             }
-            this.divOptionsDropdown.appendChild(this.addFolderButton);
+            this.divOptionsDropdown.appendChild(this.newFolderButton);
         }
 
         if(this.parent.isRoot == false){

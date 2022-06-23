@@ -102,6 +102,56 @@ class Project{
         }
         return false;
     }
+
+
+    // Projects will call this when user has picked files to add to the project
+    setToFolderSelectionMode(row, files, selectedCallback){
+        if(row.isRoot == false){
+            row.rowDiv.onclick = async (event) => {
+                
+                for(let ifx=0; ifx<files.length; ifx++){
+                    // First check that the new incoming file doesn't exist here
+                    let path = row.getPath() + row.text + "/" + files[ifx].name;
+                    if(this.doesPathExist(path, row) == false){
+                        let newRow = row.addChild(files[ifx].name, false);
+                        let buffer = new Uint8Array(await files[ifx].arrayBuffer());
+                        this.DB.addFile(buffer, newRow.filePath);
+                    }else{
+                        window.showError("Could not add file, file with name '" + files[ifx].name + "' already exists in the directory");
+                    }
+                }
+
+                selectedCallback();
+            }
+        }
+
+        for(let icx=0; icx<row.childRows.length; icx++){
+            if(row.childRows[icx].isFolder){
+                this.setToFolderSelectionMode(row.childRows[icx], files, selectedCallback);
+            }else{
+                row.childRows[icx].rowDiv.disabled = true;
+                row.childRows[icx].rowDiv.style.cursor = "default";
+                row.childRows[icx].rowDiv.style.backgroundColor = "rgb(107 114 128)";
+            }
+        }
+    }
+
+    // Projects will call this when user picked a location to add the files to
+    unsetFromFolderSelectionMode(row){
+        if(row.isRoot == false){
+            row.rowDiv.onclick = undefined;
+        }
+
+        for(let icx=0; icx<row.childRows.length; icx++){
+            if(row.childRows[icx].isFolder){
+                this.unsetFromFolderSelectionMode(row.childRows[icx]);
+            }else{
+                row.childRows[icx].rowDiv.disabled = false;
+                row.childRows[icx].rowDiv.style.cursor = null;
+                row.childRows[icx].rowDiv.style.backgroundColor = null;
+            }
+        }
+    }
 }
 
 export { Project }

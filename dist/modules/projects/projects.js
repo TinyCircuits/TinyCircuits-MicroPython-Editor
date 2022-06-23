@@ -84,6 +84,20 @@ class Projects{
             }
         }
     }
+
+
+    setToFolderSelectionMode(files, selectedCallback){
+        for(let ipx=0; ipx<this.projects.length; ipx++){
+            // Each project also has a function with the same name but takes a row
+            this.projects[ipx].setToFolderSelectionMode(this.projects[ipx].rootRow, files, selectedCallback);
+        }
+    }
+
+    unsetFromFolderSelectionMode(){
+        for(let ipx=0; ipx<this.projects.length; ipx++){
+            this.projects[ipx].unsetFromFolderSelectionMode(this.projects[ipx].rootRow);
+        }
+    }
 }
 
 export { Projects }

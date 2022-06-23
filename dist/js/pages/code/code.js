@@ -37,3 +37,25 @@ document.getElementById("btnResetLayout").onclick = (event) => {
     layout.resetLayoutSize();
     spriteEditor.resetLayoutSize();
 }
+
+
+document.getElementById("btnProjectAddFiles").onclick = (event) => {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+
+    input.onchange = (event) => { 
+        let files = event.target.files;
+
+        let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the files", () => {
+            projects.unsetFromFolderSelectionMode();
+        });
+
+        projects.setToFolderSelectionMode(files, () => {
+            projects.unsetFromFolderSelectionMode();
+            close();
+        });
+    }
+
+    input.click();
+}

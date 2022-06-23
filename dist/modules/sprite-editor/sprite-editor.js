@@ -123,6 +123,7 @@ class SpriteEditor{
             this.canvasSpriteEditor.style.width = newCanvasDOMWidth + "px";
             this.canvasSpriteEditor.style.height = newCanvasDOMHeight + "px";
 
+            // Offset scale to center of canvas
             let x = parseFloat(this.canvasSpriteEditor.style.left);
             let y = parseFloat(this.canvasSpriteEditor.style.top);
 

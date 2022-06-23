@@ -34,6 +34,27 @@ window.inputDialog = (question, defaultInputText, callback) => {
         }
     }
 
+    let btnParentDiv = document.createElement("div");
+    btnParentDiv.classList = "relative w-full h-fit flex flew-row justify-evenly mt-2";
+    inputDialogDiv.appendChild(btnParentDiv);
+
+    let btnCancel = document.createElement("button");
+    btnCancel.classList = "rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200";
+    btnCancel.textContent = "Cancel";
+    btnCancel.onclick = (event) => {
+        close();
+    }
+    btnParentDiv.appendChild(btnCancel);
+
+    let btnConfirm = document.createElement("button");
+    btnConfirm.classList = "rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200";
+    btnConfirm.textContent = "Confirm";
+    btnConfirm.onclick = (event) => {
+        callback(inputString.value);
+        close();
+    }
+    btnParentDiv.appendChild(btnConfirm);
+
 
     let close = () => {
         document.body.removeChild(overlayDiv);

@@ -228,6 +228,51 @@ class Row{
     }
 
 
+    // Update each row's children by calling the rename function with the same name
+    #updateChildFilePaths(row){
+        for(let icx=0; icx<row.childRows.length; icx++){
+            row.childRows[icx].#rename(row.childRows[icx].text);
+            if(row.childRows[icx].isFolder){
+                this.#updateChildFilePaths(row.childRows[icx]);
+            }
+        }
+    }
+
+
+    #rename(text){
+        // Generate a file path based on the new name and check if it exists already in the project
+        let filePath = this.#getPath() + text;
+        if(this.project.doesPathExist(filePath) == false){
+            // Set this row's text and visible text
+            this.text = text;
+            this.textDiv.textContent = this.text;
+
+            // Get this file's contents using the old project's file path and replace everything under the new path
+            this.project.DB.getFile(this.filePath, (data) => {
+                this.project.DB.deleteFile(this.filePath);
+                
+                this.filePath = filePath;
+                this.project.DB.addFile(data, this.filePath);
+
+                // Change the linked code editors path (which in turn changes the code editor tab visible text)
+                if(this.codeEditorTab){
+                    this.codeEditorTab.changeFilePath(this.filePath);
+                }
+                
+                // In case this is a folder. update all the child file paths, recursively
+                if(this.isFolder){
+                    this.#updateChildFilePaths(this);
+                }
+                
+                // Save all changes to local storage for reconstruction on page reload
+                this.project.saveProjectStructure();
+            });
+        }else{
+            window.showError("Did not rename, that file path already exists");
+        }
+    }
+
+
     #showOptionsDropdown(){
         // Create square to cover area of clicked item
         this.divOptionsDropdownSelector = document.createElement("div");
@@ -293,31 +338,7 @@ class Row{
         `
         this.renameButton.onclick = (event) => {
             window.inputDialog("New name:", this.text, (text) => {
-                // Generate a file path based on the new name and check if it exists already in the project
-                let filePath = this.#getPath() + text;
-                if(this.project.doesPathExist(filePath) == false){
-                    // Set this row's text and visible text
-                    this.text = text;
-                    this.textDiv.textContent = this.text;
-
-                    // Get this file's contents using the old project's file path and replace everything under the new path
-                    this.project.DB.getFile(this.filePath, (data) => {
-                        this.project.DB.deleteFile(this.filePath);
-                        
-                        this.filePath = filePath;
-                        this.project.DB.addFile(data, this.filePath);
-
-                        // Change the linked code editors path (which in turn changes the code editor tab visible text)
-                        if(this.codeEditorTab){
-                            this.codeEditorTab.changeFilePath(this.filePath);
-                        }
-
-                        // Save all changes to local storage for reconstruction on page reload
-                        this.project.saveProjectStructure();
-                    });
-                }else{
-                    window.showError("Did not rename, that file path already exists");
-                }
+                this.#rename(text);
             });
         }
         this.divOptionsDropdown.appendChild(this.renameButton);
@@ -397,7 +418,7 @@ class Row{
             </button>
             `
             this.deleteButton.onclick = (event) => {
-                this.#delete();
+                this.#askDelete();
             }
             this.divOptionsDropdown.appendChild(this.deleteButton);
         }
@@ -411,28 +432,50 @@ class Row{
     }
 
 
-    // Removes row from parent childRows, removes HTML, remove DB file, and close code editor tab if it exists
+    // Delete folders should result in all child file and folders also being deleted
+    #deleteChildren(row){
+        while(row.childRows.length > 0){
+            if(row.childRows[0].isFolder){
+                this.#deleteChildren(row.childRows[0]);
+            }
+            row.childRows[0].#delete();
+        }
+    }
+
+
+    // Goes through the process of removing the database file at this file path and closing an file editors
     #delete(){
+        if(this.codeEditorTab){
+            this.codeEditorTab.close();
+        }
+
+        this.project.DB.deleteFile(this.filePath);
+
+        this.parent.rowExpanderDiv.removeChild(this.rowExpanderDiv);
+
+        // Find this row in the parent's childRows and remove it
+        for(let icx=0; icx<this.parent.childRows.length; icx++){
+            if(this.parent.childRows[icx].filePath == this.filePath){
+                this.parent.childRows.remove(icx);
+                break;
+            }
+        }
+
+        // If this is a folder, also delete all the child files and folders
+        if(this.isFolder){
+            this.#deleteChildren(this);
+        }
+
+        this.#hideOptionsDropdown();
+
+        this.project.saveProjectStructure();
+    }
+
+
+    // Removes row from parent childRows, removes HTML, remove DB file, and close code editor tab if it exists
+    #askDelete(){
         window.confirm("Are you sure you want to delete this? It will not be recoverable in any way", () => {
-            if(this.codeEditorTab){
-                this.codeEditorTab.close();
-            }
-    
-            this.project.DB.deleteFile(this.filePath);
-    
-            this.parent.rowExpanderDiv.removeChild(this.rowExpanderDiv);
-    
-            // Find this row in the parent's childRows and remove it
-            for(let icx=0; icx<this.parent.childRows.length; icx++){
-                if(this.parent.childRows[icx].filePath == this.filePath){
-                    this.parent.childRows.remove(icx);
-                    break;
-                }
-            }
-    
-            this.#hideOptionsDropdown();
-    
-            this.project.saveProjectStructure();
+            this.#delete();
         });
     }
 

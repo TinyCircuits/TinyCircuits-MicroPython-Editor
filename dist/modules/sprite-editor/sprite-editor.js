@@ -105,28 +105,32 @@ class SpriteEditor{
 
         // Zoom the canvas in and out based on cursor and current location using scroll wheel
         this.divSpriteEditor.onwheel = (event) => {
-            let canvasDOMWidth = parseInt(this.canvasSpriteEditor.style.width);
-            let canvasDOMHeight = parseInt(this.canvasSpriteEditor.style.height);
-            let canvasDomAspectRatio = canvasDOMWidth / canvasDOMHeight;
+            event.preventDefault();
+
+            let canvasDOMWidth = parseFloat(this.canvasSpriteEditor.style.width);
+            let canvasDOMHeight = parseFloat(this.canvasSpriteEditor.style.height);
 
             let newCanvasDOMWidth = undefined;
             let newCanvasDOMHeight = undefined;
 
-            if(event.deltaY < 0){       // Up/forward == Zoom in
-                newCanvasDOMWidth = parseInt(parseInt(this.canvasSpriteEditor.style.width) * 2);
-                newCanvasDOMHeight = parseInt(parseInt(this.canvasSpriteEditor.style.height) * 2);
-            }else if(event.deltaY > 0){ // Down/backwards == Zoom out
-                newCanvasDOMWidth = parseInt(parseInt(this.canvasSpriteEditor.style.width) / 2);
-                newCanvasDOMHeight = parseInt(parseInt(this.canvasSpriteEditor.style.height) / 2);
+            if(event.deltaY < 0){
+                newCanvasDOMWidth = canvasDOMWidth * 1.25;
+            }else if(event.deltaY > 0){
+                newCanvasDOMWidth = canvasDOMWidth / 1.25;
             }
+            newCanvasDOMHeight = newCanvasDOMWidth / (canvasDOMWidth/canvasDOMHeight);
 
-            let newCanvasDomAspectRatio = newCanvasDOMWidth / newCanvasDOMHeight;
-            
-            // Apply new size
-            if(canvasDomAspectRatio == newCanvasDomAspectRatio && newCanvasDOMWidth != 0 && newCanvasDOMHeight != 0){
-                this.canvasSpriteEditor.style.width = newCanvasDOMWidth + "px";
-                this.canvasSpriteEditor.style.height = newCanvasDOMHeight + "px";
-            }
+            this.canvasSpriteEditor.style.width = newCanvasDOMWidth + "px";
+            this.canvasSpriteEditor.style.height = newCanvasDOMHeight + "px";
+
+            let x = parseFloat(this.canvasSpriteEditor.style.left);
+            let y = parseFloat(this.canvasSpriteEditor.style.top);
+
+            let pdx = (newCanvasDOMWidth - canvasDOMWidth)/2;
+            let pdy = (newCanvasDOMHeight - canvasDOMHeight)/2;
+
+            this.canvasSpriteEditor.style.left = (x - pdx) + "px";
+            this.canvasSpriteEditor.style.top = (y - pdy) + "px";
 
             // Make sure it is still in bounds
             this.#checkCanvasBounds();
@@ -149,10 +153,10 @@ class SpriteEditor{
         let editorDOMHeight = this.divSpriteEditor.clientHeight;
 
         let canvasDOMWidth = this.canvasSpriteEditor.clientWidth;
-        let canvasDOmHeight = this.canvasSpriteEditor.clientHeight;
+        let canvasDOMHeight = this.canvasSpriteEditor.clientHeight;
 
         this.canvasSpriteEditor.style.left = ((editorDOMWidth/2) - (canvasDOMWidth/2)) + "px";
-        this.canvasSpriteEditor.style.top = ((editorDOMHeight/2) - (canvasDOmHeight/2)) + "px";
+        this.canvasSpriteEditor.style.top = ((editorDOMHeight/2) - (canvasDOMHeight/2)) + "px";
     }
 
 

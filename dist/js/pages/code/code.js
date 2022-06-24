@@ -64,19 +64,14 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 let savingMethod = {method: undefined, module: undefined};
 
 
-let saveCurrentProject = () => {
+let saveCurrentProject = async () => {
     let project = projects.projects[0];
-    project.getFileList(async (fileList) => {
-        savingMethod.module = await window.showDirectoryPicker();
 
-        // for(let ifx=0; ifx<fileList.length; ifx++){
-        //     if(fileList[ifx].isFolder){
-        //         savingMethod.module
-        //     }else{
-
-        //     }
-        // }
-    });
+    if(savingMethod.module == undefined){
+        savingMethod.module = await window.showDirectoryPicker({mode: "readwrite"});
+    }
+    
+    project.save(savingMethod.module);
 }
 
 
@@ -87,6 +82,7 @@ document.addEventListener("keydown", (event) => {
             window.showSaveToDialog(savingMethod, saveCurrentProject);
         }else{
             console.log("Save to " + savingMethod.method);
+            saveCurrentProject();
         }
     }
 });

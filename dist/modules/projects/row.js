@@ -484,7 +484,7 @@ class Row{
 
     // Removes row from parent childRows, removes HTML, remove DB file, and close code editor tab if it exists
     #askDelete(){
-        window.confirm("Are you sure you want to delete this? It will not be recoverable in any way", () => {
+        window.confirm("Are you sure you want to delete this? It will not be recoverable in any way.\n\nThis also means the selected will be erased from its location on your PC, Thumby, or Google Drive next time the project is saved.", () => {
             this.#delete();
         });
     }

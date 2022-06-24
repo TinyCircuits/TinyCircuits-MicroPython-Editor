@@ -154,42 +154,75 @@ class Project{
     }
 
 
-    // Probably just try not to look at this, lots of gross callback logic
-    getFileList(doneCallback, fileList, row){
+
+    async save(dirHandle, row){
         if(row == undefined){
             row = this.projectRow;
+
+            // Remove all base folders and then rewrite the whole structure to the location
+            for await (const [name, handle] of dirHandle.entries()) {
+                await dirHandle.removeEntry(name, {recursive: true});
+            }
         }
-        if(fileList == undefined){
-            fileList = [];
+
+        for(let icx=0; icx<row.childRows.length; icx++){
+            if(row.childRows[icx].isFolder){
+                dirHandle.getDirectoryHandle(row.childRows[icx].text, {create: true}).then((newDirHandle) => {
+                    this.save(newDirHandle, row.childRows[icx]);
+                })
+            }else{
+                this.DB.getFile(row.childRows[icx].filePath, (data) => {
+                    dirHandle.getFileHandle(row.childRows[icx].text, {create: true}).then((fileHandle) => {
+                        if(data != undefined){
+                            fileHandle.createWritable().then((stream) => {
+                                stream.write({type: "write", data: data}).then(() => {
+                                    stream.close();
+                                });
+                            });
+                        }
+                    })
+                });
+            }
         }
+    }
 
-        let icx = 0;
-        let next = () => {
-            let filePath = row.childRows[icx].filePath;
-            this.DB.getFile(filePath, (data) => {
-                fileList.push({filePath: filePath, data: data, isFolder: row.childRows[icx].isFolder});
 
-                let check = (fileList) => {
-                    if(icx < row.childRows.length-1){
-                        icx++;
-                        next();
-                    }else{
-                        doneCallback(fileList);
-                    }
-                }
+    // // Probably just try not to look at this, lots of gross callback logic
+    // getFileList(doneCallback, fileList, row){
+    //     if(row == undefined){
+    //         row = this.projectRow;
+    //     }
+    //     if(fileList == undefined){
+    //         fileList = [];
+    //     }
 
-                if(row.childRows[icx].isFolder){
-                    this.getFileList(check, fileList, row.childRows[icx]);
-                }else{
-                    check(fileList);
-                }
+    //     let icx = 0;
+    //     let next = () => {
+    //         let filePath = row.childRows[icx].filePath;
+    //         this.DB.getFile(filePath, (data) => {
+    //             fileList.push({filePath: filePath, data: data, isFolder: row.childRows[icx].isFolder});
+
+    //             let check = (fileList) => {
+    //                 if(icx < row.childRows.length-1){
+    //                     icx++;
+    //                     next();
+    //                 }else{
+    //                     doneCallback(fileList);
+    //                 }
+    //             }
+
+    //             if(row.childRows[icx].isFolder){
+    //                 this.getFileList(check, fileList, row.childRows[icx]);
+    //             }else{
+    //                 check(fileList);
+    //             }
 
                 
-            });
-        }
+    //         });
+    //     }
 
-        next();
-    }
+    //     next();
+    // }
 }
 
 export { Project }

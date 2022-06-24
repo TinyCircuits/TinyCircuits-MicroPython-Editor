@@ -237,3 +237,42 @@ window.folderSelectionShow = (dialog, closeCallback) => {
 
     return close;
 }
+
+
+window.showSaveToDialog = (savingMethod, saveCallback) => {
+    document.getElementById("divSaveToDialog").classList.remove("invisible");
+
+    let close = () => {
+        document.getElementById("divSaveToDialog").classList.add("invisible");
+        document.removeEventListener("keydown", escKeyPressed);
+    }
+
+    let escKeyPressed = (event) => {
+        if(event.code == "Escape"){
+            close();
+        }
+    }
+    document.addEventListener("keydown", escKeyPressed);
+
+    document.getElementById("btnSaveToDialogPC").onclick = (event) => {
+        savingMethod.method = "PC";
+        saveCallback();
+        close();
+    }
+
+    document.getElementById("btnSaveToDialogThumby").onclick = (event) => {
+        savingMethod.method = "Thumby";
+        saveCallback();
+        close();
+    }
+
+    document.getElementById("btnSaveToDialogGoogleDrive").onclick = (event) => {
+        savingMethod.method = "GoogleDrive"
+        saveCallback();
+        close();
+    }
+
+    document.getElementById("btnSaveToDialogExit").onclick = (event) => {
+        close();
+    }
+}

@@ -59,3 +59,39 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 
     input.click();
 }
+
+
+let savingMethod = {method: undefined, module: undefined};
+
+
+let saveCurrentProject = () => {
+    let project = projects.projects[0];
+    project.getFileList(async (fileList) => {
+        savingMethod.module = await window.showDirectoryPicker();
+
+        // for(let ifx=0; ifx<fileList.length; ifx++){
+        //     if(fileList[ifx].isFolder){
+        //         savingMethod.module
+        //     }else{
+
+        //     }
+        // }
+    });
+}
+
+
+document.addEventListener("keydown", (event) => {
+    if(event.code == "KeyS" && event.ctrlKey){
+        event.preventDefault();
+        if(savingMethod.method == undefined){
+            window.showSaveToDialog(savingMethod, saveCurrentProject);
+        }else{
+            console.log("Save to " + savingMethod.method);
+        }
+    }
+});
+
+
+document.getElementById("btnSaveProjectTo").onclick = (event) => {
+    window.showSaveToDialog(savingMethod, saveCurrentProject);
+}

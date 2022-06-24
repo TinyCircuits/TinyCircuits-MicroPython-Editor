@@ -28,7 +28,7 @@
             </button>
         </li>
         <li>
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+            <button id="btnSaveProjectTo" class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
                 <span>Save to</span>
             </button>
         </li>
@@ -318,6 +318,57 @@
                 <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
         </button>
+
+
+        <div id="divSaveToDialog" class="absolute z-30 left-0 right-0 top-0 bottom-0 bg-[#ffffffaa] invisible">
+    <div class="absolute w-[525px] h-fit bg-white border-2 border-black border rounded-md m-auto left-0 right-0 top-0 bottom-0 z-40 flex flex-col p-2 opacity-100">
+    
+        <div class="relative w-full h-fit p-1 flex justify-center">
+            What location would you like to save this project to?
+        </div>
+
+        <div class="w-full h-[175px] flex flex-row justify-evenly items-center">
+            <button id="btnSaveToDialogPC" class="w-[150px] h-[150px] rounded-md bg-black text-white hover:text-black hover:bg-white stroke-white hover:stroke-black border border-black active:text-white active:bg-black active:stroke-white duration-200 p-1">
+                <div class="w-full h-[80%] flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="w-full h-[20%] flex justify-center items-center text-xl font-bold">
+                    PC
+                </div>
+            </button>
+            <button id="btnSaveToDialogThumby" class="w-[150px] h-[150px] rounded-md bg-black text-white hover:text-black hover:bg-white stroke-white hover:stroke-black border border-black active:text-white active:bg-black active:stroke-white duration-200 p-1">
+                <div class="w-full h-[80%] flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                </div>
+                <div class="w-full h-[20%] flex justify-center items-center text-xl font-bold">
+                    Thumby
+                </div>
+            </button>
+
+            <button id="btnSaveToDialogGoogleDrive" class="w-[150px] h-[150px] rounded-md bg-black text-white hover:text-black hover:bg-white stroke-white hover:stroke-black border border-black active:text-white active:bg-black active:stroke-white duration-200 p-1">
+                <div class="w-full h-[80%] flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                    </svg>
+                </div>
+                <div class="w-full h-[20%] flex justify-center items-center text-xl font-bold">
+                    Google Drive
+                </div>
+            </button>
+        </div>
+
+        <!-- Exit button -->
+        <button id="btnSaveToDialogExit" class="w-[15px] h-[15px] absolute right-1 top-1 fill-black active:fill-white duration-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+</div>
 
 
         <script src="/dist/modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>

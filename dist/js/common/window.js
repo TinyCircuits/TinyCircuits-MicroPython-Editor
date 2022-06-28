@@ -284,5 +284,5 @@ window.showSaveToDialog = (savingMethod, saveCallback) => {
 window.load = (percent, text) => {
     let divLoadingBar = document.getElementById("divLoadingBar");
     divLoadingBar.children[0].style.width = percent + "%";
-    divLoadingBar.children[0].children[0].innerText = text;
+    divLoadingBar.children[0].children[0].innerText = text + " (" + percent.toFixed(0) + "%)";
 }

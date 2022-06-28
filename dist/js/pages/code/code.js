@@ -5,6 +5,7 @@ import { Projects } from "../../../modules/projects/projects.js";
 import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
 import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
 import { Serial } from "../../../modules/serial/serial.js";
+import { Repl } from "../../../modules/repl/repl.js";
 
 
 let divLayout = document.getElementById("divLayout");
@@ -18,9 +19,10 @@ let codeEditor = new CodeEditor("divCodeEditor");
 let projects = new Projects("divProjects", codeEditor);
 
 // For some reason, Mac OS makes the PID show up as 10 for Thumby, sometimes
+let repl = new Repl();
 let serial = new Serial([{usbVendorId: 11914, usbProductId: 5}, {usbVendorId:11914, usbProductId: 10}]);
 serial.onData = (data) => {
-    console.log(data);
+    repl.consumeData(data);
 }
 
 let spriteEditor = new SpriteEditor();

@@ -276,3 +276,10 @@ window.showSaveToDialog = (savingMethod, saveCallback) => {
         close();
     }
 }
+
+
+window.setLoadingPercent = (percent, text) => {
+    let divLoadingBar = document.getElementById("divLoadingBar");
+    divLoadingBar.children[0].style.width = percent + "%";
+    divLoadingBar.children[0].children[0].innerText = text;
+}

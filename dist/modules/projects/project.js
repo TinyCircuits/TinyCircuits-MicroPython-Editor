@@ -185,44 +185,6 @@ class Project{
             }
         }
     }
-
-
-    // // Probably just try not to look at this, lots of gross callback logic
-    // getFileList(doneCallback, fileList, row){
-    //     if(row == undefined){
-    //         row = this.projectRow;
-    //     }
-    //     if(fileList == undefined){
-    //         fileList = [];
-    //     }
-
-    //     let icx = 0;
-    //     let next = () => {
-    //         let filePath = row.childRows[icx].filePath;
-    //         this.DB.getFile(filePath, (data) => {
-    //             fileList.push({filePath: filePath, data: data, isFolder: row.childRows[icx].isFolder});
-
-    //             let check = (fileList) => {
-    //                 if(icx < row.childRows.length-1){
-    //                     icx++;
-    //                     next();
-    //                 }else{
-    //                     doneCallback(fileList);
-    //                 }
-    //             }
-
-    //             if(row.childRows[icx].isFolder){
-    //                 this.getFileList(check, fileList, row.childRows[icx]);
-    //             }else{
-    //                 check(fileList);
-    //             }
-
-                
-    //         });
-    //     }
-
-    //     next();
-    // }
 }
 
 export { Project }

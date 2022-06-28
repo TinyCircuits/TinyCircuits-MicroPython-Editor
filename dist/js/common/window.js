@@ -120,8 +120,8 @@ window.confirm = (question, callback) => {
     btnConfirm.classList = "rounded-md w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200";
     btnConfirm.textContent = "Confirm";
     btnConfirm.onclick = (event) => {
-        callback();
         close();
+        callback();
     }
     btnParentDiv.appendChild(btnConfirm);
 
@@ -240,9 +240,12 @@ window.folderSelectionShow = (dialog, closeCallback) => {
 
 
 window.showSaveToDialog = (savingMethod, saveCallback) => {
+    // Change opacity to see change right away and make invisible for mouse clicks/selection
+    document.getElementById("divSaveToDialog").style.opacity = 100;
     document.getElementById("divSaveToDialog").classList.remove("invisible");
 
     let close = () => {
+        document.getElementById("divSaveToDialog").style.opacity = 0;
         document.getElementById("divSaveToDialog").classList.add("invisible");
         document.removeEventListener("keydown", escKeyPressed);
     }
@@ -278,7 +281,7 @@ window.showSaveToDialog = (savingMethod, saveCallback) => {
 }
 
 
-window.setLoadingPercent = (percent, text) => {
+window.load = (percent, text) => {
     let divLoadingBar = document.getElementById("divLoadingBar");
     divLoadingBar.children[0].style.width = percent + "%";
     divLoadingBar.children[0].children[0].innerText = text;

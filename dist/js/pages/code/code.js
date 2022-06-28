@@ -4,6 +4,7 @@ import { WorkspaceSelection } from "../../../modules/workspace-selection/workspa
 import { Projects } from "../../../modules/projects/projects.js";
 import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
 import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
+import { Repl } from "../../../modules/repl/repl.js";
 
 
 let divLayout = document.getElementById("divLayout");
@@ -16,6 +17,8 @@ let codeEditor = new CodeEditor("divCodeEditor");
 
 let projects = new Projects("divProjects", codeEditor);
 
+// For some reason, Mac OS makes the PID show up as 10 for Thumby, sometimes
+let repl = new Repl([{usbVendorId: 11914, usbProductId: 5}, {usbVendorId:11914, usbProductId: 10}]);
 
 let spriteEditor = new SpriteEditor();
 let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], 
@@ -61,6 +64,15 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 }
 
 
+document.getElementById("btnRunOnThumby").onclick = async (event) => {
+    if(!repl.connected){
+        await repl.connect();
+    }
+}
+
+
+
+
 let savingMethod = {method: undefined, module: undefined};
 
 
@@ -68,10 +80,13 @@ let saveCurrentProject = async () => {
     let project = projects.projects[0];
 
     if(savingMethod.module == undefined){
-        savingMethod.module = await window.showDirectoryPicker({mode: "readwrite"});
+        if(savingMethod.method == "PC"){
+            savingMethod.module = await window.showDirectoryPicker({mode: "readwrite"});
+            project.save(savingMethod.module);
+        }else if(savingMethod.method == "Thumby"){
+            savingMethod.module = repl;
+        }
     }
-    
-    project.save(savingMethod.module);
 }
 
 

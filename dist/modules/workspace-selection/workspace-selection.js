@@ -34,6 +34,8 @@ class WorkspaceSelection{
                     }
 
                     for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
+                        // Change opacity as well to see change right away
+                        this.entryDictList[iex][1][idx].style.opacity = 0;
                         this.entryDictList[iex][1][idx].classList.add("invisible");
                         this.entryDictList[iex][1][idx].style.zIndex = null;
                     }
@@ -45,6 +47,7 @@ class WorkspaceSelection{
                 entry[0].style.color = "black";
 
                 for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
+                    entry[1][idx].style.opacity = 100;
                     entry[1][idx].classList.remove("invisible");
                     entry[1][idx].style.zIndex = 10;
                 }

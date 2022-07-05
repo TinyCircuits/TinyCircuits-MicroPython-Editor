@@ -18,13 +18,6 @@ let codeEditor = new CodeEditor("divCodeEditor");
 
 let projects = new Projects("divProjects", codeEditor);
 
-// For some reason, Mac OS makes the PID show up as 10 for Thumby, sometimes
-let repl = new Repl();
-let serial = new Serial([{usbVendorId: 11914, usbProductId: 5}, {usbVendorId:11914, usbProductId: 10}]);
-serial.onData = (data) => {
-    repl.consumeData(data);
-}
-
 let spriteEditor = new SpriteEditor();
 let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], 
                                             ["btnSprite", ["divSprite"], () => {spriteEditor.shown = true;}, () => {spriteEditor.shown = false;}],
@@ -33,6 +26,35 @@ let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]],
 
 let thumbyConsole = new Console(document.getElementById("divThumbyConsole"), "Thumby console\r\n");
 let browserConsole = new Console(document.getElementById("divBrowserConsole"), "Browser console\r\n");
+
+
+// For some reason, Mac OS makes the PID show up as 10 for Thumby, sometimes
+let repl = new Repl();
+let serial = new Serial([{usbVendorId: 11914, usbProductId: 5}, {usbVendorId:11914, usbProductId: 10}]);
+
+// When serial is connected and gets data from a device, filter it through REPL first before outputting to the console
+serial.onData = (data) => {
+    repl.consumeData(data);
+}
+
+// When serial connects, allow repl to go through connection procedure
+serial.onConnect = () => {
+    repl.connected();
+}
+
+// REPL module filtered the incoming serial data, output to console
+repl.onOutput = (data) => {
+    thumbyConsole.write(data);
+}
+
+repl.onWrite = (data) => {
+    serial.write(data);
+}
+
+
+thumbyConsole.onType = (data) => {
+    serial.write(data);
+}
 
 
 // When a new project is to be added, open a new project with

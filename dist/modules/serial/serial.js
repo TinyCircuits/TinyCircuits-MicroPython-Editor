@@ -28,10 +28,25 @@ class Serial{
     }
 
 
+    async write(data, encode=true){
+        if(this.writer){
+            if(encode){
+                await this.writer.write(this.encoder.encode(data));
+            }else{
+                await this.writer.write(data);
+            }
+        }else{
+            window.showError("Not connected, did not write...");
+        }
+    }
+
+
     async #readLoop(){
         this.reader = undefined;
         this.writer = await this.port.writable.getWriter();
-        // await this.writer.write(this.encoder.encode("\r\x02"));
+        
+        // Call the connected callback for external modules
+        this.onConnect();
 
         // Loop to keep the reading loop going every time it ends due to done status
         while(this.port.readable && this.connected){
@@ -88,7 +103,6 @@ class Serial{
 
             this.connected = true;
             this.#readLoop();
-            this.onConnect();
 
             window.load(100, "Connected!");
         }catch(error){
@@ -98,6 +112,8 @@ class Serial{
             }else if(error.name == "NetworkError"){
                 window.showError("Failed to open port, is something using it?");
                 window.load(0, "Failed to open port, is something using it?");
+            }else{
+                console.error(error);
             }
         }
     }

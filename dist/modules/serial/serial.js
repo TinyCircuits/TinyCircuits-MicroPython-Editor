@@ -6,7 +6,7 @@ class Serial{
 
         navigator.serial.addEventListener('connect', (event) => {
             console.log("Detected serial device");
-            this.attemptAutoConnect();
+            this.connect();
         });
 
         
@@ -29,25 +29,19 @@ class Serial{
 
 
     async write(data, encode=true){
-        if(this.writer){
-            if(encode){
-                await this.writer.write(this.encoder.encode(data));
-            }else{
-                await this.writer.write(data);
-            }
+        if(!this.connected){
+            await this.connect();
+        }
+
+        if(encode){
+            await this.writer.write(this.encoder.encode(data));
         }else{
-            window.showError("Not connected, did not write...");
+            await this.writer.write(data);
         }
     }
 
 
     async #readLoop(){
-        this.reader = undefined;
-        this.writer = await this.port.writable.getWriter();
-        
-        // Call the connected callback for external modules
-        this.onConnect();
-
         // Loop to keep the reading loop going every time it ends due to done status
         while(this.port.readable && this.connected){
 
@@ -102,7 +96,14 @@ class Serial{
             this.port = port;
 
             this.connected = true;
+
+            this.reader = undefined;
+            this.writer = await this.port.writable.getWriter();
+
             this.#readLoop();
+
+            // Call the connected callback for external modules
+            await this.onConnect();
 
             window.load(100, "Connected!");
         }catch(error){
@@ -130,7 +131,7 @@ class Serial{
                 for(let pairidx=0; pairidx<this.vendorProductIDs.length; pairidx++){
                     let portInfo = ports[portidx].getInfo();
                     if(portInfo.usbVendorId == this.vendorProductIDs[pairidx].usbVendorId && portInfo.usbProductId == this.vendorProductIDs[pairidx].usbProductId){
-                        this.#connect(ports[portidx]);
+                        await this.#connect(ports[portidx]);
                         return true;
                     }
                 }
@@ -147,7 +148,7 @@ class Serial{
             try{
                 window.load(50, "Waiting on device selection...");
                 let port = await navigator.serial.requestPort({filters: this.vendorProductIDs});
-                this.#connect(port);
+                await this.#connect(port);
             }catch(error){
                 // User did not select anything and closed browser dialog
                 window.load(0, "No device selected for connection...");

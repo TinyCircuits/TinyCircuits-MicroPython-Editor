@@ -38,8 +38,8 @@ serial.onData = (data) => {
 }
 
 // When serial connects, allow repl to go through connection procedure
-serial.onConnect = () => {
-    repl.connected();
+serial.onConnect = async () => {
+    await repl.connected();
 }
 
 // REPL module filtered the incoming serial data, output to console
@@ -47,13 +47,13 @@ repl.onOutput = (data) => {
     thumbyConsole.write(data);
 }
 
-repl.onWrite = (data) => {
-    serial.write(data);
+repl.onWrite = async (data) => {
+    await serial.write(data);
 }
 
 
-thumbyConsole.onType = (data) => {
-    serial.write(data);
+thumbyConsole.onType = async (data) => {
+    await serial.write(data);
 }
 
 
@@ -92,9 +92,7 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 
 
 document.getElementById("btnRunOnThumby").onclick = async (event) => {
-    if(!serial.connected){
-        await serial.connect();
-    }
+    await repl.test();
 }
 
 

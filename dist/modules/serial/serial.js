@@ -29,14 +29,12 @@ class Serial{
 
 
     async write(data, encode=true){
-        if(!this.connected){
-            await this.connect();
-        }
-
-        if(encode){
-            await this.writer.write(this.encoder.encode(data));
-        }else{
-            await this.writer.write(data);
+        if(this.writer){
+            if(encode){
+                await this.writer.write(this.encoder.encode(data));
+            }else{
+                await this.writer.write(data);
+            }
         }
     }
 

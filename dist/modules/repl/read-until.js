@@ -15,9 +15,6 @@ class ReadUntil{
         // Callback for when readUntilString is found or timeout occurs
         this.callback = undefined;
 
-        // Sometimes it is necessary to wait for data to stop coming in and then fire callback
-        this.forceWaitTimeout = undefined;
-
 
         // Portions of incoming data are stored here for stitching incoming serial
         // data in large enough sizes to find the readUntilString but small enough
@@ -26,31 +23,33 @@ class ReadUntil{
 
         // Data collected while not being pushed out to console (array or typed arrays of varying sizes)
         this.accumulatedData = undefined;
+
+        // Number of bytes accumulated
+        this.accumulatedDataLength = undefined;
     }
 
 
-    activate(readUntilString, callback, forceWaitTimeout=false){
+    activate(readUntilString, callback){
         this.isActive = true;
         this.readUntilString = readUntilString;
         this.callback = callback;
-        this.forceWaitTimeout = forceWaitTimeout;
         this.searchingString = "";
         this.accumulatedData = [];
+        this.accumulatedDataLength = 0;
     }
 
 
-    #deactivate(extraBytesCount){
+    #deactivate(finalData){
         let callbackCopy = this.callback;
-        let accumulatedDataCopy = this.accumulatedData;
 
         this.isActive = false;
         this.readUntilString = undefined;
         this.callback = undefined;
-        this.forceWaitTimeout = undefined;
         this.searchingString = undefined;
         this.accumulatedData = undefined;
+        this.accumulatedDataLength = undefined;
 
-        callbackCopy(accumulatedDataCopy, extraBytesCount);
+        callbackCopy(finalData);
     }
 
 
@@ -58,16 +57,22 @@ class ReadUntil{
         this.searchingString += this.decoder.decode(data);
         
         let index = this.searchingString.indexOf(this.readUntilString);
+        this.accumulatedDataLength += data.length;
         this.accumulatedData.push(data);
 
         if(index != -1){
             // readUntilString found
-            let extraData = data.slice((index - Math.abs(this.searchingString.length - data.length)) + this.readUntilString.length);
+            let extraData = data.slice((index - Math.abs(this.searchingString.length - data.length)) + this.readUntilString.length)
 
-            // Found readUntilString, allow the callback to run
-            let extraBytesCount = this.readUntilString.length + extraData.length;
+            let totalToRemove = this.readUntilString.length + extraData.length;
+            let finalData = new Uint8Array(this.accumulatedDataLength);
+            let offset = 0;
+            for(let idx=0; idx<this.accumulatedData.length; idx++){
+                finalData.set(this.accumulatedData[idx], offset);
+                offset += this.accumulatedData[idx].length;
+            }
 
-            this.#deactivate(extraBytesCount);
+            this.#deactivate(finalData.slice(2, finalData.length-totalToRemove-2));
         }else{
             // readUntilString not found, remove some of the searchingString so it doesn't
             // take as long to find the readUntilString next time, also saves memory

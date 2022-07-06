@@ -92,6 +92,10 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 
 
 document.getElementById("btnRunOnThumby").onclick = async (event) => {
+    if(!serial.connected){
+        await serial.connect();
+    }
+
     await repl.test();
 }
 

@@ -11,6 +11,12 @@ class Repl{
     }
 
 
+    async enterRawPrompt(){
+        await this.onWrite("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.onWrite("\x01");       // Enter raw mode if not already
+    }
+
+
     // Called when serial connects to a device
     async connected(){
         let gotNormal = false;
@@ -22,8 +28,7 @@ class Repl{
             });
             await this.onWrite("\x04");         // Soft reset/exit raw mode
         });
-        await this.onWrite("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.onWrite("\x01");       // Enter raw mode if not already
+        await this.enterRawPrompt();
 
         // Hang this function until the normal prompt bytes are sent so that
         // functions calling this can await this function and continue once
@@ -45,7 +50,21 @@ class Repl{
 
 
     async test(){
-        await this.onWrite("\x01");
+        // let file = await (await fetch("/dist/py/file_downloader.py")).arrayBuffer();
+        // console.log(file);
+
+        this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+            this.readUntil.activate(">", async (data, extraBytes) => {
+                console.log(new TextDecoder().decode(data));
+
+                // Just want to hide these characters so as not to duplicate
+                this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {});
+                await this.onWrite("\x02");     // Get a normal/friendly prompt
+            });
+            this.onWrite("print(\"TEST\")");
+            this.onWrite("\x04");
+        });
+        await this.enterRawPrompt();
     }
 }
 

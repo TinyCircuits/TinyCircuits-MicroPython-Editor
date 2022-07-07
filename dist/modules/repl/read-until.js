@@ -54,6 +54,7 @@ class ReadUntil{
 
 
     evaluate(data){
+        console.log(this.decoder.decode(data));
         this.searchingString += this.decoder.decode(data);
         
         let index = this.searchingString.indexOf(this.readUntilString);

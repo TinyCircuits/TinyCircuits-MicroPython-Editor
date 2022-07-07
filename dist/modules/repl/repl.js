@@ -17,6 +17,12 @@ class Repl{
     }
 
 
+    async enterRawPasteMode(){
+        await this.onWrite("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.onWrite("\x05");       // Enter raw paste mode if not already
+    }
+
+
     // Called when serial connects to a device
     async connected(){
         let gotNormal = false;
@@ -49,22 +55,126 @@ class Repl{
     }
 
 
-    async test(){
-        // let file = await (await fetch("/dist/py/file_downloader.py")).arrayBuffer();
-        // console.log(file);
+    async sendCmd(cmd, encode=true){
+        let length = cmd.length != undefined ? cmd.length : cmd.byteLength;
+
+        // See how many chunks of data need to be sent
+        let chunkCount = Math.ceil(length/255)+1;
+
+        // Send the chunks one by one
+        for(let b=0; b < chunkCount; b++){
+            let chunk = cmd.slice(b*255, (b+1)*255);
+            await this.onWrite(chunk, encode);
+        }
+    }
+
+
+    async executeRaw(cmd){
+        // Wait for paste mode
+        this.readUntil.activate("paste mode; Ctrl-C to cancel, Ctrl-D to finish\r\n=== ", async () => {
+            // Wait for exit from paste mode
+            this.readUntil.activate(">>>", async (data, extraBytes) => {
+                // Once command is done running, wait for soft reboot to clear defined utility code from repl
+                this.readUntil.activate("MPY: soft reboot", async () => {
+                    // Back at main menu most likely, stop it and get back to normal prompt
+                    this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
+                        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {console.log("Done running! Back at normal!")});
+                        await this.onWrite("\x02");
+                    });
+
+                    // Stop main menu
+                    await this.onWrite("\x03\x03");
+                });
+
+                // At the end of command run, this will be interpreted and run to soft reset
+                await this.onWrite("\x04");
+            });
+
+            // Send command in paste mode and exit/finish to run it
+            await this.sendCmd(cmd);
+            await this.onWrite("\x04");
+        });
+
+        // Enter paste mode while waiting
+        await this.enterRawPasteMode();
+    }
+
+
+    async getMainMenu(){
+        this.readUntil.activate("MPY: soft reboot", async () => {
+            this.onOutput("\r\n");
+        });
+        await this.onWrite("\x03\x03");
+        await this.onWrite("\x04");
+    }
+
+    
+    async buildPath(path){
+        if(this.buildPathScript == undefined) this.buildPathScript = await (await fetch("/dist/py/build_path.py")).text();
+
+        let cmd = this.buildPathScript +
+                  "\nbuild(\"" + path + "\")"
+
+        await this.executeRaw(cmd);
+    }
+
+
+    // Defines build and save functions and then allows saving through use of the JS save function here
+    async startSaveFileMode(callback){
+        if(this.buildPathScript == undefined) this.buildPathScript = await (await fetch("/dist/py/build_path.py")).text();
+        if(this.saveFileScript == undefined) this.saveFileScript = await (await fetch("/dist/py/save_file.py")).text();
+
+        // Wait for paste mode
+        this.readUntil.activate("paste mode; Ctrl-C to cancel, Ctrl-D to finish\r\n=== ", async () => {
+            this.readUntil.activate(">>> ", async () => {
+                callback();
+            });
+            // Send command in paste mode and exit/finish to run it
+            await this.sendCmd(this.buildPathScript + this.saveFileScript);
+            await this.onWrite("\x04");
+        });
+
+        // Enter paste mode
+        await this.enterRawPasteMode();
+    }
+
+    async saveFile(filePath, data){
+        // Check the type and convert to Uint8Array if not already
+        let typeStr = Object.prototype.toString.call(data);
+        if(typeStr == "[object ArrayBuffer]"){
+            data = new Uint8Array(data);
+        }
 
         this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-            this.readUntil.activate(">", async (data, extraBytes) => {
-                console.log(new TextDecoder().decode(data));
-
-                // Just want to hide these characters so as not to duplicate
-                this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {});
-                await this.onWrite("\x02");     // Get a normal/friendly prompt
+            this.readUntil.activate("OK>", async () => {
+                this.readUntil.activate("OKREADY_TO_SAVE", async () => {
+                    this.readUntil.activate("FILE_SAVED", async () => {
+                        
+                    });
+                    
+                    // Send data 255 bytes at a time to always fill the buffer
+                    let chunkCount = Math.ceil(data.length/255)+1;
+                    for(let b=0; b < chunkCount; b++){
+                        let chunk = data.slice(b*255, (b+1)*255);
+                        this.onWrite(chunk, false);
+                        if(chunk.length < 255){
+                            this.onWrite(new Uint8Array(255 - chunk.length), false);
+                            break;
+                        }
+                    }
+                });
+                await this.sendCmd("start_save(\"" + filePath + "\"," + data.length + ")\r");
+                this.sendCmd("\x04");
             });
-            this.onWrite("print(\"TEST\")");
-            this.onWrite("\x04");
+            this.sendCmd("build(\"" + filePath.slice(0, filePath.lastIndexOf("/")) + "\")");
+            this.sendCmd("\x04");
         });
         await this.enterRawPrompt();
+    }
+
+    async endSaveFileMode(){
+        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {});
+        this.sendCmd("\x02");
     }
 }
 

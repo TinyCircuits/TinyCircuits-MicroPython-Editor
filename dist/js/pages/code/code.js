@@ -91,12 +91,25 @@ document.getElementById("btnProjectAddFiles").onclick = (event) => {
 }
 
 
+document.getElementById("btnStartMainMenu").onclick = async (event) => {
+    if(!serial.connected){
+        await serial.connect();
+    }
+
+    await repl.getMainMenu();
+}
+
+
 document.getElementById("btnRunOnThumby").onclick = async (event) => {
     if(!serial.connected){
         await serial.connect();
     }
 
-    await repl.test();
+    // await repl.buildPath();
+    // await repl.saveFile();
+    await repl.startSaveFileMode(async () => {
+        repl.saveFile("/test/test.py", await (await fetch("/dist/py/build_path.py")).text());
+    });
 }
 
 

@@ -1,1 +1,0 @@
-# Starts a loop that takes bytes from serial and writes them to the designated file

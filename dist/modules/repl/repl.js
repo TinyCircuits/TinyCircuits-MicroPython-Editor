@@ -64,7 +64,7 @@ class Repl{
         // Send the chunks one by one
         for(let b=0; b < chunkCount; b++){
             let chunk = cmd.slice(b*255, (b+1)*255);
-            await this.onWrite(chunk, encode);
+            this.onWrite(chunk, encode);
         }
     }
 
@@ -121,59 +121,97 @@ class Repl{
 
     // Defines build and save functions and then allows saving through use of the JS save function here
     async startSaveFileMode(callback){
+        if(this.busy) return;
+        this.busy = true;
+
         if(this.buildPathScript == undefined) this.buildPathScript = await (await fetch("/dist/py/build_path.py")).text();
         if(this.saveFileScript == undefined) this.saveFileScript = await (await fetch("/dist/py/save_file.py")).text();
 
         // Wait for paste mode
         this.readUntil.activate("paste mode; Ctrl-C to cancel, Ctrl-D to finish\r\n=== ", async () => {
-            this.readUntil.activate(">>> ", async () => {
-                callback();
+            this.readUntil.activate("print(\"FILE_SAVED\")", async () => {
+                this.readUntil.activate(">>> ", async () => {
+                    this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+                        this.busy = false;
+                        callback();
+                    });
+                    await this.enterRawPrompt();
+                });
+                await this.onWrite("\x04");
             });
             // Send command in paste mode and exit/finish to run it
             await this.sendCmd(this.buildPathScript + this.saveFileScript);
-            await this.onWrite("\x04");
         });
 
         // Enter paste mode
         await this.enterRawPasteMode();
     }
 
-    async saveFile(filePath, data){
+    async saveFile(filePath, data, callback){
+        if(this.busy) return;
+        this.busy = true;
+
         // Check the type and convert to Uint8Array if not already
         let typeStr = Object.prototype.toString.call(data);
-        if(typeStr == "[object ArrayBuffer]"){
+        if(typeStr == "[object String]"){
+            let dataCopy = data;
+            data = new Uint8Array(data.length);
+            for(let icx=0; icx<data.length; icx++){
+                data[icx] = dataCopy.charCodeAt(icx);
+            }
+        }if(typeStr == "[object ArrayBuffer]"){
             data = new Uint8Array(data);
         }
 
-        this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-            this.readUntil.activate("OK>", async () => {
-                this.readUntil.activate("OKREADY_TO_SAVE", async () => {
-                    this.readUntil.activate("FILE_SAVED", async () => {
-                        
-                    });
-                    
-                    // Send data 255 bytes at a time to always fill the buffer
-                    let chunkCount = Math.ceil(data.length/255)+1;
-                    for(let b=0; b < chunkCount; b++){
-                        let chunk = data.slice(b*255, (b+1)*255);
-                        this.onWrite(chunk, false);
-                        if(chunk.length < 255){
-                            this.onWrite(new Uint8Array(255 - chunk.length), false);
-                            break;
-                        }
-                    }
+        
+        this.readUntil.activate(">", async () => {
+            this.readUntil.activate("READY_TO_SAVE", async () => {
+                this.readUntil.activate(">", async () => {
+                    this.busy = false;
+                    callback();
                 });
-                await this.sendCmd("start_save(\"" + filePath + "\"," + data.length + ")\r");
-                this.sendCmd("\x04");
+                
+                // Send data 255 bytes at a time to always fill the buffer
+                let chunkCount = Math.ceil(data.length/255)+1;
+                for(let b=0; b < chunkCount; b++){
+                    let chunk = data.slice(b*255, (b+1)*255);
+                    await this.onWrite(chunk, false);
+
+                    if(chunk.length < 255){
+                        await this.onWrite(new Uint8Array(255 - chunk.length), false);
+                        break;
+                    }
+                }
             });
-            this.sendCmd("build(\"" + filePath.slice(0, filePath.lastIndexOf("/")) + "\")");
-            this.sendCmd("\x04");
+            await this.sendCmd("start_save(\"" + filePath + "\"," + data.length + ")\r");
+            await this.sendCmd("\x04");
         });
-        await this.enterRawPrompt();
+        await this.sendCmd("build(\"" + filePath.slice(0, filePath.lastIndexOf("/")) + "\")");
+        await this.sendCmd("\x04");
     }
 
     async endSaveFileMode(){
-        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {});
+        if(this.busy) return;
+        this.busy = true;
+
+        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
+            // Once command is done running, wait for soft reboot to clear defined utility code from repl
+            this.readUntil.activate("MPY: soft reboot", async () => {
+                this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+                    this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+                        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
+                            this.busy = false;
+                        });
+                        await this.onWrite("\x02");     // Get a normal/friendly prompt
+                    });
+                    await this.onWrite("\x04");         // Soft reset/exit raw mode
+                });
+                await this.enterRawPrompt();
+            });
+
+            // At the end of command run, this will be interpreted and run to soft reset
+            await this.onWrite("\x04");
+        });
         this.sendCmd("\x02");
     }
 }

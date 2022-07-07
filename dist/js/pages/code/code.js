@@ -47,8 +47,8 @@ repl.onOutput = (data) => {
     thumbyConsole.write(data);
 }
 
-repl.onWrite = async (data) => {
-    await serial.write(data);
+repl.onWrite = async (data, encode) => {
+    await serial.write(data, encode);
 }
 
 
@@ -105,10 +105,13 @@ document.getElementById("btnRunOnThumby").onclick = async (event) => {
         await serial.connect();
     }
 
-    // await repl.buildPath();
-    // await repl.saveFile();
+
     await repl.startSaveFileMode(async () => {
-        repl.saveFile("/test/test.py", await (await fetch("/dist/py/build_path.py")).text());
+        await repl.saveFile("/test/test.py", await (await fetch("/dist/py/build_path.py")).text(), async () => {
+            await repl.saveFile("/test/test2.py", await (await fetch("/dist/py/save_file.py")).text(), async () => {
+                await repl.endSaveFileMode();
+            });
+        });
     });
 }
 

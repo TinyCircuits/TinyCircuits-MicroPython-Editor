@@ -12,14 +12,14 @@ class Repl{
 
 
     async enterRawPrompt(){
-        await this.onWrite("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.onWrite("\x01");       // Enter raw mode if not already
+        await this.onWrite("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.onWrite("\r\x01");       // Enter raw mode if not already
     }
 
 
     async enterRawPasteMode(){
-        await this.onWrite("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.onWrite("\x05");       // Enter raw paste mode if not already
+        await this.onWrite("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.onWrite("\r\x05");       // Enter raw paste mode if not already
     }
 
 
@@ -104,8 +104,8 @@ class Repl{
         this.readUntil.activate("MPY: soft reboot", async () => {
             this.onOutput("\r\n");
         });
-        await this.onWrite("\x03\x03");
-        await this.onWrite("\x04");
+        await this.onWrite("\r\x03\x03");
+        await this.onWrite("\r\x04");
     }
 
     
@@ -127,24 +127,16 @@ class Repl{
         if(this.buildPathScript == undefined) this.buildPathScript = await (await fetch("/dist/py/build_path.py")).text();
         if(this.saveFileScript == undefined) this.saveFileScript = await (await fetch("/dist/py/save_file.py")).text();
 
-        // Wait for paste mode
-        this.readUntil.activate("paste mode; Ctrl-C to cancel, Ctrl-D to finish\r\n=== ", async () => {
-            this.readUntil.activate("print(\"FILE_SAVED\")", async () => {
-                this.readUntil.activate(">>> ", async () => {
-                    this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                        this.busy = false;
-                        callback();
-                    });
-                    await this.enterRawPrompt();
-                });
-                await this.onWrite("\x04");
+        this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+            this.readUntil.activate(">", async () => {
+                this.busy = false;
+                callback();
             });
             // Send command in paste mode and exit/finish to run it
             await this.sendCmd(this.buildPathScript + this.saveFileScript);
+            await this.onWrite("\x04");
         });
-
-        // Enter paste mode
-        await this.enterRawPasteMode();
+        await this.enterRawPrompt();
     }
 
     async saveFile(filePath, data, callback){
@@ -170,16 +162,18 @@ class Repl{
                     this.busy = false;
                     callback();
                 });
-                
-                // Send data 255 bytes at a time to always fill the buffer
-                let chunkCount = Math.ceil(data.length/255)+1;
-                for(let b=0; b < chunkCount; b++){
-                    let chunk = data.slice(b*255, (b+1)*255);
-                    await this.onWrite(chunk, false);
 
-                    if(chunk.length < 255){
-                        await this.onWrite(new Uint8Array(255 - chunk.length), false);
-                        break;
+                if(data.length > 0){
+                    // Send data 255 bytes at a time to always fill the buffer
+                    let chunkCount = Math.ceil(data.length/255)+1;
+                    for(let b=0; b < chunkCount; b++){
+                        let chunk = data.slice(b*255, (b+1)*255);
+                        await this.onWrite(chunk, false);
+
+                        if(chunk.length < 255){
+                            await this.onWrite(new Uint8Array(255 - chunk.length), false);
+                            break;
+                        }
                     }
                 }
             });
@@ -202,7 +196,7 @@ class Repl{
                         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
                             this.busy = false;
                         });
-                        await this.onWrite("\x02");     // Get a normal/friendly prompt
+                        await this.onWrite("\r\x02");     // Get a normal/friendly prompt
                     });
                     await this.onWrite("\x04");         // Soft reset/exit raw mode
                 });
@@ -212,7 +206,7 @@ class Repl{
             // At the end of command run, this will be interpreted and run to soft reset
             await this.onWrite("\x04");
         });
-        this.sendCmd("\x02");
+        this.sendCmd("\r\x02");
     }
 }
 

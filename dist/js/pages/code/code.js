@@ -134,6 +134,7 @@ let saveCurrentProject = async () => {
         }
 
         await repl.startSaveFileMode(async () => {
+            console.error("START");
             project.saveThumby(savingMethod.module);
         });
     }

@@ -62,6 +62,8 @@ class ReadUntil{
         this.accumulatedData.push(data);
 
         if(index != -1){
+            console.warn("FOUND: " + this.readUntilString);
+
             // readUntilString found
             let extraData = data.slice((index - Math.abs(this.searchingString.length - data.length)) + this.readUntilString.length)
 

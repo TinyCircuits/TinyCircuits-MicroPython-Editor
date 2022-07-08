@@ -39,7 +39,7 @@ class ReadUntil{
     }
 
 
-    #deactivate(finalData){
+    #deactivate(finalData, extraData){
         let callbackCopy = this.callback;
 
         this.isActive = false;
@@ -49,7 +49,7 @@ class ReadUntil{
         this.accumulatedData = undefined;
         this.accumulatedDataLength = undefined;
 
-        callbackCopy(finalData);
+        callbackCopy(finalData, extraData);
     }
 
 
@@ -73,7 +73,7 @@ class ReadUntil{
                 offset += this.accumulatedData[idx].length;
             }
 
-            this.#deactivate(finalData.slice(2, finalData.length-totalToRemove-2));
+            this.#deactivate(finalData.slice(2, finalData.length-totalToRemove-2), extraData);
         }else{
             // readUntilString not found, remove some of the searchingString so it doesn't
             // take as long to find the readUntilString next time, also saves memory

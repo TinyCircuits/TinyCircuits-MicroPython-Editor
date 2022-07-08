@@ -57,12 +57,6 @@ thumbyConsole.onType = async (data) => {
 }
 
 
-// When a new project is to be added, open a new project with
-document.getElementById("btnNewProject").onclick = (event) => {
-    projects.addProject("TEST");
-}
-
-
 document.getElementById("btnResetLayout").onclick = (event) => {
     layout.resetLayoutSize();
     spriteEditor.resetLayoutSize();
@@ -127,10 +121,21 @@ let saveCurrentProject = async () => {
     if(savingMethod.module == undefined){
         if(savingMethod.method == "PC"){
             savingMethod.module = await window.showDirectoryPicker({mode: "readwrite"});
-            project.save(savingMethod.module);
         }else if(savingMethod.method == "Thumby"){
             savingMethod.module = repl;
         }
+    }
+
+    if(savingMethod.method == "PC"){
+        project.savePC(savingMethod.module);
+    }else if(savingMethod.method == "Thumby"){
+        if(!serial.connected){
+            await serial.connect();
+        }
+
+        await repl.startSaveFileMode(async () => {
+            project.saveThumby(savingMethod.module);
+        });
     }
 }
 

@@ -155,7 +155,7 @@ class Project{
 
 
 
-    async save(dirHandle, row){
+    async savePC(dirHandle, row){
         if(row == undefined){
             row = this.projectRow;
 
@@ -168,7 +168,7 @@ class Project{
         for(let icx=0; icx<row.childRows.length; icx++){
             if(row.childRows[icx].isFolder){
                 dirHandle.getDirectoryHandle(row.childRows[icx].text, {create: true}).then((newDirHandle) => {
-                    this.save(newDirHandle, row.childRows[icx]);
+                    this.savePC(newDirHandle, row.childRows[icx]);
                 })
             }else{
                 this.DB.getFile(row.childRows[icx].filePath, (data) => {
@@ -184,6 +184,34 @@ class Project{
                 });
             }
         }
+    }
+
+
+    async saveThumby(repl, row){
+        if(row == undefined){
+            row = this.projectRow;
+        }
+
+        let icx = -1;
+        let callback = async () => {
+            icx++;
+            if(icx < row.childRows.length){
+                if(row.childRows[icx].isFolder){
+                    this.saveThumby(repl, row.childRows[icx]);
+                }else{
+                    // console.log(row.childRows[icx].filePath);
+                    // callback();
+                    this.DB.getFile(row.childRows[icx].filePath, async (data) => {
+                        if(data == undefined) data = "";
+                        await repl.saveFile("/Games" + row.childRows[icx].filePath, data, callback);
+                    });
+                }
+            }else{
+                await repl.endSaveFileMode();
+                return;
+            }
+        }
+        callback();
     }
 }
 

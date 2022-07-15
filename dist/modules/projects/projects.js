@@ -77,15 +77,15 @@ class Projects{
             folder.addChild("Hi1.py", false);
             folder.addChild("Hi2.py", false);
             folder.addChild("Hi3.py", false);
-            folder.addChild("Hi4.py", false);
-            folder.addChild("Hi5.py", false);
-            folder.addChild("Hi6.py", false);
-            folder.addChild("Hi7.py", false);
-            folder.addChild("Hi8.py", false);
-            folder.addChild("Hi9.py", false);
-            folder.addChild("Hi10.py", false);
-            folder.addChild("Hi11.py", false);
-            folder.addChild("Hi12.py", false);
+            // folder.addChild("Hi4.py", false);
+            // folder.addChild("Hi5.py", false);
+            // folder.addChild("Hi6.py", false);
+            // folder.addChild("Hi7.py", false);
+            // folder.addChild("Hi8.py", false);
+            // folder.addChild("Hi9.py", false);
+            // folder.addChild("Hi10.py", false);
+            // folder.addChild("Hi11.py", false);
+            // folder.addChild("Hi12.py", false);
             project.saveProjectStructure();
         }else{
             for(let inx=0; inx<names.length; inx++){

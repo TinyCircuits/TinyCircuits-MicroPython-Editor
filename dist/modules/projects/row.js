@@ -139,9 +139,8 @@ class Row{
 
             // Set flag and make sure state/structure is saved
             this.isOpened = true;
-
+            
             this.project.DB.getFile(this.filePath, (data) => {
-
                 if(typeof data == "string" || typeof data == "undefined"){
                     console.log("File data:", data);
                     let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);

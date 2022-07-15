@@ -281,8 +281,29 @@ window.showSaveToDialog = (savingMethod, saveCallback) => {
 }
 
 
-window.load = (percent, text) => {
+window.load = (percent, text, increase=false) => {
     let divLoadingBar = document.getElementById("divLoadingBar");
+
+    if(increase == true){
+        let barPercent = parseFloat(divLoadingBar.children[0].style.width);
+        if(barPercent >= 100){
+            barPercent = 0;
+        }
+        percent = barPercent + percent;
+    }
+
     divLoadingBar.children[0].style.width = percent + "%";
     divLoadingBar.children[0].children[0].innerText = text + " (" + percent.toFixed(0) + "%)";
+}
+
+
+window.loadStop = (doneMessage, timeout=2000) => {
+    setTimeout(() => {
+        divLoadingBar.children[0].style.width = 0 + "%";
+        if(doneMessage != undefined){
+            divLoadingBar.children[0].children[0].innerText = doneMessage;
+        }else{
+            divLoadingBar.children[0].children[0].innerText = "";
+        }
+    }, timeout);
 }

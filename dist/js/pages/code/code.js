@@ -134,8 +134,8 @@ let saveCurrentProject = async () => {
         }
 
         await repl.startSaveFileMode(async () => {
-            console.error("START");
-            project.saveThumby(savingMethod.module);
+            await project.saveThumby(savingMethod.module);
+            console.error("IDK");
         });
     }
 }

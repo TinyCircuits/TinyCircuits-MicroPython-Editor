@@ -104,6 +104,24 @@ class Project{
     }
 
 
+    // Gets the number of files in this project (useful for loading bar when saving)
+    getFileCount(fileCount, row){
+        if(row == undefined){
+            fileCount = 0;
+            row = this.rootRow;
+        }
+
+        for(let icx=0; icx<row.childRows.length; icx++){
+            if(row.childRows[icx].isFolder){
+                fileCount = this.getFileCount(fileCount, row.childRows[icx]);
+            }else{
+                fileCount++;
+            }
+        }
+        return fileCount;
+    }
+
+
     // Projects will call this when user has picked files to add to the project
     setToFolderSelectionMode(row, files, selectedCallback){
         if(row.isRoot == false){
@@ -187,31 +205,38 @@ class Project{
     }
 
 
-    async saveThumby(repl, row){
-        if(row == undefined){
-            row = this.projectRow;
+    saveThumby(repl, row, fileCountPercentStep){
+        if(fileCountPercentStep == undefined){
+            fileCountPercentStep = 100 / this.getFileCount();
         }
 
-        let icx = -1;
-        let callback = async () => {
-            icx++;
-            if(icx < row.childRows.length){
-                if(row.childRows[icx].isFolder){
-                    this.saveThumby(repl, row.childRows[icx]);
-                }else{
-                    // console.log(row.childRows[icx].filePath);
-                    // callback();
-                    this.DB.getFile(row.childRows[icx].filePath, async (data) => {
-                        if(data == undefined) data = "";
-                        await repl.saveFile("/Games" + row.childRows[icx].filePath, data, callback);
-                    });
-                }
-            }else{
-                await repl.endSaveFileMode();
-                return;
+        return new Promise((resolve, reject) => {
+            if(row == undefined){
+                row = this.projectRow;
             }
-        }
-        callback();
+    
+            let icx = -1;
+            let callback = async () => {
+                icx++;
+                if(icx < row.childRows.length){
+                    if(row.childRows[icx].isFolder){
+                        this.saveThumby(repl, row.childRows[icx], fileCountPercentStep);
+                    }else{
+                        this.DB.getFile(row.childRows[icx].filePath, async (data) => {
+                            if(data == undefined) data = "";
+                            await repl.saveFile("/Games" + row.childRows[icx].filePath, data, callback);
+                            window.load(fileCountPercentStep, "Saving to Thumby... " + row.childRows[icx].filePath.slice(row.childRows[icx].filePath.lastIndexOf("/")+1), true);
+                        });
+                    }
+                }else{
+                    resolve();
+                    await repl.endSaveFileMode();
+                    window.loadStop("Done saving to Thumby!", 0);
+                    return;
+                }
+            }
+            callback();
+        });
     }
 }
 

@@ -203,13 +203,17 @@ export class RP2040 {
         this.onScreenAddr = (placeholder) => { };
         this.onAudioFreq = (placeholder) => { };
         this.onBrightness = (placeholder) => { };
+        this.onUpdate = () => { };
         // Debugging
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         this.onBreak = (code) => {
             // TODO: raise HardFault exception
             // console.error('Breakpoint!', code);
             // console.log(code);
-            if (code == 27) {
+            if(code == 31){
+                this.onUpdate();
+            }
+            else if (code == 27) {
                 const flashAddr = this.registers[0];
                 const ramAddr = this.registers[1] - RAM_START_ADDRESS;
                 const count = this.registers[2];

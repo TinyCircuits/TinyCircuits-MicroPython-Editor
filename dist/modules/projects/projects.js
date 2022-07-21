@@ -72,20 +72,8 @@ class Projects{
         if(names == null){
             this.projects = [];
 
-            let project = this.addProject("HelloWorldProject");
-            let folder = project.addFolder("HelloWorld");
-            folder.addChild("Hi1.py", false);
-            folder.addChild("Hi2.py", false);
-            folder.addChild("Hi3.py", false);
-            // folder.addChild("Hi4.py", false);
-            // folder.addChild("Hi5.py", false);
-            // folder.addChild("Hi6.py", false);
-            // folder.addChild("Hi7.py", false);
-            // folder.addChild("Hi8.py", false);
-            // folder.addChild("Hi9.py", false);
-            // folder.addChild("Hi10.py", false);
-            // folder.addChild("Hi11.py", false);
-            // folder.addChild("Hi12.py", false);
+            let project = this.addProject("MyGame");
+            project.addFile("MyGame.py", false);
             project.saveProjectStructure();
         }else{
             for(let inx=0; inx<names.length; inx++){

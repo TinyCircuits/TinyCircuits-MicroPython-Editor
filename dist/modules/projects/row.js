@@ -141,6 +141,12 @@ class Row{
             this.isOpened = true;
 
             this.project.DB.getFile(this.filePath, (data) => {
+                
+                // If the row determined this should be opened here (couldn't detect sprite or binary), try and convert to text
+                if(typeof data == "object"){
+                    data = new TextDecoder().decode(data);
+                }
+
                 if(typeof data == "string" || typeof data == "undefined"){
                     console.log("File data:", data);
                     let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);

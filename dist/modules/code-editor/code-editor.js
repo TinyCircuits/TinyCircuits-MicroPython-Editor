@@ -160,6 +160,8 @@ class Tab{
 
         this.editor = ace.edit(this.divEditor);
         this.editor.setTheme("ace/theme/chrome");
+        this.editor.session.setMode("ace/mode/python");
+
         if(data != undefined){
             this.editor.setValue(data, 1);
         }

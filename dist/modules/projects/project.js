@@ -205,7 +205,7 @@ class Project{
     }
 
 
-    saveThumby(repl, row, fileCountPercentStep){
+    saveThumby(repl, finishedCallback, row, fileCountPercentStep){
         if(fileCountPercentStep == undefined){
             fileCountPercentStep = 100 / this.getFileCount();
         }
@@ -220,7 +220,7 @@ class Project{
                 icx++;
                 if(icx < row.childRows.length){
                     if(row.childRows[icx].isFolder){
-                        this.saveThumby(repl, row.childRows[icx], fileCountPercentStep);
+                        this.saveThumby(repl, finishedCallback, row.childRows[icx], fileCountPercentStep);
                     }else{
                         this.DB.getFile(row.childRows[icx].filePath, async (data) => {
                             if(data == undefined) data = "";
@@ -230,12 +230,37 @@ class Project{
                     }
                 }else{
                     resolve();
-                    await repl.endSaveFileMode();
+                    await repl.endSaveFileMode(finishedCallback);
                     window.loadStop("Done saving to Thumby!", 0);
                     return;
                 }
             }
             callback();
+        });
+    }
+
+
+    // Returns list of dicts where each dict has keys 'path' and 'data'
+    getAllFiles(fileList, row){
+        return new Promise((resolve, reject) => {
+            if(row == undefined){
+                fileList = [];
+                row = this.projectRow;
+            }
+        
+            for(let icx=0; icx<row.childRows.length; icx++){
+                if(row.childRows[icx].isFolder){
+                    this.getAllFiles(fileList, row.childRows[icx])
+                }else{
+                    this.DB.getFile(row.childRows[icx].filePath, async (data) => {
+                        if(data == undefined) data = "";
+                        fileList.push({path: row.childRows[icx].filePath, data: data});
+                    });
+                }
+            }
+
+            resolve(fileList);
+            return;
         });
     }
 }

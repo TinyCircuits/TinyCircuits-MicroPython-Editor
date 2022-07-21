@@ -13,6 +13,13 @@ class DB{
     #initDB(successCallback){
         // Open database for files and handle any errors
         const request = indexedDB.open(this.DB_ID, this.DB_VER);
+
+        request.onsuccess = (event) => {
+            this.DB = event.target.result;
+
+            successCallback();
+        };
+
         request.onerror = (event) => {
             console.error(`Database error: ${event.target.errorCode}`);
         };
@@ -29,11 +36,6 @@ class DB{
             editorStore.createIndex(this.STORE_INDEX, this.STORE_INDEX, {
                 unique: false
             });
-        };
-
-        request.onsuccess = (event) => {
-            this.DB = event.target.result;
-            successCallback();
         };
     }
 

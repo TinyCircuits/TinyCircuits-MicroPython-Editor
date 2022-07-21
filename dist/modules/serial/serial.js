@@ -103,7 +103,7 @@ class Serial{
             // Call the connected callback for external modules
             await this.onConnect();
 
-            window.load(100, "Connected!");
+            window.loadStop("Connected!", 100);
         }catch(error){
             if(error.name == "InvalidStateError"){
                 window.showError("Port already open...");

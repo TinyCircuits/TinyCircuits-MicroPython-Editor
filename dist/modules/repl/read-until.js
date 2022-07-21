@@ -29,10 +29,11 @@ class ReadUntil{
     }
 
 
-    activate(readUntilString, callback){
+    activate(readUntilString, callback, forceOutput){
         this.isActive = true;
         this.readUntilString = readUntilString;
         this.callback = callback;
+        this.forceOutput = forceOutput;
         this.searchingString = "";
         this.accumulatedData = [];
         this.accumulatedDataLength = 0;
@@ -45,6 +46,7 @@ class ReadUntil{
         this.isActive = false;
         this.readUntilString = undefined;
         this.callback = undefined;
+        this.forceOutput = undefined;
         this.searchingString = undefined;
         this.accumulatedData = undefined;
         this.accumulatedDataLength = undefined;

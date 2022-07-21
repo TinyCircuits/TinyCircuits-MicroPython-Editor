@@ -6,6 +6,7 @@ import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
 import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
 import { Serial } from "../../../modules/serial/serial.js";
 import { Repl } from "../../../modules/repl/repl.js";
+import { Emulator } from "../../../modules/emulator/emulator.js";
 
 
 let divLayout = document.getElementById("divLayout");
@@ -26,6 +27,20 @@ let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]],
 
 let thumbyConsole = new Console(document.getElementById("divThumbyConsole"), "Thumby console\r\n");
 let browserConsole = new Console(document.getElementById("divBrowserConsole"), "Browser console\r\n");
+
+
+let emulator = new Emulator();
+emulator.onOutput = (data) => {
+    browserConsole.write(data);
+}
+browserConsole.onType = (data) => {
+    emulator.write(data);
+}
+
+let btnRunInBrowser = document.getElementById("btnRunInBrowser");
+btnRunInBrowser.onclick = async (event) => {
+    emulator.startEmulator(await projects.projects[0].getAllFiles(), projects.projects[0].projectName);
+}
 
 
 // For some reason, Mac OS makes the PID show up as 10 for Thumby, sometimes
@@ -60,6 +75,7 @@ thumbyConsole.onType = async (data) => {
 document.getElementById("btnResetLayout").onclick = (event) => {
     layout.resetLayoutSize();
     spriteEditor.resetLayoutSize();
+    emulator.resetLayoutSize();
 }
 
 
@@ -99,14 +115,24 @@ document.getElementById("btnRunOnThumby").onclick = async (event) => {
         await serial.connect();
     }
 
+    savingMethod.method = "Thumby";
+    savingMethod.module = repl;
 
-    await repl.startSaveFileMode(async () => {
-        await repl.saveFile("/test/test.py", await (await fetch("/dist/py/build_path.py")).text(), async () => {
-            await repl.saveFile("/test/test2.py", await (await fetch("/dist/py/save_file.py")).text(), async () => {
-                await repl.endSaveFileMode();
-            });
-        });
+    await saveCurrentProject(() => {
+        let projectName = projects.projects[0].projectName;
+        let path = "/Games/" + projectName + "/" + projectName + ".py";
+        
+        repl.executeFile(path);
     });
+}
+
+
+document.getElementById("btnStopThumby").onclick = async (event) => {
+    if(!serial.connected){
+        await serial.connect();
+    }
+
+    repl.stop();
 }
 
 
@@ -115,7 +141,7 @@ document.getElementById("btnRunOnThumby").onclick = async (event) => {
 let savingMethod = {method: undefined, module: undefined};
 
 
-let saveCurrentProject = async () => {
+let saveCurrentProject = async (callback = () => {}) => {
     let project = projects.projects[0];
 
     if(savingMethod.module == undefined){
@@ -134,8 +160,7 @@ let saveCurrentProject = async () => {
         }
 
         await repl.startSaveFileMode(async () => {
-            await project.saveThumby(savingMethod.module);
-            console.error("IDK");
+            await project.saveThumby(savingMethod.module, callback);
         });
     }
 }

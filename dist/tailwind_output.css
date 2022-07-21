@@ -570,10 +570,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 9px;
 }
 
-.left-\[698px\] {
-  left: 698px;
-}
-
 .top-6 {
   top: 1.5rem;
 }
@@ -642,8 +638,17 @@ Ensure the default browser behavior of the `hidden` attribute.
   z-index: 100000;
 }
 
+.m-2 {
+  margin: 0.5rem;
+}
+
 .m-auto {
   margin: auto;
+}
+
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .mx-3 {
@@ -711,6 +716,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: none;
 }
 
+.aspect-\[72\/40\] {
+  aspect-ratio: 72 / 40;
+}
+
 .h-12 {
   height: 3rem;
 }
@@ -737,6 +746,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: fit-content;
 }
 
+.h-5 {
+  height: 1.25rem;
+}
+
 .h-\[175px\] {
   height: 175px;
 }
@@ -755,10 +768,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .h-\[15px\] {
   height: 15px;
-}
-
-.h-5 {
-  height: 1.25rem;
 }
 
 .h-\[40px\] {
@@ -811,6 +820,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 66.666667%;
 }
 
+.w-12 {
+  width: 3rem;
+}
+
+.w-5 {
+  width: 1.25rem;
+}
+
 .w-\[0\%\] {
   width: 0%;
 }
@@ -847,10 +864,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-4 {
   width: 1rem;
-}
-
-.w-5 {
-  width: 1.25rem;
 }
 
 .w-\[85\%\] {
@@ -954,6 +967,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   justify-content: space-evenly;
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -1021,6 +1038,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .border-black {
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
+}
+
+.border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
 }
 
 .border-x-black {
@@ -1104,14 +1126,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding: 10px;
 }
 
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .pt-1 {
@@ -1246,10 +1268,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .lg\:right-2 {
     right: 0.5rem;
-  }
-
-  .lg\:right-12 {
-    right: 3rem;
   }
 }
 

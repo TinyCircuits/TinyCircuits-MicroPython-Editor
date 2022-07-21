@@ -47,9 +47,11 @@ class Repl{
 
     // Main data consumer, data comes here from serial before being output again
     consumeData(data){
-        if(!this.readUntil.isActive){
+        if(!this.readUntil.isActive || this.readUntil.forceOutput == true){
             this.onOutput(data);
-        }else{
+        }
+
+        if(this.readUntil.isActive){
             this.readUntil.evaluate(data);
         }
     }
@@ -184,7 +186,7 @@ class Repl{
         await this.sendCmd("\x04");
     }
 
-    async endSaveFileMode(){
+    async endSaveFileMode(callback = () => {}){
         if(this.busy) return;
         this.busy = true;
 
@@ -195,6 +197,7 @@ class Repl{
                     this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
                         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
                             this.busy = false;
+                            callback();
                         });
                         await this.onWrite("\r\x02");     // Get a normal/friendly prompt
                     });
@@ -207,6 +210,26 @@ class Repl{
             await this.onWrite("\x04");
         });
         this.sendCmd("\r\x02");
+    }
+
+
+    async executeFile(filePath){
+        this.readUntil.activate("execfile(\"" + filePath + "\")\r\n", async (finalData, extraData) => {
+            // Output the extra data that was used during the finding of the activate line
+            await this.onOutput(extraData);
+        });
+        await this.onOutput("\r\n");
+        await this.sendCmd("from machine import freq\r\n");
+        await this.sendCmd("freq(125000000)\r\n");
+        await this.sendCmd("execfile(\"" + filePath + "\")\r\n");
+        window.loadStop("Started!", 0);
+    }
+
+
+    async stop(){
+        await this.onWrite("\x03\x03");
+        window.load(100, "Stopping...");
+        window.loadStop("Stopped!", 100);
     }
 }
 

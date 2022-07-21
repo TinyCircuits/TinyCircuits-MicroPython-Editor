@@ -212,8 +212,7 @@ export class RP2040 {
             // console.log(code);
             if(code == 31){
                 this.onUpdate();
-            }
-            else if (code == 27) {
+            }else if (code == 27) {
                 const flashAddr = this.registers[0];
                 const ramAddr = this.registers[1] - RAM_START_ADDRESS;
                 const count = this.registers[2];

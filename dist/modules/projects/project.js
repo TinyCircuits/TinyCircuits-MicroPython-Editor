@@ -7,15 +7,14 @@ import { DB } from "../db/js/db.js";
 //  * Tracking of open files in code tabs
 //  * Tracking of open files in sprite
 class Project{
-    constructor(projectName, div, closeCallback, codeEditor){
+    constructor(projects, projectName, div, codeEditor){
+        this.projects = projects;
+
         this.projectName = projectName;
         this.div = div;
 
         // Each row will need to be able to add its own tab to the code editor, pass it down
         this.codeEditor = codeEditor;
-
-        // Called when this project is closed so Projects can remove it from list
-        this.closeCallback = closeCallback;
 
         // Create a database with the project name to make it unique
         // to other projects (more than one project with the same name 
@@ -49,6 +48,15 @@ class Project{
         let hierarchy = {};
         this.#getProjectHierarchy(this.rootRow, hierarchy);
         localStorage.setItem("Project" + this.projectName, JSON.stringify(hierarchy));
+    }
+
+
+    // If the project name is changed, call this to change name here, change reference in projects, and rename database
+    async updateProjectName(newName){
+        this.projectName = newName;
+        this.projects.saveProjectNames();
+
+        this.DB = await this.DB.rename(newName);
     }
 
 

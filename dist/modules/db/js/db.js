@@ -147,6 +147,30 @@ class DB{
     }
 
 
+    #getAll(storeBucket){
+        return new Promise((resolve, reject) => {
+            this.#initDB(() => {
+                // Create a transaction with binary store in read only mode
+                const txn = this.DB.transaction(storeBucket, 'readwrite');
+
+                // Get the store/bucket
+                const store = txn.objectStore(storeBucket);
+
+                const all = store.getAll();
+
+                all.onsuccess = (event) => {
+                    resolve(event.target.result);
+                }
+
+                // Close the database connection
+                txn.oncomplete = () => {
+                    this.DB.close();
+                };
+            });
+        });
+    }
+
+
     addFile(dataBuffer, name){
         this.#addDBFile(dataBuffer, this.STORE_ID, this.STORE_INDEX, name);
     }
@@ -157,6 +181,26 @@ class DB{
 
     deleteFile(name){
         this.#deleteDBFile(this.STORE_ID, this.STORE_INDEX, name);
+    }
+
+    // Rename database by return new version under new name with all old content and then deleting old data base
+    async rename(newName){
+        let newDB = new DB(newName);
+
+        const all = await this.#getAll(this.STORE_ID);
+
+        for(let iix=0; iix<all.length; iix++){
+            let keys = Object.keys(all[iix]);
+
+            let path = all[iix][keys[0]];
+            let data = all[iix][keys[1]];
+            if(data == undefined) data ="";
+            newDB.addFile(path, data);
+        }
+
+        indexedDB.deleteDatabase(this.DB_ID);
+
+        return newDB;
     }
 }
 

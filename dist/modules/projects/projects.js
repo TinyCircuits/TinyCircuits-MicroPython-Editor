@@ -29,10 +29,10 @@ class Projects{
         }
 
         // Second, add the project with name and close callback
-        let newProject = new Project(name, this.div, this.closeProject, this.codeEditor);
+        let newProject = new Project(this, name, this.div, this.codeEditor);
         this.projects.push(newProject);
 
-        this.#saveProjectNames();
+        this.saveProjectNames();
 
         return newProject;
     }
@@ -46,13 +46,14 @@ class Projects{
             }
         }
 
-        this.#saveProjectNames();
+        this.saveProjectNames();
     }
+
 
 
     // Each project name is unique and used as a ledger to 
     // fetch each project's related localstorage data
-    #saveProjectNames(){
+    saveProjectNames(){
         let names = [];
         for(let ipx=0; ipx<this.projects.length; ipx++){
             names.push(this.projects[ipx].projectName);
@@ -77,7 +78,7 @@ class Projects{
             project.saveProjectStructure();
         }else{
             for(let inx=0; inx<names.length; inx++){
-                this.projects.push(new Project(names[inx], this.div, this.closeProject, this.codeEditor));
+                this.projects.push(new Project(this, names[inx], this.div, this.codeEditor));
             }
         }
     }

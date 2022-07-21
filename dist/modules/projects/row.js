@@ -262,26 +262,29 @@ class Row{
             this.text = text;
             this.textDiv.textContent = this.text;
 
-            // Get this file's contents using the old project's file path and replace everything under the new path
-            this.project.DB.getFile(this.filePath, (data) => {
-                this.project.DB.deleteFile(this.filePath);
-                
-                this.filePath = filePath;
-                this.project.DB.addFile(data, this.filePath);
-
-                // Change the linked code editors path (which in turn changes the code editor tab visible text)
-                if(this.codeEditorTab){
-                    this.codeEditorTab.changeFilePath(this.filePath);
+            // Depending on if renaming a file, a folder, or a folder that is root, do different things
+            if(this.isFolder){
+                if(this.parent.isRoot){
+                    this.project.updateProjectName(text);
                 }
-                
-                // In case this is a folder. update all the child file paths, recursively
-                if(this.isFolder){
-                    this.#updateChildFilePaths(this);
-                }
-                
-                // Save all changes to local storage for reconstruction on page reload
+                this.#updateChildFilePaths(this);
                 this.project.saveProjectStructure();
-            });
+            }else{
+                // Get this file's contents using the old project's file path and replace everything under the new path
+                this.project.DB.getFile(this.filePath, (data) => {
+                    this.project.DB.deleteFile(this.filePath);
+                    
+                    this.filePath = filePath;
+                    this.project.DB.addFile(data, this.filePath);
+
+                    // Change the linked code editors path (which in turn changes the code editor tab visible text)
+                    if(this.codeEditorTab){
+                        this.codeEditorTab.changeFilePath(this.filePath);
+                    }
+                    
+                    this.project.saveProjectStructure();
+                });
+            }
         }else{
             window.showError("Did not rename, that file path already exists");
         }

@@ -231,19 +231,32 @@ class Emulator{
             this.littlefs = new Littlefs();
             await this.littlefs.init();
 
-            this.littlefs.saveFile("/lib/font3x5.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font3x5.bin")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/font5x7.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font5x7.bin")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/font8x8.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font8x8.bin")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/font3x5.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font3x5.bin")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/font5x7.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font5x7.bin")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/font8x8.bin", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/font8x8.bin")).arrayBuffer()));
             // this.littlefs.saveFile("/lib/ssd1306.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/ssd1306.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumby.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumby.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbyAudioBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyAudioBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbyButtonBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyButtonBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbyGraphicsBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyGraphicsBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbyHardwareBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyHardwareBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbyLinkBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyLinkBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbySavesBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbySavesBase.py")).arrayBuffer()));
+            // this.littlefs.saveFile("/lib/thumbySpriteBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbySpriteBase.py")).arrayBuffer()));
+
+            this.littlefs.saveFile("/lib/font3x5.bin", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/font3x5.bin")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/font5x7.bin", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/font5x7.bin")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/font8x8.bin", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/font8x8.bin")).arrayBuffer()));
             this.littlefs.saveFile("/lib/ssd1306.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/ssd1306.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumby.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumby.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbyAudioBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyAudioBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbyButtonBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyButtonBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbyGraphicsBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyGraphicsBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbyHardwareBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyHardwareBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbyLinkBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbyLinkBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbySavesBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbySavesBase.py")).arrayBuffer()));
-            this.littlefs.saveFile("/lib/thumbySpriteBase.py", new Uint8Array(await (await fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Code-Editor/master/ThumbyGames/lib-emulator/thumbySpriteBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumby.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumby.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbyAudioBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbyAudioBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbyButtonBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbyButtonBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbyGraphicsBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbyGraphicsBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbyHardwareBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbyHardwareBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbyLinkBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbyLinkBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbySavesBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbySavesBase.py")).arrayBuffer()));
+            this.littlefs.saveFile("/lib/thumbySpriteBase.py", new Uint8Array(await (await fetch("/dist/ThumbyFiles/lib-emulator/thumbySpriteBase.py")).arrayBuffer()));
+
 
             for(let ifx=0; ifx<fileList.length; ifx++){
                 this.littlefs.saveFile("/Games" + fileList[ifx].path, new TextEncoder().encode(fileList[ifx].data));

@@ -52,38 +52,39 @@ class Tab{
 
 
     close(){
-        // Remove self from tabs list
-        for(let itx=0; itx<this.tabManager.tabs.length; itx++){
-            if(this.tabManager.tabs[itx].filePath == this.filePath){
-                this.tabManager.tabs.remove(itx);
+        // Only close when actually in the tab header and not already closed
+        if(this.tabHeaderDiv.contains(this.divTab)){
+            // Remove self from tabs list
+            for(let itx=0; itx<this.tabManager.tabs.length; itx++){
+                if(this.tabManager.tabs[itx].filePath == this.filePath){
+                    this.tabManager.tabs.remove(itx);
 
-                // If this tab is selected, select the next best tab since this one is closing
-                if(this.selected){
-                    if(this.tabManager.tabs.length > 0){
-                        if(itx == this.tabManager.tabs.length){
-                            this.tabManager.tabs[itx-1].select();
-                        }else{
-                            this.tabManager.tabs[itx].select();
+                    // If this tab is selected, select the next best tab since this one is closing
+                    if(this.selected){
+                        if(this.tabManager.tabs.length > 0){
+                            if(itx == this.tabManager.tabs.length){
+                                this.tabManager.tabs[itx-1].select();
+                            }else{
+                                this.tabManager.tabs[itx].select();
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
-        }
 
-        // Destroy ace editor and remove tab HTML
-        this.editor.destroy();
-        if(this.tabHeaderDiv.contains(this.divTab)){
+            // Destroy ace editor and remove tab HTML
+            this.editor.destroy();
             this.tabHeaderDiv.removeChild(this.divTab);
             this.divCodeEditorParent.removeChild(this.divEditor);
+
+            // Call the callback for when a tab closes
+            this.onClose();
+
+            // Make sure to save an undefined value so it won't resume position from saved
+            this.tabIndex = undefined;
+            this.#saveTabData();
         }
-
-        // Call the callback for when a tab closes
-        this.onClose();
-
-        // Make sure to save an undefined value so it won't resume position from saved
-        this.tabIndex = undefined;
-        this.#saveTabData();
     }
 
 

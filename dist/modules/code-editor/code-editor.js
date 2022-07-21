@@ -7,7 +7,7 @@ class Tab{
 
         this.selected = false;
 
-        console.log("File data at tab:", data);
+        // console.log("File data at tab:", data);
 
         // Overridable functions for external modules to use (projects, project, row)
         this.onSave = (data) => {};
@@ -73,8 +73,10 @@ class Tab{
 
         // Destroy ace editor and remove tab HTML
         this.editor.destroy();
-        this.tabHeaderDiv.removeChild(this.divTab);
-        this.divCodeEditorParent.removeChild(this.divEditor);
+        if(this.tabHeaderDiv.contains(this.divTab)){
+            this.tabHeaderDiv.removeChild(this.divTab);
+            this.divCodeEditorParent.removeChild(this.divEditor);
+        }
 
         // Call the callback for when a tab closes
         this.onClose();

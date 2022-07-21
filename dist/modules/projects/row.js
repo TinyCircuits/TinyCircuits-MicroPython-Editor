@@ -148,7 +148,7 @@ class Row{
                 }
 
                 if(typeof data == "string" || typeof data == "undefined"){
-                    console.log("File data:", data);
+                    // console.log("File data:", data);
                     let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);
 
                     // Check that a tab was actually created, if it already existed then it may not have been

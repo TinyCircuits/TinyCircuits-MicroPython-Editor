@@ -3,6 +3,7 @@ import { USBCDC } from './rp2040js/usb/cdc.js';
 import { ConsoleLogger, LogLevel } from './rp2040js/utils/logging.js';
 import { decodeBlock } from './uf2/uf2.js';
 import { Littlefs } from "./littlefs/littlefs-wrapper.js";
+import { Record } from './record.js';
 
 class Emulator{
     constructor(){
@@ -11,6 +12,8 @@ class Emulator{
         this.btnStopBrowser = document.getElementById("btnStopBrowser");
         this.btnZoomInEmulator = document.getElementById("btnZoomInEmulator");
         this.btnZoomOutEmulator = document.getElementById("btnZoomOutEmulator");
+        this.btnRotateEmulator = document.getElementById("btnRotateEmulator");
+        this.btnEmulatorAudio = document.getElementById("btnEmulatorAudio");
 
         this.context = this.canvasEmulator.getContext('2d', { alpha: false });
         this.context.imageSmoothingEnabled = false;
@@ -19,10 +22,14 @@ class Emulator{
         this.context.webkitImageSmoothingEnabled = false;
         this.context.msImageSmoothingEnabled = false;
 
+        this.recorder = new Record();
+
         this.onOutput = (data) => {};
 
         this.width = 72;
         this.height = 40;
+
+        this.muted = false;
 
         this.mcu = undefined;
         this.cdc = undefined;
@@ -43,6 +50,19 @@ class Emulator{
 
         this.mainFilePath = undefined;
 
+        // Stop emulator if started, clear canvas, stop audio
+        this.btnStopBrowser.onclick = () => {
+            if(this.mcu != undefined){
+                this.mcu.stop();
+                this.mcu.reset();
+
+                this.context.fillStyle = "black";
+                this.context.fillRect(0, 0, this.width, this.height);
+
+                this.audioVolumeNode.gain.value = 0.0;
+            }
+        }
+
         this.btnZoomInEmulator.onclick = () => {
             let w = parseInt(this.canvasEmulator.style.width);
             let h = parseInt(this.canvasEmulator.style.height);
@@ -59,6 +79,41 @@ class Emulator{
                 this.canvasEmulator.style.height = (h/2) + "px";
             }
         }
+
+        this.btnRotateEmulator.onclick = () => {
+            let rotation = this.canvasEmulator.style.transform;
+
+            if(rotation == ""){
+                this.canvasEmulator.style.transform = "rotate(-90deg)";
+            }else{
+                rotation = parseInt(rotation.slice(rotation.indexOf('(')+1, rotation.indexOf('deg'))) - 90;
+                if(rotation < -270){
+                    rotation = 0;
+                }
+                this.canvasEmulator.style.transform = "rotate(" + rotation + "deg)";
+            }
+        }
+
+
+        this.btnEmulatorAudio.onclick = () => {
+            console.error(this.muted);
+            if(this.muted){
+                this.muted = false;
+                this.btnEmulatorAudio.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                </svg>
+                `
+            }else{
+                this.muted = true;
+                if(this.audioBuzzerNode != undefined) this.audioBuzzerNode.frequency.value = 0;
+                this.btnEmulatorAudio.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                `
+            }
+        }
     }
 
 
@@ -73,6 +128,7 @@ class Emulator{
 
         this.audioVolumeNode = this.audioContext.createGain();
         this.audioVolumeNode.connect(this.audioContext.destination);
+        this.audioVolumeNode.gain.value = 0.25;
 
         this.audioBuzzerNode = this.audioContext.createOscillator();
         this.audioBuzzerNode.frequency.value = 0;
@@ -133,8 +189,11 @@ class Emulator{
             }
         }
         
-        this.context.putImageData(new ImageData(this.displayPixelBuffer, this.width, this.height), 0, 0);
-        // this.context.drawImage(await createImageBitmap(new ImageData(this.displayPixelBuffer, this.width, this.height)), 0, 0);
+        let imageData = new ImageData(this.displayPixelBuffer, this.width, this.height);
+        this.context.putImageData(imageData, 0, 0);
+
+        // Send frame to recorder to be scaled and/or rotated then saved to video (if recording)
+        this.recorder.sendFrame(imageData);
     }
 
 
@@ -142,14 +201,15 @@ class Emulator{
         this.mcu = new RP2040();
         this.mcu.onScreenAddr = (addr) => {this.displayBufferAddress = addr - 0x20000000;};
         this.mcu.onBrightness = (brightness) => {this.displayBrightness = Math.floor((brightness / 127) * 255)};
-        this.mcu.onAudioFreq = (freq) => {this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.AUDIO_CONTEXT.currentTime + 0.03)};
+        this.mcu.onAudioFreq = (freq) => {
+            if(this.muted == false){
+                this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.audioContext.currentTime + 0.03);
+            }
+        };
         this.mcu.onUpdate = () => {this.#updateDisplay()};
 
         this.mcu.logger = new ConsoleLogger(LogLevel.Error);
 
-        // this.mcu.gpio[2].addListener(() => {
-        //     this.#updateDisplay();
-        // });
         this.displayPixelBuffer =new Uint8ClampedArray(new ArrayBuffer(this.width * this.height * 4));
 
         addEventListener("keydown", (event) => {

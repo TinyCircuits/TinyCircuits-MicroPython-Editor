@@ -1,38 +1,59 @@
 <div class="w-full h-full flex">
     <div class="w-full h-full m-2 overflow-auto">
         <!-- Canvas parent -->
-        <div class="w-full h-fit aspect-[72/40] border border-black flex justify-center items-center">
+        <div class="w-full h-fit aspect-[72/40] border border-black flex justify-center items-center overflow-hidden">
             <canvas id="canvasEmulator" width="72" height="40" class="border border-dashed border-gray-200 crisp-canvas" style="width:144px; height:80px">
             </canvas>
         </div>
 
-        <!-- Button parent -->
-        <div class="w-full h-8 my-1 flex justify-evenly">
-            <button id="btnRunInBrowser" title="Runs the current project in the borwser emulator (saves then runs from /Games folder)" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md px-1 w-12 h-8 border duration-200">
+        <!-- Button top row parent -->
+        <div class="w-full h-8 my-1 flex justify-center">
+            <button id="btnRunInBrowser" title="Runs the current project in the borwser emulator (saves then runs from /Games folder)" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md px-1 w-12 h-8 border duration-200">
                 Run
             </button>
 
-            <button id="btnStopBrowser" title="Stops the currently running emulator script" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black select-none rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnStopBrowser" title="Stops the currently running emulator script" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black select-none rounded-md px-1 w-12 h-8 border duration-200">
                 Stop
             </button>
 
-            <button id="btnZoomInEmulator" title="Zooms the emulator in" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnZoomInEmulator" title="Zooms the emulator in" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M5 8a1 1 0 011-1h1V6a1 1 0 012 0v1h1a1 1 0 110 2H9v1a1 1 0 11-2 0V9H6a1 1 0 01-1-1z" />
                     <path fill-rule="evenodd" d="M2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8zm6-4a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd" />
                 </svg>
             </button>
 
-            <button id="btnZoomOutEmulator" title="Zooms the emulator out" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnZoomOutEmulator" title="Zooms the emulator out" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M5 8a1 1 0 011-1h4a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
                 </svg>
             </button>
 
-            <button id="btnZoomOutEmulator" title="Rotates the emulator counter-clockwise" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnRotateEmulator" title="Rotates the emulator counter-clockwise" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Button bottom row parent -->
+        <div class="w-full h-8 my-1 flex justify-center">
+            <button id="btnEmulatorAudio" title="Mute or unmute emulator audio" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+            <button id="btnEmulatorVideo" title="Toggle emulator video recording" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                </svg>
+            </button>
+
+            <button id="btnEmulatorScreenshot" title="Take screenshot of emulator" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
                 </svg>
             </button>
         </div>

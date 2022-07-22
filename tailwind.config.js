@@ -1,4 +1,5 @@
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{html,js}', 
             './dist/js/**/*.{html,js}',
             './dist/modules/Tabs-Handler/**/*.{html,js}',

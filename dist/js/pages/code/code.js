@@ -78,6 +78,15 @@ document.getElementById("btnResetLayout").onclick = (event) => {
     emulator.resetLayoutSize();
 }
 
+// https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
+document.getElementById("btnInvertTheme").onclick = (event) => {{
+    if(document.documentElement.classList.contains("dark")){
+        document.documentElement.classList.remove('dark');
+    }else{
+        document.documentElement.classList.add('dark')
+    }
+}}
+
 
 document.getElementById("btnProjectAddFiles").onclick = (event) => {
     let input = document.createElement('input');

@@ -2,12 +2,12 @@
     <div class="resizable-left" id="win1">
         <div class="resizable-left" id="win3">
             <div id="divProjectsLayoutPanel" class="min-w-full min-h-full bg-white">
-                <div class="w-full h-6 bg-black text-white">
+                <div class="w-full h-6 bg-black text-white dark:text-black dark:bg-white">
                     <div class="ml-1">
                         Projects
                     </div>
                 </div>
-                <div id="divProjects" class="absolute top-6 bottom-0 left-0 right-0">
+                <div id="divProjects" class="absolute top-6 bottom-0 left-0 right-0 dark:bg-black">
                     
                 </div>
             </div>
@@ -46,20 +46,20 @@
 
 
     <div class="resizable-right" id="win2">
-        <div class="min-w-full min-h-full bg-white">
-            <div class="w-full h-6 bg-black text-white flex">
+        <div class="min-w-full min-h-full bg-white dark:bg-black">
+            <div class="w-full h-6 bg-black text-white dark:bg-white dark:text-black flex">
                 <button id="btnThumbyConsole" class="select-none whitespace-nowrap w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run on Thumby</button>
                 <button id="btnBrowserConsole" class="select-none whitespace-nowrap w-1/2 min-h-full bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200">Run in browser</button>
             </div>
 
             <div id="divRunOnThumby" class="absolute top-6 bottom-0 left-0 right-0 flex flex-col items-center">
-                <button id="btnRunOnThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="select-none rounded-md mt-2 px-2 w-fit h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <button id="btnRunOnThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
                     Run
                 </button>
-                <button id="btnStartMainMenu" title="Starts the main menu on Thumby" class="select-none rounded-md mt-2 px-2 w-fit h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <button id="btnStartMainMenu" title="Starts the main menu on Thumby" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
                     Main Menu
                 </button>
-                <button id="btnStopThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="select-none rounded-md mt-2 px-2 w-fit h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <button id="btnStopThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
                     Stop
                 </button>
             </div>

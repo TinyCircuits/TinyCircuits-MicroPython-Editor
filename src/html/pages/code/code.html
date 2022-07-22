@@ -11,14 +11,14 @@
         <link rel="stylesheet" type="text/css" href="/dist/css/pages/code/code.css">
     </head>
 
-    <body class="overflow-hidden">
+    <body class="overflow-hidden dark:bg-black">
         @@include('./project-dropdown.html')
         @@include('./view-dropdown.html')
         @@include('./workspace-selection.html')
 
-        <div class="flex absolute left-2 top-2 w-[240px] h-8 border border-black bg-white">
+        <div class="flex absolute left-2 top-2 w-[240px] h-8 border  border-black bg-white  dark:border-white dark:bg-black">
             <input type="text" value="Project Name" class="w-[221px] min-h-full focus:border-0">
-            <button class="bg-black hover:bg-white active:bg-black stroke-white hover:stroke-black active:stroke-white flex justify-center items-center min-w-[35px] min-h-full border-l border-l-black duration-100">
+            <button class="bg-black hover:bg-white active:bg-black stroke-white hover:stroke-black active:stroke-white border-l-black  dark:bg-white dark:hover:bg-black dark:active:bg-white dark:stroke-black dark:hover:stroke-white dark:active:stroke-black dark:border-l-white  flex justify-center items-center min-w-[35px] min-h-full border-l duration-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-2/3 w-2/3" fill="none" viewBox="0 0 24 24" stroke="inherit" stroke-width="1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
@@ -26,7 +26,7 @@
         </div>
 
 
-        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-8 border border-black bg-white">
+        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-8 border border-black bg-white dark:border-white dark:bg-black">
             @@include('./layout.html')
         </div>
 
@@ -35,7 +35,7 @@
         </div>
 
 
-        <button class="absolute left-[738px] lg:left-auto lg:right-2 top-[9px] h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
+        <button class="bg-black hover:bg-white fill-white hover:fill-black border-black active:bg-black active:fill-white  dark:bg-white dark:hover:bg-black dark:fill-black dark:hover:fill-white dark:border-white dark:active:bg-white dark:active:fill-black  border absolute left-[738px] lg:left-auto lg:right-2 top-[9px] h-8 w-8 rounded-full duration-200 p-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>

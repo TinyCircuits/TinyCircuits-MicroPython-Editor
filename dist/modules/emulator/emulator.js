@@ -202,7 +202,6 @@ class Emulator{
 
         if(this.bootromData == undefined) this.bootromData = new Uint32Array(await (await fetch("/dist/modules/emulator/bootrom.bin")).arrayBuffer());
         if(this.firmwareData == undefined) this.firmwareData = new Uint8Array(await (await fetch("/dist/modules/emulator/emulator-micropython-firmware-1.19.1.uf2")).arrayBuffer());
-    
         this.mcu.loadBootrom(this.bootromData);
         console.log("Emulator bootrom loaded!");
 

@@ -113,7 +113,9 @@
                     </div>
                     
                     <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
-                        <div class="min-w-full min-h-full">
+                        
+                        <div class="w-full h-full">
+
     <!-- Panel title -->
     <div class="w-full h-6 bg-black text-white">
         <div class="ml-1">
@@ -121,7 +123,13 @@
         </div>
     </div>
 
-    <div class="absolute top-10 bottom-4 left-4 right-4 flex flex-row">
+    <!-- Tabs header container -->
+    <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-black">
+        
+    </div>
+
+    <!-- Main editor container where tab contents get shown/hidden -->
+    <div class="absolute top-[89px] bottom-4 left-4 right-4 flex flex-row">
         <div id="divSpriteListParent" class="flex-auto w-[15%]">
             <!-- Sprite list -->
             <div id="divSpriteList" class="h-full border border-black rounded-md">
@@ -136,9 +144,9 @@
             <div class="h-full w-full">
                 <!-- Sprite Editor -->
                 <div id="divSpriteEditor" class="h-full border border-black rounded-md relative overflow-hidden">
-                    <canvas id="canvasSpriteEditor" width="72" height="40" class="w-[72px] h-[40px] border border-black border-dashed absolute top-[0px] left-[0px] crisp-canvas">
+                    <!-- <canvas id="canvasSpriteEditor" width="72" height="40" class="w-[72px] h-[40px] border border-black border-dashed absolute top-[0px] left-[0px] crisp-canvas">
 
-                    </canvas>
+                    </canvas> -->
                 </div>
             </div>
             <div class="h-10 w-full">
@@ -244,6 +252,7 @@
             </div>
         </div>
     </div>
+
 </div>
                     </div>
     

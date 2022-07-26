@@ -96,7 +96,6 @@ class Emulator{
 
 
         this.btnEmulatorAudio.onclick = () => {
-            console.error(this.muted);
             if(this.muted){
                 this.muted = false;
                 this.btnEmulatorAudio.innerHTML = `

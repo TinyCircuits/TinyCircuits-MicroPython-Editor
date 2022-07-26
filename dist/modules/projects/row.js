@@ -1,11 +1,12 @@
 class Row{
-    constructor(text, parent, isFolder, isOpened, project, codeEditor, insertBeforeElement){
+    constructor(text, parent, isFolder, isOpened, project, codeEditor, spriteEditorManager, insertBeforeElement){
         // Each row gets text, parent row, flag for being a folder, and children
         this.text = text;
         this.parent = parent;
         this.isFolder = isFolder;
         this.project = project;
         this.codeEditor = codeEditor;
+        this.spriteEditorManager = spriteEditorManager;
         this.childRows = [];
 
         // File contents need to have a unique key to get files from the passed project
@@ -148,36 +149,36 @@ class Row{
 
             this.project.DB.getFile(this.filePath, (data) => {
                 
-                // If the row determined this should be opened here (couldn't detect sprite or binary), try and convert to text
-                if(typeof data == "object"){
-                    data = new TextDecoder().decode(data);
+                // Figure out what type of tab to use
+                this.tab = undefined;
+                if(this.filePath.indexOf(".spr") != -1){
+                    this.tab = this.spriteEditorManager.addTab(this.filePath, this.data);
+                }else{
+                    this.tab = this.codeEditor.openFile(this.filePath, data);
+
+                    // Code editor only takes strings, convert if not a string type array
+                    if(typeof data == "object"){
+                        data = new TextDecoder().decode(data);
+                    }
                 }
 
-                if(typeof data == "string" || typeof data == "undefined"){
-                    // console.log("File data:", data);
-                    let tempCodeEditorTab = this.codeEditor.openFile(this.filePath, data);
+                // If the tab already existed in its current editor tab manager, then it may be undefined still
+                if(this.tab != undefined){
+                    // Hook up its events and select it if it was selected before
+                    this.tab.onSave = (data) => {
+                        this.project.DB.addFile(data, this.filePath);
+                    }
 
-                    // Check that a tab was actually created, if it already existed then it may not have been
-                    if(tempCodeEditorTab != undefined){
-                        this.codeEditorTab = tempCodeEditorTab;
-
-                        this.codeEditorTab.onSave = (data) => {
-                            this.project.DB.addFile(data, this.filePath);
-                        }
-
-                        this.codeEditorTab.onClose = () => {
-                            this.isOpened = false;
-                            this.project.saveProjectStructure();
-                        }
+                    this.tab.onClose = () => {
+                        this.isOpened = false;
+                        this.project.saveProjectStructure();
                     }
 
                     if(select){
-                        this.codeEditorTab.select();
+                        this.tab.select();
                     }
 
                     this.project.saveProjectStructure();
-                }else{
-                    window.showError("Could not open this file in a code editor...");
                 }
             });
 
@@ -242,7 +243,7 @@ class Row{
             }
         }
 
-        let child = new Row(text, this, isFolder, isOpened, this.project, this.codeEditor, firstFolderElement);
+        let child = new Row(text, this, isFolder, isOpened, this.project, this.codeEditor, this.spriteEditorManager, firstFolderElement);
         this.childRows.push(child);
         this.project.saveProjectStructure();
         return child;

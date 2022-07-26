@@ -7,6 +7,7 @@ import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
 import { Serial } from "../../../modules/serial/serial.js";
 import { Repl } from "../../../modules/repl/repl.js";
 import { Emulator } from "../../../modules/emulator/emulator.js";
+import { SpriteEditorManager } from "../../../modules/sprite-editor/sprite-editor-manager.js";
 
 
 let divLayout = document.getElementById("divLayout");
@@ -16,12 +17,12 @@ let consoleWorkspace = new WorkspaceSelection([["btnThumbyConsole", ["divThumbyC
 
 
 let codeEditor = new CodeEditor("divCodeEditor");
+let spriteEditorManager = new SpriteEditorManager();
 
-let projects = new Projects("divProjects", codeEditor);
+let projects = new Projects("divProjects", codeEditor, spriteEditorManager);
 
-let spriteEditor = new SpriteEditor();
 let mainWorkspace = new WorkspaceSelection([["btnCode", ["divCode"]], 
-                                            ["btnSprite", ["divSprite"], () => {spriteEditor.shown = true;}, () => {spriteEditor.shown = false;}],
+                                            ["btnSprite", ["divSprite"], () => {spriteEditorManager.shown = true;}, () => {spriteEditorManager.shown = false;}],
                                             ["btnMusic", ["divMusic"]]]);
 
 
@@ -74,7 +75,7 @@ thumbyConsole.onType = async (data) => {
 
 document.getElementById("btnResetLayout").onclick = (event) => {
     layout.resetLayoutSize();
-    spriteEditor.resetLayoutSize();
+    spriteEditorManager.resetLayoutSize();
     emulator.resetLayoutSize();
 }
 

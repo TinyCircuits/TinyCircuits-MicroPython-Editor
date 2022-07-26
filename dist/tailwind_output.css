@@ -586,8 +586,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 0.25rem;
 }
 
-.top-10 {
-  top: 2.5rem;
+.top-\[89px\] {
+  top: 89px;
 }
 
 .bottom-4 {
@@ -659,6 +659,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .mx-3 {
   margin-left: 0.75rem;
   margin-right: 0.75rem;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .ml-4 {
@@ -799,10 +804,18 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 100%;
 }
 
+.min-h-\[49px\] {
+  min-height: 49px;
+}
+
 .min-h-fit {
   min-height: -webkit-fit-content;
   min-height: -moz-fit-content;
   min-height: fit-content;
+}
+
+.min-h-\[40px\] {
+  min-height: 40px;
 }
 
 .w-8 {
@@ -925,6 +938,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-width: fit-content;
 }
 
+.min-w-\[48px\] {
+  min-width: 48px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -958,6 +975,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .items-center {
   align-items: center;
+}
+
+.justify-start {
+  justify-content: flex-start;
 }
 
 .justify-center {
@@ -1101,6 +1122,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   fill: #a8a29e;
 }
 
+.fill-slate-400 {
+  fill: #94a3b8;
+}
+
 .stroke-white {
   stroke: #fff;
 }
@@ -1129,6 +1154,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .pt-1 {
@@ -1211,6 +1241,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .hover\:fill-black:hover {
   fill: #000;
+}
+
+.hover\:fill-slate-200:hover {
+  fill: #e2e8f0;
 }
 
 .hover\:stroke-black:hover {

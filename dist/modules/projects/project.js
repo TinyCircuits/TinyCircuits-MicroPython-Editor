@@ -7,7 +7,7 @@ import { DB } from "../db/js/db.js";
 //  * Tracking of open files in code tabs
 //  * Tracking of open files in sprite
 class Project{
-    constructor(projects, projectName, div, codeEditor){
+    constructor(projects, projectName, div, codeEditor, spriteEditorManager){
         this.projects = projects;
 
         this.projectName = projectName;
@@ -15,6 +15,7 @@ class Project{
 
         // Each row will need to be able to add its own tab to the code editor, pass it down
         this.codeEditor = codeEditor;
+        this.spriteEditorManager = spriteEditorManager;
 
         // Create a database with the project name to make it unique
         // to other projects (more than one project with the same name 
@@ -65,7 +66,7 @@ class Project{
         let hierarchy = JSON.parse(localStorage.getItem("Project" + this.projectName));
 
         // Always start with root row and project row
-        this.rootRow = new Row("", this.div, true, false, this, this.codeEditor);
+        this.rootRow = new Row("", this.div, true, false, this, this.codeEditor, this.spriteEditorManager);
         this.projectRow = this.rootRow.addChild(this.projectName, true);
 
         // Restore from saved if available

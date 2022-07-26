@@ -2,12 +2,13 @@ import { Project } from "./project.js";
 
 
 class Projects{
-    constructor(divID, codeEditor){
+    constructor(divID, codeEditor, spriteEditorManager){
         // The Projects main div in the layout
         this.div = document.getElementById(divID);
 
         // Each row will need to be able to add its own tab to the code editor, pass it down
         this.codeEditor = codeEditor;
+        this.spriteEditorManager = spriteEditorManager;
 
         // List of Project classes for each added/restored
         // project that may remain empty or restore from
@@ -29,7 +30,7 @@ class Projects{
         }
 
         // Second, add the project with name and close callback
-        let newProject = new Project(this, name, this.div, this.codeEditor);
+        let newProject = new Project(this, name, this.div, this.codeEditor, this.spriteEditorManager);
         this.projects.push(newProject);
 
         this.saveProjectNames();
@@ -75,10 +76,11 @@ class Projects{
 
             let project = this.addProject("MyGame");
             project.addFile("MyGame.py", false);
+            project.addFile("MySprite.spr", false);
             project.saveProjectStructure();
         }else{
             for(let inx=0; inx<names.length; inx++){
-                this.projects.push(new Project(this, names[inx], this.div, this.codeEditor));
+                this.projects.push(new Project(this, names[inx], this.div, this.codeEditor, this.spriteEditorManager));
             }
         }
     }

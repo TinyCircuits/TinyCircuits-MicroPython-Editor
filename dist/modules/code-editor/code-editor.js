@@ -117,6 +117,8 @@ class Tab{
     changeFilePath(filePath){
         localStorage.removeItem("tabData" + this.filePath);
 
+        console.warn(filePath);
+
         this.filePath = filePath;
         this.divTab.title = this.filePath;
         this.divText.innerText = this.filePath.slice(this.filePath.lastIndexOf("/")+1);

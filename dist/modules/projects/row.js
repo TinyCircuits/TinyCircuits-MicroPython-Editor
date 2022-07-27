@@ -277,6 +277,7 @@ class Row{
                 this.#updateChildFilePaths(this);
                 this.project.saveProjectStructure();
             }else{
+
                 // Get this file's contents using the old project's file path and replace everything under the new path
                 this.project.DB.getFile(this.filePath, (data) => {
                     this.project.DB.deleteFile(this.filePath);
@@ -285,8 +286,8 @@ class Row{
                     this.project.DB.addFile(data, this.filePath);
 
                     // Change the linked code editors path (which in turn changes the code editor tab visible text)
-                    if(this.codeEditorTab){
-                        this.codeEditorTab.changeFilePath(this.filePath);
+                    if(this.tab){
+                        this.tab.changeFilePath(this.filePath);
                     }
                     
                     this.project.saveProjectStructure();
@@ -470,8 +471,8 @@ class Row{
 
     // Goes through the process of removing the database file at this file path and closing an file editors
     #delete(){
-        if(this.codeEditorTab){
-            this.codeEditorTab.close();
+        if(this.tab){
+            this.tab.close();
         }
 
         this.project.DB.deleteFile(this.filePath);

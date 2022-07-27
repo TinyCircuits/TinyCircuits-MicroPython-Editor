@@ -74,6 +74,11 @@ class SpriteTab{
     
         this.selected = false;
     }
+
+
+    changeFilePath(path){
+
+    }
 }
 
 export { SpriteTab }

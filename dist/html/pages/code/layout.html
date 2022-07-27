@@ -41,16 +41,32 @@
 
     <!-- Main editor container where tab contents get shown/hidden -->
     <div class="absolute top-[89px] bottom-4 left-4 right-4 flex flex-row">
-        <div id="divSpriteListParent" class="flex-auto w-[15%]">
-            <!-- Sprite list -->
-            <div id="divSpriteList" class="h-full border border-black rounded-md">
+        <div id="divSpriteListParent" class="flex-auto w-[15%] flex flex-col">
+            <div id="divSpriteList" class="h-full w-full border border-black rounded-md">
+                
+            </div>
+            <div class="h-10 w-full flex flew-row items-center justify-evenly">
+
+                <button class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md px-2 w-fit h-8 border duration-200">
+                    Set Dimensions
+                </button>
+
+                <!-- W:
+                <input type="number" value="8" class="w-[35%] h-[75%] border border-black rounded-md">
+                
+                H:
+                <input type="number" value="8" class="w-[35%] h-[75%] border border-black rounded-md"> -->
+
             </div>
         </div>
+
+        <!-- Drag handle -->
         <div id="divSpriteDraggable" class="w-4 h-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hover:cursor-w-resize" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
             </svg>
         </div>
+
         <div id="divSpriteEditorParent" class="flex-auto w-[85%] flex flex-col">
             <div class="h-full w-full">
                 <!-- Sprite Editor -->

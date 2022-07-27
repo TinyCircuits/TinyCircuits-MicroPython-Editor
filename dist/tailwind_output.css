@@ -780,12 +780,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 15px;
 }
 
-.h-\[40px\] {
-  height: 40px;
-}
-
 .h-10 {
   height: 2.5rem;
+}
+
+.h-\[75\%\] {
+  height: 75%;
+}
+
+.h-\[40px\] {
+  height: 40px;
 }
 
 .h-\[37px\] {
@@ -878,6 +882,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-\[15\%\] {
   width: 15%;
+}
+
+.w-\[35\%\] {
+  width: 35%;
 }
 
 .w-4 {

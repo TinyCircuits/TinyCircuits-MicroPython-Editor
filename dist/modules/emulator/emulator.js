@@ -4,6 +4,7 @@ import { ConsoleLogger, LogLevel } from './rp2040js/utils/logging.js';
 import { decodeBlock } from './uf2/uf2.js';
 import { Littlefs } from "./littlefs/littlefs-wrapper.js";
 import { Record } from './record.js';
+import { Multiplayer } from './multiplayer.js';
 
 class Emulator{
     constructor(){
@@ -325,6 +326,8 @@ class Emulator{
         this.mainFilePath = "/Games/" + projectName + "/" + projectName + ".py";
 
         this.mcu.flash.set(this.littlefs.flash, this.littlefs.FS_FLASH_OFFSET);
+
+        // this.mp = new Multiplayer(this.mcu);
 
         this.mcu.PC = 0x10000000;
         this.mcu.start();

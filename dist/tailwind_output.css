@@ -928,6 +928,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 100%;
 }
 
+.w-\[500px\] {
+  width: 500px;
+}
+
 .w-6 {
   width: 1.5rem;
 }

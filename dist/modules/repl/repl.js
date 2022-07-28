@@ -12,14 +12,14 @@ class Repl{
 
 
     async enterRawPrompt(){
-        await this.sendCmd("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.sendCmd("\x01");       // Enter raw mode if not already
+        await this.sendCmd("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.sendCmd("\r\x01");       // Enter raw mode if not already
     }
 
 
     async enterRawPasteMode(){
-        await this.sendCmd("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.sendCmd("\x05");       // Enter raw paste mode if not already
+        await this.sendCmd("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.sendCmd("\r\x05");       // Enter raw paste mode if not already
     }
 
 

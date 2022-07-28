@@ -34,9 +34,13 @@ class ReadUntil{
         this.readUntilString = readUntilString;
         this.callback = callback;
         this.forceOutput = forceOutput;
-        this.searchingString = "";
+        this.searchingString = this.searchingString == undefined ? "" : this.searchingString;
         this.accumulatedData = [];
         this.accumulatedDataLength = 0;
+
+        // Call this as soon as this is activated since extra data may have been pushed into the searchIngString
+        // and contains the string data this activation needs to invoke the callback
+        this.evaluate(new Uint8Array(0));
     }
 
 
@@ -47,7 +51,7 @@ class ReadUntil{
         this.readUntilString = undefined;
         this.callback = undefined;
         this.forceOutput = undefined;
-        this.searchingString = undefined;
+        this.searchingString = extraData != undefined ? this.decoder.decode(extraData) : undefined;
         this.accumulatedData = undefined;
         this.accumulatedDataLength = undefined;
 
@@ -65,7 +69,7 @@ class ReadUntil{
         this.accumulatedData.push(data);
 
         if(index != -1){
-            // console.warn("Found!");
+            // console.warn("Found! " + this.readUntilString);
 
             // readUntilString found
             let extraData = data.slice((index - Math.abs(this.searchingString.length - data.length)) + this.readUntilString.length)

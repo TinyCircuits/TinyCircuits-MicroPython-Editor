@@ -214,7 +214,7 @@ class Project{
     }
 
 
-    saveThumby(repl, finishedCallback, row, fileCountPercentStep){
+    saveThumby(repl, finishedCallback, row, fileCountPercentStep, topLevel=true){
         if(fileCountPercentStep == undefined){
             fileCountPercentStep = 100 / this.getFileCount();
         }
@@ -229,7 +229,7 @@ class Project{
                 icx++;
                 if(icx < row.childRows.length){
                     if(row.childRows[icx].isFolder){
-                        this.saveThumby(repl, finishedCallback, row.childRows[icx], fileCountPercentStep);
+                        this.saveThumby(repl, finishedCallback, row.childRows[icx], fileCountPercentStep, false);
                     }else{
                         this.DB.getFile(row.childRows[icx].filePath, async (data) => {
                             if(data == undefined) data = "";
@@ -239,9 +239,12 @@ class Project{
                     }
                 }else{
                     resolve();
-                    await repl.endSaveFileMode(finishedCallback);
-                    window.loadStop("Done saving to Thumby!", 0);
-                    return;
+
+                    // Only the top most level should be able to end the file saving
+                    if(topLevel){
+                        await repl.endSaveFileMode(finishedCallback);
+                        window.loadStop("Done saving to Thumby!", 0);
+                    }
                 }
             }
             callback();

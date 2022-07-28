@@ -28,7 +28,7 @@ class Repl{
         return new Promise(async (resolve) => {
             this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
                 this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                    await this.sendCmd("\x02");     // Get a normal/friendly prompt
+                    await this.sendCmd("\r\x02");     // Get a normal/friendly prompt
                     resolve();
                 });
                 await this.sendCmd("\x04");         // Soft reset/exit raw mode
@@ -76,11 +76,11 @@ class Repl{
                     // Back at main menu most likely, stop it and get back to normal prompt
                     this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
                         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {console.log("Done running! Back at normal!")});
-                        await this.sendCmd("\x02");
+                        await this.sendCmd("\r\x02");
                     });
 
                     // Stop main menu
-                    await this.sendCmd("\x03\x03");
+                    await this.sendCmd("\r\x03\x03");
                 });
 
                 // At the end of command run, this will be interpreted and run to soft reset
@@ -101,7 +101,7 @@ class Repl{
         this.readUntil.activate("MPY: soft reboot", async () => {
             this.onOutput("\r\n");
         });
-        await this.sendCmd("\x03\x03");
+        await this.sendCmd("\r\x03\x03");
         await this.sendCmd("\x04");
     }
 
@@ -187,7 +187,7 @@ class Repl{
 
         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
             // Once command is done running, wait for soft reset and reboot to clear defined utility code from repl ('] comes from end of main menu output)
-            this.readUntil.activate("']", async () => {
+            this.readUntil.activate("MPY: soft reboot", async () => {
 
                 this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
                     this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
@@ -195,7 +195,7 @@ class Repl{
                             this.busy = false;
                             callback();
                         });
-                        await this.sendCmd("\x02");     // Get a normal/friendly prompt
+                        await this.sendCmd("\r\x02");     // Get a normal/friendly prompt
                     });
                     await this.sendCmd("\x04");         // Soft reset/exit raw mode
                 });
@@ -206,7 +206,7 @@ class Repl{
             // At the end of command run, this will be interpreted and run to soft reset
             await this.sendCmd("\x04");
         });
-        this.sendCmd("\x02");
+        this.sendCmd("\r\x02");
     }
 
 
@@ -222,9 +222,8 @@ class Repl{
         window.loadStop("Started!", 0);
     }
 
-
     async stop(){
-        await this.sendCmd("\x03\x03");
+        await this.sendCmd("\r\x03\x03");
         window.load(100, "Stopping...");
         window.loadStop("Stopped!", 100);
     }

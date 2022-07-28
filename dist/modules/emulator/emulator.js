@@ -4,7 +4,7 @@ import { ConsoleLogger, LogLevel } from './rp2040js/utils/logging.js';
 import { decodeBlock } from './uf2/uf2.js';
 import { Littlefs } from "./littlefs/littlefs-wrapper.js";
 import { Record } from './record.js';
-import { Multiplayer } from './multiplayer.js';
+// import { Multiplayer } from './multiplayer.js';
 
 class Emulator{
     constructor(){

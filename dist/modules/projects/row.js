@@ -154,12 +154,12 @@ class Row{
                 if(this.filePath.indexOf(".spr") != -1){
                     this.tab = this.spriteEditorManager.addTab(this.filePath, this.data);
                 }else{
-                    this.tab = this.codeEditor.openFile(this.filePath, data);
-
                     // Code editor only takes strings, convert if not a string type array
                     if(typeof data == "object"){
                         data = new TextDecoder().decode(data);
                     }
+
+                    this.tab = this.codeEditor.openFile(this.filePath, data);
                 }
 
                 // If the tab already existed in its current editor tab manager, then it may be undefined still

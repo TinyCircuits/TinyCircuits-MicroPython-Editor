@@ -12,36 +12,29 @@ class Repl{
 
 
     async enterRawPrompt(){
-        await this.onWrite("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.onWrite("\r\x01");       // Enter raw mode if not already
+        await this.sendCmd("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.sendCmd("\x01");       // Enter raw mode if not already
     }
 
 
     async enterRawPasteMode(){
-        await this.onWrite("\r\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
-        await this.onWrite("\r\x05");       // Enter raw paste mode if not already
+        await this.sendCmd("\x03\x03");   // Interrupt any running program (https://github.com/micropython/micropython/blob/master/tools/pyboard.py#L326)
+        await this.sendCmd("\x05");       // Enter raw paste mode if not already
     }
 
 
     // Called when serial connects to a device
     async connected(){
-        let gotNormal = false;
-
-        this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+        return new Promise(async (resolve) => {
             this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                await this.onWrite("\x02");     // Get a normal/friendly prompt
-                gotNormal = true;
+                this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
+                    await this.sendCmd("\x02");     // Get a normal/friendly prompt
+                    resolve();
+                });
+                await this.sendCmd("\x04");         // Soft reset/exit raw mode
             });
-            await this.onWrite("\x04");         // Soft reset/exit raw mode
+            await this.enterRawPrompt();
         });
-        await this.enterRawPrompt();
-
-        // Hang this function until the normal prompt bytes are sent so that
-        // functions calling this can await this function and continue once
-        // all the way through the repl setup process
-        while(gotNormal == false){
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
     }
 
 
@@ -54,6 +47,8 @@ class Repl{
         if(this.readUntil.isActive){
             this.readUntil.evaluate(data);
         }
+
+        console.log(new TextDecoder().decode(data));
     }
 
 
@@ -66,7 +61,7 @@ class Repl{
         // Send the chunks one by one
         for(let b=0; b < chunkCount; b++){
             let chunk = cmd.slice(b*255, (b+1)*255);
-            this.onWrite(chunk, encode);
+            await this.onWrite(chunk, encode);
         }
     }
 
@@ -81,20 +76,20 @@ class Repl{
                     // Back at main menu most likely, stop it and get back to normal prompt
                     this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
                         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {console.log("Done running! Back at normal!")});
-                        await this.onWrite("\x02");
+                        await this.sendCmd("\x02");
                     });
 
                     // Stop main menu
-                    await this.onWrite("\x03\x03");
+                    await this.sendCmd("\x03\x03");
                 });
 
                 // At the end of command run, this will be interpreted and run to soft reset
-                await this.onWrite("\x04");
+                await this.sendCmd("\x04");
             });
 
             // Send command in paste mode and exit/finish to run it
             await this.sendCmd(cmd);
-            await this.onWrite("\x04");
+            await this.sendCmd("\x04");
         });
 
         // Enter paste mode while waiting
@@ -106,8 +101,8 @@ class Repl{
         this.readUntil.activate("MPY: soft reboot", async () => {
             this.onOutput("\r\n");
         });
-        await this.onWrite("\r\x03\x03");
-        await this.onWrite("\r\x04");
+        await this.sendCmd("\x03\x03");
+        await this.sendCmd("\x04");
     }
 
     
@@ -136,7 +131,7 @@ class Repl{
             });
             // Send command in paste mode and exit/finish to run it
             await this.sendCmd(this.buildPathScript + this.saveFileScript);
-            await this.onWrite("\x04");
+            await this.sendCmd("\x04");
         });
         await this.enterRawPrompt();
     }
@@ -173,13 +168,13 @@ class Repl{
                         await this.onWrite(chunk, false);
 
                         if(chunk.length < 255){
-                            await this.onWrite(new Uint8Array(255 - chunk.length), false);
+                            await this.onWrite(new Uint8Array(255 - (chunk.length)), false);
                             break;
                         }
                     }
                 }
             });
-            await this.sendCmd("start_save(\"" + filePath + "\"," + data.length + ")\r");
+            await this.sendCmd("start_save(\"" + filePath + "\"," + data.length + ")");
             await this.sendCmd("\x04");
         });
         await this.sendCmd("build(\"" + filePath.slice(0, filePath.lastIndexOf("/")) + "\")");
@@ -191,25 +186,27 @@ class Repl{
         this.busy = true;
 
         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
-            // Once command is done running, wait for soft reboot to clear defined utility code from repl
-            this.readUntil.activate("MPY: soft reboot", async () => {
+            // Once command is done running, wait for soft reset and reboot to clear defined utility code from repl ('] comes from end of main menu output)
+            this.readUntil.activate("']", async () => {
+
                 this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
                     this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                        this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
+                        this.readUntil.activate("Type \"help()\" for more information.\r\n>>> ", async () => {
                             this.busy = false;
                             callback();
                         });
-                        await this.onWrite("\r\x02");     // Get a normal/friendly prompt
+                        await this.sendCmd("\x02");     // Get a normal/friendly prompt
                     });
-                    await this.onWrite("\x04");         // Soft reset/exit raw mode
+                    await this.sendCmd("\x04");         // Soft reset/exit raw mode
                 });
+                
                 await this.enterRawPrompt();
             });
 
             // At the end of command run, this will be interpreted and run to soft reset
-            await this.onWrite("\x04");
+            await this.sendCmd("\x04");
         });
-        this.sendCmd("\r\x02");
+        this.sendCmd("\x02");
     }
 
 
@@ -227,7 +224,7 @@ class Repl{
 
 
     async stop(){
-        await this.onWrite("\x03\x03");
+        await this.sendCmd("\x03\x03");
         window.load(100, "Stopping...");
         window.loadStop("Stopped!", 100);
     }

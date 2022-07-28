@@ -169,6 +169,9 @@ class Tab{
 
         if(data != undefined){
             this.editor.setValue(data, 1);
+
+            // Clear undo manager so user can't undo what was restored (might be nice to store the undo list from before)
+            this.editor.session.getUndoManager().reset();
         }
 
         this.editor.session.on('change', (event) => {

@@ -56,14 +56,17 @@ class ReadUntil{
 
 
     evaluate(data){
-        console.log(this.decoder.decode(data));
         this.searchingString += this.decoder.decode(data);
         
+        // console.log("%c " + this.searchingString + " %c " + this.readUntilString, 'color: red', 'color: lime');
+
         let index = this.searchingString.indexOf(this.readUntilString);
         this.accumulatedDataLength += data.length;
         this.accumulatedData.push(data);
 
         if(index != -1){
+            // console.warn("Found!");
+
             // readUntilString found
             let extraData = data.slice((index - Math.abs(this.searchingString.length - data.length)) + this.readUntilString.length)
 

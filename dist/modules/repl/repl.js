@@ -188,25 +188,17 @@ class Repl{
         this.readUntil.activate("Type \"help()\" for more information.\r\n>>>", async () => {
             // Once command is done running, wait for soft reset and reboot to clear defined utility code from repl ('] comes from end of main menu output)
             this.readUntil.activate("MPY: soft reboot", async () => {
-
-                this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                    this.readUntil.activate("raw REPL; CTRL-B to exit\r\n>", async () => {
-                        this.readUntil.activate("Type \"help()\" for more information.\r\n>>> ", async () => {
-                            this.busy = false;
-                            callback();
-                        });
-                        await this.sendCmd("\r\x02");     // Get a normal/friendly prompt
-                    });
-                    await this.sendCmd("\x04");         // Soft reset/exit raw mode
+                this.readUntil.activate("Type \"help()\" for more information.\r\n>>> ", async () => {
+                    this.busy = false;
+                    callback();
                 });
-                
-                await this.enterRawPrompt();
+                await this.sendCmd("\x03");
             });
 
             // At the end of command run, this will be interpreted and run to soft reset
             await this.sendCmd("\x04");
         });
-        this.sendCmd("\r\x02");
+        await this.sendCmd("\r\x02");
     }
 
 

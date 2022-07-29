@@ -1,5 +1,5 @@
 class SpriteTab{
-    constructor(divSpriteTabHeader, filePath, tabData, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}){
+    constructor(divSpriteTabHeader, filePath, spriteData, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}){
         // Tab data is a file in the following format (per-byte) (otherwise activate importer/converter legacy tool if start string not found)
         // TINYCIRCUITS_SPRITE_FORMAT_V001                       (31 bytes)
         // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (3 bytes)
@@ -8,7 +8,7 @@ class SpriteTab{
         this.divSpriteTabHeader = divSpriteTabHeader;
         this.filePath = filePath;
         this.name = filePath.slice(filePath.lastIndexOf("/")+1);
-        this.tabData = tabData;
+        this.spriteData = spriteData;
 
         this.tabClosedCallback = tabClosedCallback;
         this.tabUnselectAll = tabUnselectAll;
@@ -86,7 +86,6 @@ class SpriteTab{
     close(){
         this.onClose();
         this.divSpriteTabHeader.removeChild(this.divTab);
-
         this.tabClosedCallback(this.filePath);
     }
 }

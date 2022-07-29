@@ -1,6 +1,8 @@
 import micropython
 import sys
 import time
+from machine import freq
+freq(48000000)
 
 def start_save(file_path, byte_count_to_read):
     f = open(file_path, 'wb')

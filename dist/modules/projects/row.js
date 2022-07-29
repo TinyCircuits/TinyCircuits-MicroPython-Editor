@@ -449,6 +449,28 @@ class Row{
             this.divOptionsDropdown.appendChild(this.deleteButton);
         }
 
+        if(this.parent.isRoot == false && this.isFolder == false){
+            this.downloadFileButton = document.createElement("button");
+            this.downloadFileButton.innerHTML = `
+            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+                <span>Download</span>
+            </button>
+            `
+            this.downloadFileButton.onclick = (event) => {
+                this.project.DB.getFile(this.filePath, (data) => {
+                    let a = document.createElement("a");
+
+                    let blob = new Blob([data], {type: "octet/stream"});
+                    let url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = this.filePath.slice(this.filePath.lastIndexOf("/")+1);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+            }
+            this.divOptionsDropdown.appendChild(this.downloadFileButton);
+        }
+
         // Set tracking flag used to prohibit removing 
         // a second time if the cursor flies past both
         this.optionsDropdownShown = true;

@@ -97,7 +97,6 @@ class Tab{
         this.divEditor.classList.remove("invisible");
 
         this.selected = true;
-
         this.#saveTabData();
     }
 
@@ -108,7 +107,6 @@ class Tab{
         this.divEditor.classList.add("invisible");
 
         this.selected = false;
-
         this.#saveTabData();
     }
 
@@ -116,8 +114,6 @@ class Tab{
     // Changing the file path changes the name shown in the tab (used by project rows on rename)
     changeFilePath(filePath){
         localStorage.removeItem("tabData" + this.filePath);
-
-        console.warn(filePath);
 
         this.filePath = filePath;
         this.divTab.title = this.filePath;

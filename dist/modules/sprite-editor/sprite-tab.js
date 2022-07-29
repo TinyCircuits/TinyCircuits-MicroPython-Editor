@@ -1,5 +1,7 @@
+import { SpriteTabCanvas } from "./sprite-tab-canvas.js";
+
 class SpriteTab{
-    constructor(divSpriteTabHeader, filePath, spriteData, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}){
+    constructor(divSpriteTabHeader, filePath, spriteData, tabIndex, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}){
         // Tab data is a file in the following format (per-byte) (otherwise activate importer/converter legacy tool if start string not found)
         // TINYCIRCUITS_SPRITE_FORMAT_V001                       (31 bytes)
         // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (3 bytes)
@@ -9,6 +11,9 @@ class SpriteTab{
         this.filePath = filePath;
         this.name = filePath.slice(filePath.lastIndexOf("/")+1);
         this.spriteData = spriteData;
+        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, "divSpriteEditor");
+
+        this.selected = false;
 
         this.tabClosedCallback = tabClosedCallback;
         this.tabUnselectAll = tabUnselectAll;
@@ -16,6 +21,37 @@ class SpriteTab{
         this.#initTab();
 
         this.onClose = () => {};
+
+        this.#restoreFromTabData();
+
+        if(this.tabIndex == undefined || this.tabIndex == null){
+            this.tabIndex = tabIndex;
+            this.#saveTabData();
+        }
+    }
+
+
+    #saveTabData(){
+        localStorage.setItem("spriteTabData" + this.filePath, JSON.stringify({
+            selected: this.selected,
+            tabIndex: this.tabIndex
+        }));
+    }
+
+    #restoreFromTabData(){
+        // Each tab has a unique ID that's the filepath, store persistent data like last selected tab under that
+        let tabData = JSON.parse(localStorage.getItem("spriteTabData" + this.filePath));
+        
+        if(tabData != null){
+            this.tabIndex = tabData["tabIndex"];
+            if(tabData["selected"] == true){
+                this.select();
+            }else{
+                this.unselect();
+            }
+        }else{
+            this.unselect();
+        }
     }
 
 
@@ -68,6 +104,9 @@ class SpriteTab{
         this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full  bg-white hover:bg-white text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
     
         this.selected = true;
+        this.#saveTabData();
+
+        this.spriteTabCanvas.show();
     }
 
 
@@ -75,18 +114,35 @@ class SpriteTab{
         this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
     
         this.selected = false;
+        this.#saveTabData();
+
+        this.spriteTabCanvas.hide();
     }
 
 
-    changeFilePath(path){
+    changeFilePath(filePath){
+        localStorage.removeItem("spriteTabData" + this.filePath);
 
+        this.filePath = filePath;
+        this.divTab.title = this.filePath;
+        this.divTabText.textContent = this.filePath.slice(this.filePath.lastIndexOf("/")+1);
+
+        this.#saveTabData();
     }
 
 
     close(){
-        this.onClose();
-        this.divSpriteTabHeader.removeChild(this.divTab);
-        this.tabClosedCallback(this.filePath);
+        // Only actually close in the header and therefore not closed
+        if(this.divSpriteTabHeader.contains(this.divTab)){
+            this.onClose();
+            this.divSpriteTabHeader.removeChild(this.divTab);
+
+            // Make sure to save an undefined value so it won't resume position from saved
+            this.tabIndex = undefined;
+            this.#saveTabData();
+
+            this.tabClosedCallback(this.filePath);
+        }
     }
 }
 

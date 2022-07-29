@@ -10,7 +10,18 @@ class SpriteEditorManager{
     }
 
 
-    // When a tab is closed it will call this as a callback, remove tab from list with passed filePath
+    // Re-sorts tabs from left to right by tabIndex
+    #sortTabs(){
+        this.tabs = this.tabs.sort((a, b) => {
+            return a.tabIndex - b.tabIndex;
+        })
+        for(let itx=0; itx<this.tabs.length; itx++){
+            this.divSpriteTabHeader.appendChild(this.tabs[itx].divTab);
+        }
+    }
+
+
+    // When a tab is closed it will call this as a callback, remove tab from list with passed filePath, and select next best
     #tabClosed(filePath){
         for(let itx=0; itx<this.tabs.length; itx++){
             if(filePath == this.tabs[itx].filePath){
@@ -38,9 +49,17 @@ class SpriteEditorManager{
             }
         }
 
+        let tabIndex = 0;
+        if(this.tabs.length > 0){
+            tabIndex = this.tabs[this.tabs.length-1].tabIndex+1;
+        }
+
         // Didn't find that it was already open, 
-        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, this.#tabClosed.bind(this), this.#unselectAll.bind(this));
+        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, tabIndex, this.#tabClosed.bind(this), this.#unselectAll.bind(this), this);
         this.tabs.push(newTab);
+
+        this.#sortTabs();
+
         return newTab;
     }
 

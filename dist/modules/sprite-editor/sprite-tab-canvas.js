@@ -1,13 +1,53 @@
-class SpriteTabCanvas{
-    constructor(filePath, divEditorMainID){
-        this.divEditorMain = document.getElementById(divEditorMainID);
+import { Frame } from "./frame.js";
 
+class SpriteTabCanvas{
+    constructor(filePath, divEditorMainID, divSpriteFrameListMainID){
+        // A file path is stored so this module can use local storage
+        this.filePath = filePath;
+
+        // Grab some parent elements
+        this.divEditorMain = document.getElementById(divEditorMainID);
+        this.divSpriteFrameListMain = document.getElementById(divSpriteFrameListMainID);
+
+        // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
+        this.#setupFrameList();
+        this.#setupDrawingCanvas();
+    }
+
+
+    // Add frame behind the leading element (typically the add frame button)
+    #addFrame(leadingElement){
+        let newFrame = new Frame(leadingElement, this.frameList.length, 72, 40);
+        this.frameList.push(newFrame);
+    }
+
+
+    #setupFrameList(){
+        // Setup frame list
+        this.divFrameListParent = document.createElement("div");
+        this.divFrameListParent.classList = "absolute top-0 left-3 bottom-0 right-3 flex flex-col items-center";
+        this.divSpriteFrameListMain.appendChild(this.divFrameListParent);
+
+        this.frameList = [];
+
+        this.btnAddFrame = document.createElement("button");
+        this.btnAddFrame.classList = "btn rounded-full min-w-[32px] min-h-[32px] border border-black mt-3 flex items-center justify-center"
+        this.btnAddFrame.innerHTML = 
+        `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        `
+        this.btnAddFrame.onclick = (event) => {this.#addFrame(this.btnAddFrame)};
+        this.divFrameListParent.appendChild(this.btnAddFrame);
+    }
+
+
+    #setupDrawingCanvas(){
+        // Setup drawing canvas
         this.divCanvasParent = document.createElement("div");
         this.divCanvasParent.classList = "absolute top-0 left-0 bottom-0 right-0 bg-gray-50";
         this.divEditorMain.appendChild(this.divCanvasParent);
-
-        // A file path is stored so this module can use local storage
-        this.filePath = filePath;
 
         // The canvas all the drawing is done on
         this.canvas = document.createElement("canvas");
@@ -45,6 +85,7 @@ class SpriteTabCanvas{
         // Setup panning/translating canvas event
         this.#setupPanning();
 
+        // Setup mouse zooming
         this.#setupZooming();
     }
 
@@ -161,12 +202,14 @@ class SpriteTabCanvas{
 
     hide(){
         this.shown = false;
+        this.divFrameListParent.style.display = "none";
         this.divCanvasParent.classList.add("invisible");
     }
 
 
     show(){
         this.shown = true;
+        this.divFrameListParent.style.display = "flex";
         this.divCanvasParent.classList.remove("invisible");
     }
 }

@@ -11,7 +11,7 @@ class SpriteTab{
         this.filePath = filePath;
         this.name = filePath.slice(filePath.lastIndexOf("/")+1);
         this.spriteData = spriteData;
-        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, "divSpriteEditor");
+        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, "divSpriteEditor", "divSpriteFrameList");
 
         this.selected = false;
 

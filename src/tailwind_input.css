@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes */
+@layer components{
+    .btn{
+        @apply select-none whitespace-nowrap bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200;
+    }
+}

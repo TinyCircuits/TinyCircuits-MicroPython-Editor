@@ -60,7 +60,9 @@ class SpriteTab{
         this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
         this.divTab.title = this.filePath;
 
-        this.divSpriteTabHeader.appendChild(this.divTab);
+        this.divSpriteTabHeader.insertBefore(this.divTab, this.divSpriteTabHeader.lastElementChild);
+        
+        // this.divSpriteTabHeader.appendChild(this.divTab);
 
         this.#initTabText();
         this.#initTabCloseBtn();

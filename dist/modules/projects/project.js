@@ -66,7 +66,7 @@ class Project{
         let hierarchy = JSON.parse(localStorage.getItem("Project" + this.projectName));
 
         // Always start with root row and project row
-        this.rootRow = new Row("", this.div, true, false, this, this.codeEditor, this.spriteEditorManager);
+        this.rootRow = new Row("", this.div, true, false, false, this, this.codeEditor, this.spriteEditorManager);
         this.projectRow = this.rootRow.addChild(this.projectName, true);
 
         // Restore from saved if available
@@ -148,7 +148,7 @@ class Project{
                     }
                 }
 
-                selectedCallback();
+                selectedCallback(row);
             }
         }
 

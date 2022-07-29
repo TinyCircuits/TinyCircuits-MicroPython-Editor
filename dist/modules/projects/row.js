@@ -1,5 +1,5 @@
 class Row{
-    constructor(text, parent, isFolder, isOpened, project, codeEditor, spriteEditorManager, insertBeforeElement){
+    constructor(text, parent, isFolder, isOpened, openFileContents, project, codeEditor, spriteEditorManager, insertBeforeElement){
         // Each row gets text, parent row, flag for being a folder, and children
         this.text = text;
         this.parent = parent;
@@ -17,7 +17,7 @@ class Row{
         // this rows file contents and open in external editor
         this.isOpened = isOpened;
         if(this.isOpened){
-            this.#openFileContents();
+            this.openFileContents(openFileContents);
         }
 
         // Set if root or not (root is the project parent div and not the row with the project name)
@@ -36,7 +36,7 @@ class Row{
         // a the first child of root, open it's contents
         this.rowDiv.ondblclick = (event) => {
             // A check is done in the function to check if actually a file
-            this.#openFileContents(true);
+            this.openFileContents(true);
         }
 
 
@@ -140,7 +140,7 @@ class Row{
 
 
     // Opens the file contents if really a file
-    #openFileContents(select){
+    openFileContents(select){
         if(!this.isRoot && !this.parent.isRoot && !this.isFolder){
             console.log("Opening " + this.text);
 
@@ -231,7 +231,7 @@ class Row{
 
     // Add a child to this row and make this row into a parent/folder
     // row as long as this is not a file
-    addChild(text, isFolder=true, isOpened=false){
+    addChild(text, isFolder=true, isOpened=false, openFileContents=false){
         // Find the first folder element so that file rows can be placed before it
         let firstFolderElement = undefined;
         if(isFolder == false){
@@ -243,7 +243,7 @@ class Row{
             }
         }
 
-        let child = new Row(text, this, isFolder, isOpened, this.project, this.codeEditor, this.spriteEditorManager, firstFolderElement);
+        let child = new Row(text, this, isFolder, isOpened, openFileContents, this.project, this.codeEditor, this.spriteEditorManager, firstFolderElement);
         this.childRows.push(child);
         this.project.saveProjectStructure();
         return child;

@@ -851,14 +851,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 49px;
 }
 
+.min-h-\[32px\] {
+  min-height: 32px;
+}
+
 .min-h-fit {
   min-height: -webkit-fit-content;
   min-height: -moz-fit-content;
   min-height: fit-content;
-}
-
-.min-h-\[32px\] {
-  min-height: 32px;
 }
 
 .min-h-\[40px\] {
@@ -987,14 +987,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-width: 35px;
 }
 
+.min-w-\[32px\] {
+  min-width: 32px;
+}
+
 .min-w-fit {
   min-width: -webkit-fit-content;
   min-width: -moz-fit-content;
   min-width: fit-content;
-}
-
-.min-w-\[32px\] {
-  min-width: 32px;
 }
 
 .min-w-\[48px\] {

@@ -192,3 +192,24 @@ document.addEventListener("keydown", (event) => {
 document.getElementById("btnSaveProjectTo").onclick = (event) => {
     window.showSaveToDialog(savingMethod, saveCurrentProject);
 }
+
+
+document.getElementById("btnCreateSprite").onclick = (event) => {
+    let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the new sprite file", () => {
+        projects.unsetFromFolderSelectionMode();
+    });
+
+    projects.setToFolderSelectionMode([], (row) => {
+        projects.unsetFromFolderSelectionMode();
+        close();
+
+        window.inputDialog("Enter a new name for the sprite file", "MySprite.spr", (value) => {
+            if(projects.projects[0].doesPathExist(row.filePath + "/" + value) == false){
+                row.addChild(value, false, true, true);
+            }else{
+                window.showError("File already exists, did not create it");
+            }
+        });
+    });
+    // spriteEditorManager.addTab("/Games/MyGame/MySprite.spr");
+}

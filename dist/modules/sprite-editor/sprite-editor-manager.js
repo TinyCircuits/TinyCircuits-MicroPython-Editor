@@ -16,7 +16,7 @@ class SpriteEditorManager{
             return a.tabIndex - b.tabIndex;
         })
         for(let itx=0; itx<this.tabs.length; itx++){
-            this.divSpriteTabHeader.appendChild(this.tabs[itx].divTab);
+            this.divSpriteTabHeader.insertBefore(this.tabs[itx].divTab, this.divSpriteTabHeader.lastElementChild)
         }
     }
 

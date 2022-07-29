@@ -76,8 +76,6 @@ class Projects{
 
             let project = this.addProject("MyGame");
             project.addFile("MyGame.py", false);
-            project.addFile("MySprite.spr", false);
-            project.addFile("MySprite2.spr", false);
             project.saveProjectStructure();
         }else{
             for(let inx=0; inx<names.length; inx++){

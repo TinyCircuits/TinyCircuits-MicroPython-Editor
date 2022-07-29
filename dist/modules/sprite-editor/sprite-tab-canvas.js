@@ -44,13 +44,15 @@ class SpriteTabCanvas{
 
         // Setup panning/translating canvas event
         this.#setupPanning();
+
+        this.#setupZooming();
     }
 
 
     #setupPanning(){
         // On mouse down start panning
         this.divCanvasParent.onmousedown = (event) => {
-            if(this.shown){
+            if(this.shown && event.buttons == 4){
                 this.panning = true;
                 this.divCanvasParent.style.cursor = "grab";
             }
@@ -58,10 +60,8 @@ class SpriteTabCanvas{
 
         // On mouse up stop panning
         document.addEventListener("mouseup", (event) => {
-            if(this.shown){
-                this.panning = false;
-                this.divCanvasParent.style.cursor = "default";
-            }
+            this.panning = false;
+            this.divCanvasParent.style.cursor = "default";
         });
 
         // On mouse move if started panning, pan
@@ -82,6 +82,43 @@ class SpriteTabCanvas{
                 }
             }
         });
+    }
+
+
+    #setupZooming(){
+        // Zoom the canvas in and out based on cursor and current location using scroll wheel
+        this.divCanvasParent.onwheel = (event) => {
+            event.preventDefault();
+
+            let canvasDOMWidth = parseFloat(this.canvas.style.width);
+            let canvasDOMHeight = parseFloat(this.canvas.style.height);
+
+            let newCanvasDOMWidth = undefined;
+            let newCanvasDOMHeight = undefined;
+
+            if(event.deltaY < 0){
+                newCanvasDOMWidth = canvasDOMWidth * 1.25;
+            }else if(event.deltaY > 0){
+                newCanvasDOMWidth = canvasDOMWidth / 1.25;
+            }
+            newCanvasDOMHeight = newCanvasDOMWidth / (canvasDOMWidth/canvasDOMHeight);
+
+            this.canvas.style.width = newCanvasDOMWidth + "px";
+            this.canvas.style.height = newCanvasDOMHeight + "px";
+
+            // Offset scale to center of canvas
+            let x = parseFloat(this.canvas.style.left);
+            let y = parseFloat(this.canvas.style.top);
+
+            let pdx = (newCanvasDOMWidth - canvasDOMWidth)/2;
+            let pdy = (newCanvasDOMHeight - canvasDOMHeight)/2;
+
+            this.canvas.style.left = (x - pdx) + "px";
+            this.canvas.style.top = (y - pdy) + "px";
+
+            // Make sure it is still in bounds
+            this.#keepCanvasInbounds();
+        }
     }
 
 
@@ -123,14 +160,12 @@ class SpriteTabCanvas{
 
 
     hide(){
-        console.warn("Hidden", this.filePath);
         this.shown = false;
         this.divCanvasParent.classList.add("invisible");
     }
 
 
     show(){
-        console.warn("Shown", this.filePath);
         this.shown = true;
         this.divCanvasParent.classList.remove("invisible");
     }

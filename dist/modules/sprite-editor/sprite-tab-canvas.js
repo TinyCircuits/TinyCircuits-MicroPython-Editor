@@ -7,7 +7,8 @@ class SpriteTabCanvas{
 
         this.saveCallback = saveCallback;
 
-        if(this.spriteData == undefined){
+
+        if(spriteData == undefined){
             this.#initSpriteData();
         }else{
             this.spriteData = spriteData;
@@ -20,42 +21,97 @@ class SpriteTabCanvas{
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
-        // this.#setupDrawingCanvas();
     }
 
 
-    // Write data to teh sprite file for the first time
+    // Write data to the sprite file for the first time
     // Tab data is a file in the following format (per-byte) (otherwise activate importer/converter legacy tool if start string not found)
-    // TINYCIRCUITS_SPRITE_FORMAT_V001                       (always 31 bytes)
+    // TC_SPR_FMT_001                                        (always 14 bytes)
     // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (always 3 bytes)
     // VLSB_DATA ...                                         (FRAME_COUNT * FRAME_WIDTH * FRAME_HEIGHT // 8 bytes)
     #initSpriteData(){
         let data = new Uint8Array(31 + 3 + ((72*40) / 8));
-        data.set(new TextEncoder().encode("TINYCIRCUITS_SPRITE_FORMAT_V001"), 0);   // Header
-        data[31] = 1;                                                               // Frame count
-        data[32] = 72;                                                              // Frame width
-        data[33] = 40;                                                              // Frame height
-        data.set(new Uint8Array((72*40)/8));                                        // Blank frame
+        data.set(new TextEncoder().encode("TC_SPR_FMT_V001"), 0);   // Header
+        data[14] = 1;                                               // Frame count
+        data[15] = 72;                                              // Frame width
+        data[16] = 40;                                              // Frame height
+        data.set(new Uint8Array((72*40)/8), 17);                    // Blank frame
         this.spriteData = data;
 
         this.saveCallback(this.spriteData);
     }
 
 
-    // Add frame behind the leading element (typically the add frame button)
-    #addFrame(leadingElement){
-        let newFrame = new Frame(leadingElement, this.frameList.length, 72, 40);
-        this.frameList.push(newFrame);
+    // Add a new blank frame to the data (this new data will be added on
+    // and the file saved)
+    #addFrameToData(){
+        if(this.spriteData[14] + 1 <= 255){
+            this.spriteData[14] = this.spriteData[14] + 1;
+
+            let frameWidth = this.spriteData[15];
+            let frameHeight = this.spriteData[16];
+            let frameByteLength = Math.floor((frameWidth*frameHeight)/8);
+
+            let newSpriteData = new Uint8Array(this.spriteData.length + frameByteLength);
+            newSpriteData.set(this.spriteData);
+            this.spriteData = newSpriteData;
+
+            this.#updateFrameList();
+
+            this.saveCallback(this.spriteData);
+        }else{
+            window.showError("Reached sprite frame limit of 256 frames, cannot add anymore");
+        }
     }
 
 
+    // Function called by frame class to open a frame at the current index (index in children of parent element for frame list)
+    #openFrameAtIndex(index, frameCanvas){
+        if(this.canvas == undefined){
+            this.#setupDrawingCanvas();
+        }
+
+        // Copy over the frame canvas tot he drawing canvas which will in turn feed
+        // back to the frame and be formatted into VLSB when drawn ona nd then saved
+        this.context.drawImage(frameCanvas, 0, 0);
+    }
+
+
+    // Add frame behind the leading element (typically the add frame button)
+    #addFrameToList(frameIndex){
+        let frameWidth = this.spriteData[15];
+        let frameHeight = this.spriteData[16];
+        let frameByteLength = Math.floor((frameWidth * frameHeight) / 8);
+
+        let frameByteOffset = frameByteLength * frameIndex;
+        let frameData = this.spriteData.slice(frameByteOffset, frameByteLength);
+
+        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this));
+        newFrame.update(frameData);
+    }
+
+
+    // Remove all frame elements and add them back again (might get too expensive since need to recreate all canvases again...)
+    #updateFrameList(){
+        // Remove all frame elements from frame list
+        while(this.divFrameListParent.children.length > 1){
+            this.divFrameListParent.removeChild(this.divFrameListParent.children[0]);
+        }
+
+        let frameCount = this.spriteData[14];
+
+        for(let ifx=0; ifx<frameCount; ifx++){
+            this.#addFrameToList(ifx);
+        }
+    }
+
+
+    // Setup parent inside editor frame element and add the button to add more frames
     #setupFrameList(){
         // Setup frame list
         this.divFrameListParent = document.createElement("div");
         this.divFrameListParent.classList = "absolute top-0 left-3 bottom-0 right-3 flex flex-col items-center";
         this.divSpriteFrameListMain.appendChild(this.divFrameListParent);
-
-        this.frameList = [];
 
         this.btnAddFrame = document.createElement("button");
         this.btnAddFrame.classList = "btn rounded-full min-w-[32px] min-h-[32px] border border-black mt-3 flex items-center justify-center"
@@ -65,11 +121,15 @@ class SpriteTabCanvas{
             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
         </svg>
         `
-        this.btnAddFrame.onclick = (event) => {this.#addFrame(this.btnAddFrame)};
+        this.btnAddFrame.onclick = (event) => {this.#addFrameToData(this.btnAddFrame)};
         this.divFrameListParent.appendChild(this.btnAddFrame);
+
+        this.#updateFrameList();
     }
 
 
+    // Each sprite file editor gets a canvas for drawing to. Selected frames get copied to this,
+    // and edits get fed back into the frame and saved in VLSB to the sprite file on every edit
     #setupDrawingCanvas(){
         // Setup drawing canvas
         this.divCanvasParent = document.createElement("div");
@@ -80,11 +140,14 @@ class SpriteTabCanvas{
         this.canvas = document.createElement("canvas");
         this.canvas.classList = "crisp-canvas border border-gray border-dashed absolute top-[0px] left-[0px]";
 
+        let frameWidth = this.spriteData[15];
+        let frameHeight = this.spriteData[16];
+
         // Setup default dimensions
-        this.canvas.style.width = "72px";
-        this.canvas.style.height = "40px";
-        this.canvas.width = 72;
-        this.canvas.height = 40;
+        this.canvas.style.width = frameWidth + "px";
+        this.canvas.style.height = frameHeight + "px";
+        this.canvas.width = frameWidth;
+        this.canvas.height = frameHeight;
 
         // Get the context for drawing and disable any smoothing
         this.context = this.canvas.getContext('2d', { alpha: false });
@@ -106,9 +169,6 @@ class SpriteTabCanvas{
             this.#keepCanvasInbounds();
         }).observe(this.divCanvasParent);
 
-        // Hide by default, the currently selected sprite editor tab will auto show
-        this.hide();
-
         // Setup panning/translating canvas event
         this.#setupPanning();
 
@@ -117,6 +177,7 @@ class SpriteTabCanvas{
     }
 
 
+    // Middle mouse button allows panning
     #setupPanning(){
         // On mouse down start panning
         this.divCanvasParent.onmousedown = (event) => {
@@ -153,6 +214,7 @@ class SpriteTabCanvas{
     }
 
 
+    // Scroll wheel allows zooming
     #setupZooming(){
         // Zoom the canvas in and out based on cursor and current location using scroll wheel
         this.divCanvasParent.onwheel = (event) => {
@@ -227,19 +289,23 @@ class SpriteTabCanvas{
     }
 
 
+    // Can drawing canvas and frame list
     hide(){
         this.shown = false;
+        this.divFrameListParent.style.display = "none";
+
         if(this.divCanvasParent != undefined){
-            this.divFrameListParent.style.display = "none";
             this.divCanvasParent.classList.add("invisible");
         }
     }
 
 
+    // Show drawing canvas and frame list
     show(){
         this.shown = true;
+        this.divFrameListParent.style.display = "flex";
+
         if(this.divCanvasParent != undefined){
-            this.divFrameListParent.style.display = "flex";
             this.divCanvasParent.classList.remove("invisible");
         }
     }

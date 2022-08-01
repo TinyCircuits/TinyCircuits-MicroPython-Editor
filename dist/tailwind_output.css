@@ -1120,6 +1120,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-color: rgb(229 231 235 / var(--tw-border-opacity));
 }
 
+.border-gray-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
+}
+
 .border-x-black {
   --tw-border-opacity: 1;
   border-left-color: rgb(0 0 0 / var(--tw-border-opacity));
@@ -1280,6 +1285,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .\!outline {
   outline-style: solid !important;
+}
+
+.outline-2 {
+  outline-width: 2px;
+}
+
+.outline-gray-400 {
+  outline-color: #9ca3af;
 }
 
 .filter {

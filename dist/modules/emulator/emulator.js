@@ -210,7 +210,7 @@ class Emulator{
 
         this.mcu.logger = new ConsoleLogger(LogLevel.Error);
 
-        this.displayPixelBuffer =new Uint8ClampedArray(new ArrayBuffer(this.width * this.height * 4));
+        this.displayPixelBuffer = new Uint8ClampedArray(new ArrayBuffer(this.width * this.height * 4));
 
         addEventListener("keydown", (event) => {
             let key = event.code;

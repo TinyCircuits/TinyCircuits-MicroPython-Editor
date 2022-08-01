@@ -1,17 +1,15 @@
 import { SpriteTabCanvas } from "./sprite-tab-canvas.js";
 
 class SpriteTab{
-    constructor(divSpriteTabHeader, filePath, spriteData, tabIndex, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}){
-        // Tab data is a file in the following format (per-byte) (otherwise activate importer/converter legacy tool if start string not found)
-        // TINYCIRCUITS_SPRITE_FORMAT_V001                       (31 bytes)
-        // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (3 bytes)
-        // VLSB_DATA ...                                         (FRAME_COUNT * FRAME_WIDTH * FRAME_HEIGHT // 8 bytes)
-
+    constructor(divSpriteTabHeader, filePath, spriteData, tabIndex, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}, saveCallback){
         this.divSpriteTabHeader = divSpriteTabHeader;
         this.filePath = filePath;
         this.name = filePath.slice(filePath.lastIndexOf("/")+1);
         this.spriteData = spriteData;
-        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, "divSpriteEditor", "divSpriteFrameList");
+
+        this.onClose = () => {};
+
+        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, spriteData, "divSpriteEditor", "divSpriteFrameList", saveCallback);
 
         this.selected = false;
 
@@ -19,8 +17,6 @@ class SpriteTab{
         this.tabUnselectAll = tabUnselectAll;
 
         this.#initTab();
-
-        this.onClose = () => {};
 
         this.#restoreFromTabData();
 

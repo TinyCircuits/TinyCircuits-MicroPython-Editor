@@ -40,7 +40,7 @@ class SpriteEditorManager{
     }
 
 
-    addTab(filePath, tabData){
+    addTab(filePath, tabData, saveCallback){
         // Check that no tabs with this filePath already exist
         for(let itx=0; itx<this.tabs.length; itx++){
             if(filePath == this.tabs[itx].filePath){
@@ -55,7 +55,7 @@ class SpriteEditorManager{
         }
 
         // Didn't find that it was already open, 
-        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, tabIndex, this.#tabClosed.bind(this), this.#unselectAll.bind(this), this);
+        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, tabIndex, this.#tabClosed.bind(this), this.#unselectAll.bind(this), saveCallback);
         this.tabs.push(newTab);
 
         this.#sortTabs();

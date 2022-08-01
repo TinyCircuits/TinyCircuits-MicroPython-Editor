@@ -149,26 +149,26 @@ class Row{
 
             this.project.DB.getFile(this.filePath, (data) => {
                 
+                this.save = (data) => {
+                    this.project.DB.addFile(data, this.filePath);
+                }
+
                 // Figure out what type of tab to use
                 this.tab = undefined;
                 if(this.filePath.indexOf(".spr") != -1){
-                    this.tab = this.spriteEditorManager.addTab(this.filePath, this.data);
+                    this.tab = this.spriteEditorManager.addTab(this.filePath, data, this.save.bind(this));
                 }else{
                     // Code editor only takes strings, convert if not a string type array
                     if(typeof data == "object"){
                         data = new TextDecoder().decode(data);
                     }
 
-                    this.tab = this.codeEditor.openFile(this.filePath, data);
+                    this.tab = this.codeEditor.openFile(this.filePath, data, this.save.bind(this));
                 }
 
                 // If the tab already existed in its current editor tab manager, then it may be undefined still
                 if(this.tab != undefined){
                     // Hook up its events and select it if it was selected before
-                    this.tab.onSave = (data) => {
-                        this.project.DB.addFile(data, this.filePath);
-                    }
-
                     this.tab.onClose = () => {
                         this.isOpened = false;
                         this.project.saveProjectStructure();

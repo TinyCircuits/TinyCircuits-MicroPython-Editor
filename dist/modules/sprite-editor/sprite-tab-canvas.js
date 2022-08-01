@@ -1,9 +1,18 @@
 import { Frame } from "./frame.js";
 
 class SpriteTabCanvas{
-    constructor(filePath, divEditorMainID, divSpriteFrameListMainID){
+    constructor(filePath, spriteData, divEditorMainID, divSpriteFrameListMainID, saveCallback){
         // A file path is stored so this module can use local storage
         this.filePath = filePath;
+
+        this.saveCallback = saveCallback;
+
+        if(this.spriteData == undefined){
+            this.#initSpriteData();
+        }else{
+            this.spriteData = spriteData;
+        }
+
 
         // Grab some parent elements
         this.divEditorMain = document.getElementById(divEditorMainID);
@@ -11,7 +20,25 @@ class SpriteTabCanvas{
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
-        this.#setupDrawingCanvas();
+        // this.#setupDrawingCanvas();
+    }
+
+
+    // Write data to teh sprite file for the first time
+    // Tab data is a file in the following format (per-byte) (otherwise activate importer/converter legacy tool if start string not found)
+    // TINYCIRCUITS_SPRITE_FORMAT_V001                       (always 31 bytes)
+    // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (always 3 bytes)
+    // VLSB_DATA ...                                         (FRAME_COUNT * FRAME_WIDTH * FRAME_HEIGHT // 8 bytes)
+    #initSpriteData(){
+        let data = new Uint8Array(31 + 3 + ((72*40) / 8));
+        data.set(new TextEncoder().encode("TINYCIRCUITS_SPRITE_FORMAT_V001"), 0);   // Header
+        data[31] = 1;                                                               // Frame count
+        data[32] = 72;                                                              // Frame width
+        data[33] = 40;                                                              // Frame height
+        data.set(new Uint8Array((72*40)/8));                                        // Blank frame
+        this.spriteData = data;
+
+        this.saveCallback(this.spriteData);
     }
 
 
@@ -202,15 +229,19 @@ class SpriteTabCanvas{
 
     hide(){
         this.shown = false;
-        this.divFrameListParent.style.display = "none";
-        this.divCanvasParent.classList.add("invisible");
+        if(this.divCanvasParent != undefined){
+            this.divFrameListParent.style.display = "none";
+            this.divCanvasParent.classList.add("invisible");
+        }
     }
 
 
     show(){
         this.shown = true;
-        this.divFrameListParent.style.display = "flex";
-        this.divCanvasParent.classList.remove("invisible");
+        if(this.divCanvasParent != undefined){
+            this.divFrameListParent.style.display = "flex";
+            this.divCanvasParent.classList.remove("invisible");
+        }
     }
 }
 

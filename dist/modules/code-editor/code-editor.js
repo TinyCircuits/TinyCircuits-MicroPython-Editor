@@ -1,9 +1,11 @@
 class Tab{
-    constructor(tabManager, tabHeaderDiv, divCodeEditorParent, filePath, data, tabIndex){
+    constructor(tabManager, tabHeaderDiv, divCodeEditorParent, filePath, data, tabIndex, saveCallback){
         this.tabManager = tabManager;
         this.tabHeaderDiv = tabHeaderDiv;
         this.divCodeEditorParent = divCodeEditorParent;
         this.filePath = filePath;
+
+        this.saveCallback = saveCallback;
 
         this.selected = false;
 
@@ -171,7 +173,7 @@ class Tab{
         }
 
         this.editor.session.on('change', (event) => {
-            this.onSave(this.editor.getValue());
+            this.saveCallback(this.editor.getValue());
         });
 
         this.editor.resize();
@@ -209,7 +211,7 @@ class TabManager{
     }
 
 
-    addTab(filePath, data){
+    addTab(filePath, data, saveCallback){
         for(let itx=0; itx<this.tabs.length; itx++){
             if(this.tabs[itx].filePath == filePath){
                 window.showError("Tab with file path '" + filePath + "' already exists, did not open");
@@ -222,7 +224,7 @@ class TabManager{
             tabIndex = this.tabs[this.tabs.length-1].tabIndex+1;
         }
 
-        let newTab = new Tab(this, this.tabHeaderDiv, this.divCodeEditorParent, filePath, data, tabIndex);
+        let newTab = new Tab(this, this.tabHeaderDiv, this.divCodeEditorParent, filePath, data, tabIndex, saveCallback);
         this.tabs.push(newTab);
 
         this.sortTabs();
@@ -239,8 +241,8 @@ class CodeEditor{
         this.tabManager = new TabManager(this.divCodeEditor);
     }
 
-    openFile(filePath, data, tabIndex){
-        return this.tabManager.addTab(filePath, data, tabIndex);
+    openFile(filePath, data, saveCallback){
+        return this.tabManager.addTab(filePath, data, saveCallback);
     }
 }
 

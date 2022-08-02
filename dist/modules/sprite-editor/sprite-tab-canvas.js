@@ -213,7 +213,7 @@ class SpriteTabCanvas{
 
         // Get any stored information about the drawing canvas and restore from it if it exists
         let canvasDimensionsPosition = localStorage.getItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
-        if(canvasDimensionsPosition != null){
+        if(canvasDimensionsPosition != null && canvasDimensionsPosition != "null"){
             canvasDimensionsPosition = JSON.parse(canvasDimensionsPosition);
             this.canvas.style.width = canvasDimensionsPosition[0];
             this.canvas.style.height = canvasDimensionsPosition[1];
@@ -452,6 +452,16 @@ class SpriteTabCanvas{
         }else if(canvasDOMTop > parentDOMHeight){
             this.canvas.style.top = parentDOMHeight-2 + "px";
         }
+    }
+
+
+    // When the tab parent gets a rename event, also need to change keys here
+    changeFilePath(filePath){
+        // Change local storage keys
+        localStorage.setItem("SpriteEditorSelectedFrame" + filePath, localStorage.getItem("SpriteEditorSelectedFrame" + this.filePath));
+        localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + filePath, localStorage.getItem("SpriteEditorCanvasDimensionsPosition" + this.filePath));
+        localStorage.removeItem("SpriteEditorSelectedFrame" + this.filePath);
+        localStorage.removeItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
     }
 
 

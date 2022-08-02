@@ -119,11 +119,15 @@ class SpriteTab{
 
 
     changeFilePath(filePath){
+        // Change local storage key
+        localStorage.setItem("spriteTabData" + filePath, localStorage.getItem("spriteTabData" + this.filePath));
         localStorage.removeItem("spriteTabData" + this.filePath);
 
         this.filePath = filePath;
         this.divTab.title = this.filePath;
         this.divTabText.textContent = this.filePath.slice(this.filePath.lastIndexOf("/")+1);
+
+        this.spriteTabCanvas.changeFilePath(filePath);
 
         this.#saveTabData();
     }

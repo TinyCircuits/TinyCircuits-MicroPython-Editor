@@ -1,5 +1,5 @@
 class Frame{
-    constructor(leadingElement, width, height, openCallback = (index, frameCanvas) => {}){
+    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}){
         // The leading element is where this frame should input itself,
         // and the index is the index in teh frameList of the module that
         // uses this frame
@@ -27,7 +27,8 @@ class Frame{
             this.divFrameContainer.classList.add("outline-2");
             this.divFrameContainer.classList.add("outline-gray-400");
 
-            this.openCallback(Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer), this.canvas);
+            let frameIndex = Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer);
+            this.openCallback(this.canvas, this.context, frameIndex);
         }
 
         // leadingElement.parentElement.appendChild(this.divFrameContainer);

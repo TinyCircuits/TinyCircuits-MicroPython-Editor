@@ -30,7 +30,7 @@ class SpriteTabCanvas{
     // FRAME_COUNT_BYTE FRAME_WIDTH_BYTE FRAME_HEIGHT_BYTE   (always 3 bytes)
     // VLSB_DATA ...                                         (FRAME_COUNT * FRAME_WIDTH * FRAME_HEIGHT // 8 bytes)
     #initSpriteData(){
-        let data = new Uint8Array(31 + 3 + ((72*40) / 8));
+        let data = new Uint8Array(14 + 3 + Math.floor((72*40) / 8));
         data.set(new TextEncoder().encode("TC_SPR_FMT_V001"), 0);   // Header
         data[14] = 1;                                               // Frame count
         data[15] = 72;                                              // Frame width
@@ -42,15 +42,29 @@ class SpriteTabCanvas{
     }
 
 
+    // Get the VLSB frame length using width and height from the file
+    #getFrameLength(){
+        let frameByteLength = this.spriteData[15]*Math.floor(this.spriteData[16]/8);
+        if(this.spriteData[16]%8) frameByteLength += this.spriteData[15];
+        return frameByteLength;
+    }
+
+
+    // Return width and height of the current sprite from the file data
+    #getFrameWidthHeight(){
+        let frameWidth = this.spriteData[15];
+        let frameHeight = this.spriteData[16];
+        return [frameWidth, frameHeight];
+    }
+
+
     // Add a new blank frame to the data (this new data will be added on
     // and the file saved)
     #addFrameToData(){
         if(this.spriteData[14] + 1 <= 255){
             this.spriteData[14] = this.spriteData[14] + 1;
 
-            let frameWidth = this.spriteData[15];
-            let frameHeight = this.spriteData[16];
-            let frameByteLength = Math.floor((frameWidth*frameHeight)/8);
+            const frameByteLength = this.#getFrameLength();
 
             let newSpriteData = new Uint8Array(this.spriteData.length + frameByteLength);
             newSpriteData.set(this.spriteData);
@@ -66,7 +80,7 @@ class SpriteTabCanvas{
 
 
     // Function called by frame class to open a frame at the current index (index in children of parent element for frame list)
-    #openFrameAtIndex(index, frameCanvas){
+    #openFrameAtIndex(frameCanvas, frameContext, frameIndex){
         if(this.canvas == undefined){
             this.#setupDrawingCanvas();
         }
@@ -74,17 +88,22 @@ class SpriteTabCanvas{
         // Copy over the frame canvas tot he drawing canvas which will in turn feed
         // back to the frame and be formatted into VLSB when drawn ona nd then saved
         this.context.drawImage(frameCanvas, 0, 0);
+
+        // Store the context of the current frame
+        this.frameContext = frameContext;
+
+        // The index of the current frame (changes when frames are moved or deleted)
+        this.frameIndex = frameIndex;
     }
 
 
     // Add frame behind the leading element (typically the add frame button)
     #addFrameToList(frameIndex){
-        let frameWidth = this.spriteData[15];
-        let frameHeight = this.spriteData[16];
-        let frameByteLength = Math.floor((frameWidth * frameHeight) / 8);
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+        const frameByteLength = this.#getFrameLength();
 
-        let frameByteOffset = frameByteLength * frameIndex;
-        let frameData = this.spriteData.slice(frameByteOffset, frameByteLength);
+        let frameByteOffset = 17 + (frameByteLength * frameIndex);
+        let frameData = this.spriteData.slice(frameByteOffset, frameByteOffset + frameByteLength);
 
         let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this));
         newFrame.update(frameData);
@@ -140,8 +159,7 @@ class SpriteTabCanvas{
         this.canvas = document.createElement("canvas");
         this.canvas.classList = "crisp-canvas border border-gray border-dashed absolute top-[0px] left-[0px]";
 
-        let frameWidth = this.spriteData[15];
-        let frameHeight = this.spriteData[16];
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
 
         // Setup default dimensions
         this.canvas.style.width = frameWidth + "px";
@@ -174,6 +192,123 @@ class SpriteTabCanvas{
 
         // Setup mouse zooming
         this.#setupZooming();
+
+        // Setup hover and draw functions
+        this.#setupDrawing();
+    }
+
+
+    #getCanvasXY(){
+        const bb = this.canvas.getBoundingClientRect();
+        const x = Math.floor( (event.clientX - bb.left) / bb.width * this.canvas.width );
+        const y = Math.floor( (event.clientY - bb.top) / bb.height * this.canvas.height );
+        return [x, y];
+    }
+
+
+    #updateSpriteFrame(){
+        // Quickly show the edits
+        this.frameContext.drawImage(this.canvas, 0, 0);
+
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+        const frameByteLength = this.#getFrameLength();
+
+        let frame = new Uint8Array(frameByteLength);
+
+        // Update the frame in the file
+        let imageData = this.context.getImageData(0, 0, frameWidth, frameHeight).data;
+
+        let ib = 0;
+        for(let row=0; row < frameHeight; row+=8){
+            for(let col=0; col < frameWidth; col++){
+                frame[ib] = 0b00000000;
+                for(let i=0; i<8; i++){
+                    const x = col;
+                    const y = row + i;
+                    const p = (y * frameWidth + x) * 4;
+                    
+                    if(imageData[p] == 255){
+                        frame[ib] = frame[ib] | 1 << i;
+                    }
+                }
+                ib += 1;
+            }
+        }
+
+        let frameByteOffset = frameByteLength * this.frameIndex;
+        this.spriteData.set(frame, 17 + frameByteOffset);
+        this.saveCallback(this.spriteData);
+    }
+
+
+    #setupDrawing(){
+        this.canvas.onmousemove = (event) => {
+            const [x, y] = this.#getCanvasXY();
+
+            // Clear the last drawn gray pixel if it exists
+            if(this.lastColor != undefined){
+                if(this.lastColor[0] == 255){
+                    this.context.fillStyle = "white";
+                }else{
+                    this.context.fillStyle = "black";
+                }
+                this.context.beginPath();
+                this.context.fillRect(this.lastX, this.lastY, 1, 1);
+                this.context.stroke();
+            }
+
+            // Before drawing the gray pixel, get the color under it
+            this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+
+            // Draw the gray/selected pixel
+            this.context.beginPath();
+            this.context.fillStyle = "gray";
+            this.context.fillRect(x, y, 1, 1);
+            this.context.stroke();
+
+            if(event.buttons == 1){
+                this.context.beginPath();
+                this.context.fillStyle = "white";
+                this.context.fillRect(x, y, 1, 1);
+                this.context.stroke();
+
+                this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+                this.#updateSpriteFrame();
+            }
+
+            this.lastX = x;
+            this.lastY = y;
+        }
+        this.canvas.onmousedown = (event) => {
+            const [x, y] = this.#getCanvasXY();
+
+            if(event.buttons == 1){
+                this.context.beginPath();
+                this.context.fillStyle = "white";
+                this.context.fillRect(x, y, 1, 1);
+                this.context.stroke();
+                this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+
+                this.#updateSpriteFrame();
+            }
+
+            this.frameContext.drawImage(this.canvas, 0, 0);
+            this.lastX = x;
+            this.lastY = y;
+        }
+        this.canvas.onmouseleave = (event) => {
+            // Clear the last drawn gray pixel if it exists
+            if(this.lastColor != undefined){
+                if(this.lastColor[0] == 255){
+                    this.context.fillStyle = "white";
+                }else{
+                    this.context.fillStyle = "black";
+                }
+                this.context.beginPath();
+                this.context.fillRect(this.lastX, this.lastY, 1, 1);
+                this.context.stroke();
+            }
+        }
     }
 
 

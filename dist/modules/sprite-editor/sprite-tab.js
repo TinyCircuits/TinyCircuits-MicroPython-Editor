@@ -1,7 +1,7 @@
 import { SpriteTabCanvas } from "./sprite-tab-canvas.js";
 
 class SpriteTab{
-    constructor(divSpriteTabHeader, filePath, spriteData, tabIndex, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}, saveCallback){
+    constructor(divSpriteTabHeader, filePath, spriteData, tabIndex, tabClosedCallback = (filePath) => {}, tabUnselectAll = () => {}, saveCallback, spriteAnimationPreview){
         this.divSpriteTabHeader = divSpriteTabHeader;
         this.filePath = filePath;
         this.name = filePath.slice(filePath.lastIndexOf("/")+1);
@@ -9,7 +9,7 @@ class SpriteTab{
 
         this.onClose = () => {};
 
-        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, spriteData, "divSpriteEditor", "divSpriteFrameList", saveCallback);
+        this.spriteTabCanvas = new SpriteTabCanvas(this.filePath, spriteData, "divSpriteEditor", "divSpriteFrameList", saveCallback, spriteAnimationPreview);
 
         this.selected = false;
 

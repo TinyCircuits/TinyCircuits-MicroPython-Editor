@@ -1,12 +1,12 @@
 import { Frame } from "./frame.js";
 
 class SpriteTabCanvas{
-    constructor(filePath, spriteData, divEditorMainID, divSpriteFrameListMainID, saveCallback){
+    constructor(filePath, spriteData, divEditorMainID, divSpriteFrameListMainID, saveCallback, spriteAnimationPreview){
         // A file path is stored so this module can use local storage
         this.filePath = filePath;
 
         this.saveCallback = saveCallback;
-
+        this.spriteAnimationPreview = spriteAnimationPreview;
 
         if(spriteData == undefined){
             this.#initSpriteData();
@@ -481,6 +481,9 @@ class SpriteTabCanvas{
         this.shown = true;
         this.divFrameListParent.style.display = "flex";
 
+        // Preview module from sprite editor manager
+        this.spriteAnimationPreview.setFrameListParent(this.divFrameListParent);
+
         if(this.divCanvasParent != undefined){
             this.divCanvasParent.classList.remove("invisible");
         }
@@ -491,6 +494,9 @@ class SpriteTabCanvas{
     close(){
         this.divEditorMain.removeChild(this.divCanvasParent);
         this.divSpriteFrameListMain.removeChild(this.divFrameListParent);
+
+        // Set the parent element of the list of frames to undefined in case a new sprite is not selected
+        this.spriteAnimationPreview.setFrameListParent(undefined);
 
         // Remove the stored selected frame index for this file so a new file with teh same name doesn't restore from it
         localStorage.removeItem("SpriteEditorSelectedFrame" + this.filePath);

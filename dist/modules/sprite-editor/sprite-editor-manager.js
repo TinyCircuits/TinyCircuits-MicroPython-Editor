@@ -1,10 +1,12 @@
 // Manages tabs and opening or saving files
 
 import { SpriteTab } from "./sprite-tab.js";
+import { SpriteAnimationPreview } from "./sprite-animation-preview.js";
 
 class SpriteEditorManager{
     constructor(){
         this.divSpriteTabHeader = document.getElementById("divSpriteTabHeader");
+        this.spriteAnimationPreview = new SpriteAnimationPreview();
 
         this.tabs = [];
     }
@@ -55,7 +57,7 @@ class SpriteEditorManager{
         }
 
         // Didn't find that it was already open, 
-        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, tabIndex, this.#tabClosed.bind(this), this.#unselectAll.bind(this), saveCallback);
+        let newTab = new SpriteTab(divSpriteTabHeader, filePath, tabData, tabIndex, this.#tabClosed.bind(this), this.#unselectAll.bind(this), saveCallback, this.spriteAnimationPreview);
         this.tabs.push(newTab);
 
         this.#sortTabs();

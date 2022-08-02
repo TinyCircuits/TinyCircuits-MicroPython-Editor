@@ -94,6 +94,9 @@ class SpriteTabCanvas{
 
         // The index of the current frame (changes when frames are moved or deleted)
         this.frameIndex = frameIndex;
+
+        // Set the selected from index for this file
+        localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
     }
 
 
@@ -107,6 +110,8 @@ class SpriteTabCanvas{
 
         let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this));
         newFrame.update(frameData);
+
+        return newFrame;
     }
 
 
@@ -119,8 +124,18 @@ class SpriteTabCanvas{
 
         let frameCount = this.spriteData[14];
 
+        // Get the last selected frame from local storage to select that frame when it gets added
+        let selectedFrameIndex = localStorage.getItem("SpriteEditorSelectedFrame" + this.filePath);
+        if(selectedFrameIndex == null) selectedFrameIndex = 0;
+
+        // For through frame count and call method to add frames from file sprite data
         for(let ifx=0; ifx<frameCount; ifx++){
-            this.#addFrameToList(ifx);
+            let frame = this.#addFrameToList(ifx);
+
+            // Does the index match the one that was retrieved from localStorage? If so, select it
+            if(ifx == selectedFrameIndex){
+                frame.select();
+            }
         }
     }
 
@@ -152,7 +167,7 @@ class SpriteTabCanvas{
     #setupDrawingCanvas(){
         // Setup drawing canvas
         this.divCanvasParent = document.createElement("div");
-        this.divCanvasParent.classList = "absolute top-0 left-0 bottom-0 right-0 bg-gray-50";
+        this.divCanvasParent.classList = "absolute top-0 left-0 bottom-0 right-0";
         this.divEditorMain.appendChild(this.divCanvasParent);
 
         // The canvas all the drawing is done on
@@ -195,10 +210,20 @@ class SpriteTabCanvas{
 
         // Setup hover and draw functions
         this.#setupDrawing();
+
+        // Get any stored information about the drawing canvas and restore from it if it exists
+        let canvasDimensionsPosition = localStorage.getItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
+        if(canvasDimensionsPosition != null){
+            canvasDimensionsPosition = JSON.parse(canvasDimensionsPosition);
+            this.canvas.style.width = canvasDimensionsPosition[0];
+            this.canvas.style.height = canvasDimensionsPosition[1];
+            this.canvas.style.left = canvasDimensionsPosition[2];
+            this.canvas.style.top = canvasDimensionsPosition[3];
+        }
     }
 
 
-    #getCanvasXY(){
+    #getCanvasXY(event){
         const bb = this.canvas.getBoundingClientRect();
         const x = Math.floor( (event.clientX - bb.left) / bb.width * this.canvas.width );
         const y = Math.floor( (event.clientY - bb.top) / bb.height * this.canvas.height );
@@ -243,7 +268,7 @@ class SpriteTabCanvas{
 
     #setupDrawing(){
         this.canvas.onmousemove = (event) => {
-            const [x, y] = this.#getCanvasXY();
+            const [x, y] = this.#getCanvasXY(event);
 
             // Clear the last drawn gray pixel if it exists
             if(this.lastColor != undefined){
@@ -280,7 +305,7 @@ class SpriteTabCanvas{
             this.lastY = y;
         }
         this.canvas.onmousedown = (event) => {
-            const [x, y] = this.#getCanvasXY();
+            const [x, y] = this.#getCanvasXY(event);
 
             if(event.buttons == 1){
                 this.context.beginPath();
@@ -343,6 +368,9 @@ class SpriteTabCanvas{
 
                     // Make sure it is still in bounds
                     this.#keepCanvasInbounds();
+
+                    // Store the canvas dimensions and position for later restoration
+                    localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
                 }
             }
         });
@@ -383,6 +411,9 @@ class SpriteTabCanvas{
 
             // Make sure it is still in bounds
             this.#keepCanvasInbounds();
+
+            // Store the canvas dimensions and position for later restoration
+            localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
         }
     }
 
@@ -443,6 +474,19 @@ class SpriteTabCanvas{
         if(this.divCanvasParent != undefined){
             this.divCanvasParent.classList.remove("invisible");
         }
+    }
+
+
+    // When the tab in the tab header closes, remove everything related to canvas editing (canvas, frames, etc)
+    close(){
+        this.divEditorMain.removeChild(this.divCanvasParent);
+        this.divSpriteFrameListMain.removeChild(this.divFrameListParent);
+
+        // Remove the stored selected frame index for this file so a new file with teh same name doesn't restore from it
+        localStorage.removeItem("SpriteEditorSelectedFrame" + this.filePath);
+
+        // REmove the canvas dimensions and position for later restoration
+        localStorage.removeItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
     }
 }
 

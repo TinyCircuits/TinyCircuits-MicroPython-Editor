@@ -139,6 +139,9 @@ class SpriteTab{
             this.tabIndex = undefined;
             this.#saveTabData();
 
+            // Close the underlying canvas class object
+            this.spriteTabCanvas.close();
+
             this.tabClosedCallback(this.filePath);
         }
     }

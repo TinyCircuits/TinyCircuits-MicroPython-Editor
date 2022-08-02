@@ -1,5 +1,5 @@
 class Frame{
-    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}){
+    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}){        
         // The leading element is where this frame should input itself,
         // and the index is the index in teh frameList of the module that
         // uses this frame
@@ -15,20 +15,7 @@ class Frame{
         this.divFrameContainer = document.createElement("div");
         this.divFrameContainer.classList = "border border-gray-400 min-w-full mt-3";
         this.divFrameContainer.ondblclick = (event) => {
-            // Remove selected outline from all other frame elements
-            for(let icx=0; icx<this.leadingElement.parentElement.children.length; icx++){
-                this.leadingElement.parentElement.children[icx].classList.remove("outline");
-                this.leadingElement.parentElement.children[icx].classList.remove("outline-2");
-                this.leadingElement.parentElement.children[icx].classList.remove("outline-gray-400");
-            }
-
-            // Add selected outline to this frame element
-            this.divFrameContainer.classList.add("outline");
-            this.divFrameContainer.classList.add("outline-2");
-            this.divFrameContainer.classList.add("outline-gray-400");
-
-            let frameIndex = Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer);
-            this.openCallback(this.canvas, this.context, frameIndex);
+            this.select();
         }
 
         // leadingElement.parentElement.appendChild(this.divFrameContainer);
@@ -56,6 +43,24 @@ class Frame{
 
         // Add the canvas to the canvas parent div
         this.divFrameContainer.appendChild(this.canvas);
+    }
+
+
+    select(){
+        // Remove selected outline from all other frame elements
+        for(let icx=0; icx<this.leadingElement.parentElement.children.length; icx++){
+            this.leadingElement.parentElement.children[icx].classList.remove("outline");
+            this.leadingElement.parentElement.children[icx].classList.remove("outline-2");
+            this.leadingElement.parentElement.children[icx].classList.remove("outline-gray-400");
+        }
+
+        // Add selected outline to this frame element
+        this.divFrameContainer.classList.add("outline");
+        this.divFrameContainer.classList.add("outline-2");
+        this.divFrameContainer.classList.add("outline-gray-400");
+
+        let frameIndex = Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer);
+        this.openCallback(this.canvas, this.context, frameIndex);
     }
 
 

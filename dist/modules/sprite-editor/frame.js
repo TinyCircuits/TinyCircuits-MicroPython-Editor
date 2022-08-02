@@ -14,7 +14,7 @@ class Frame{
         // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
         this.divFrameContainer = document.createElement("div");
         this.divFrameContainer.classList = "border border-gray-400 min-w-full mt-3";
-        this.divFrameContainer.ondblclick = (event) => {
+        this.divFrameContainer.onclick = (event) => {
             this.select();
         }
 

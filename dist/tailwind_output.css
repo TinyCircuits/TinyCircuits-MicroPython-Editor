@@ -819,14 +819,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 15px;
 }
 
-.h-10 {
-  height: 2.5rem;
-}
-
-.h-\[75\%\] {
-  height: 75%;
-}
-
 .h-40 {
   height: 10rem;
 }
@@ -933,10 +925,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-\[15px\] {
   width: 15px;
-}
-
-.w-\[35\%\] {
-  width: 35%;
 }
 
 .w-0\.5 {
@@ -1175,11 +1163,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .bg-gray-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(249 250 251 / var(--tw-bg-opacity));
-}
-
-.bg-lime-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(101 163 13 / var(--tw-bg-opacity));
 }
 
 .bg-gray-200 {

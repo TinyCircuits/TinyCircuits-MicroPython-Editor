@@ -43,6 +43,13 @@ class SpriteAnimationPreview{
                 this.frameIndex = 0;
             }
 
+            // Resize preview to whatever the frame is set to
+            let frameWidth = this.frameListParent.children[this.frameIndex].children[0].width;
+            let frameHeight = this.frameListParent.children[this.frameIndex].children[0].height;
+            this.canvasSpriteFramePreview.style.aspectRatio = frameWidth + "/" + frameHeight;
+            this.canvasSpriteFramePreview.width = frameWidth;
+            this.canvasSpriteFramePreview.height = frameHeight;
+
             this.previewContext.drawImage(this.frameListParent.children[this.frameIndex].children[0], 0, 0);
 
             this.t0 = newtime - (dt % this.fpsInterval);

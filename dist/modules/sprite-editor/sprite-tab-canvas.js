@@ -14,10 +14,16 @@ class SpriteTabCanvas{
             this.spriteData = spriteData;
         }
 
-
         // Grab some parent elements
         this.divEditorMain = document.getElementById(divEditorMainID);
         this.divSpriteFrameListMain = document.getElementById(divSpriteFrameListMainID);
+
+        this.listenerZoomIn = () => {if(this.shown) this.#zoom(1.25);};
+        this.listenerZoomOut = () => {if(this.shown) this.#zoom(1 / 1.25);};
+        this.listenerFitCanvas = () => {if(this.shown){ this.#centerCanvas(); localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));}};
+        document.getElementById("btnSpriteEditorZoomIn").addEventListener("click", this.listenerZoomIn);
+        document.getElementById("btnSpriteEditorZoomOut").addEventListener("click", this.listenerZoomOut);
+        document.getElementById("btnSpriteEditorFitCanvas").addEventListener("click", this.listenerFitCanvas);
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
@@ -304,6 +310,10 @@ class SpriteTabCanvas{
             this.lastX = x;
             this.lastY = y;
         }
+        this.canvas.oncontextmenu = (event) => {
+            // Prevent right-click since leaves gray pixel (hacky solution)
+            event.preventDefault();
+        }
         this.canvas.onmousedown = (event) => {
             const [x, y] = this.#getCanvasXY(event);
 
@@ -377,43 +387,45 @@ class SpriteTabCanvas{
     }
 
 
+    #zoom(factor){
+        let canvasDOMWidth = parseFloat(this.canvas.style.width);
+        let canvasDOMHeight = parseFloat(this.canvas.style.height);
+
+        let newCanvasDOMWidth = canvasDOMWidth * factor;
+        let newCanvasDOMHeight = newCanvasDOMWidth / (canvasDOMWidth/canvasDOMHeight);
+
+        this.canvas.style.width = newCanvasDOMWidth + "px";
+        this.canvas.style.height = newCanvasDOMHeight + "px";
+
+        // Offset scale to center of canvas
+        let x = parseFloat(this.canvas.style.left);
+        let y = parseFloat(this.canvas.style.top);
+
+        let pdx = (newCanvasDOMWidth - canvasDOMWidth)/2;
+        let pdy = (newCanvasDOMHeight - canvasDOMHeight)/2;
+
+        this.canvas.style.left = (x - pdx) + "px";
+        this.canvas.style.top = (y - pdy) + "px";
+
+        // Make sure it is still in bounds
+        this.#keepCanvasInbounds();
+
+        // Store the canvas dimensions and position for later restoration
+        localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
+    }
+
+
     // Scroll wheel allows zooming
     #setupZooming(){
         // Zoom the canvas in and out based on cursor and current location using scroll wheel
         this.divCanvasParent.onwheel = (event) => {
             event.preventDefault();
 
-            let canvasDOMWidth = parseFloat(this.canvas.style.width);
-            let canvasDOMHeight = parseFloat(this.canvas.style.height);
-
-            let newCanvasDOMWidth = undefined;
-            let newCanvasDOMHeight = undefined;
-
             if(event.deltaY < 0){
-                newCanvasDOMWidth = canvasDOMWidth * 1.25;
+                this.#zoom(1.25);
             }else if(event.deltaY > 0){
-                newCanvasDOMWidth = canvasDOMWidth / 1.25;
+                this.#zoom(1 / 1.25);
             }
-            newCanvasDOMHeight = newCanvasDOMWidth / (canvasDOMWidth/canvasDOMHeight);
-
-            this.canvas.style.width = newCanvasDOMWidth + "px";
-            this.canvas.style.height = newCanvasDOMHeight + "px";
-
-            // Offset scale to center of canvas
-            let x = parseFloat(this.canvas.style.left);
-            let y = parseFloat(this.canvas.style.top);
-
-            let pdx = (newCanvasDOMWidth - canvasDOMWidth)/2;
-            let pdy = (newCanvasDOMHeight - canvasDOMHeight)/2;
-
-            this.canvas.style.left = (x - pdx) + "px";
-            this.canvas.style.top = (y - pdy) + "px";
-
-            // Make sure it is still in bounds
-            this.#keepCanvasInbounds();
-
-            // Store the canvas dimensions and position for later restoration
-            localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
         }
     }
 
@@ -503,6 +515,11 @@ class SpriteTabCanvas{
 
         // REmove the canvas dimensions and position for later restoration
         localStorage.removeItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
+
+        // Remove any listeners
+        document.getElementById("btnSpriteEditorZoomIn").removeEventListener("click", this.listenerZoomIn);
+        document.getElementById("btnSpriteEditorZoomOut").removeEventListener("click", this.listenerZoomOut);
+        document.getElementById("btnSpriteEditorFitCanvas").removeEventListener("click", this.listenerFitCanvas);
     }
 }
 

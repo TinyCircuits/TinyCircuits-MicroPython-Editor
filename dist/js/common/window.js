@@ -240,7 +240,7 @@ window.folderSelectionShow = (dialog, closeCallback) => {
     let rect = divProjectsLayoutPanel.getBoundingClientRect();
 
     let overlay1 = document.createElement("div");
-    overlay1.classList = "absolute z-30 bg-white opacity-90 top-0 right-0 bottom-0";
+    overlay1.classList = "absolute z-30 bg-base-100 opacity-90 top-0 right-0 bottom-0";
     overlay1.style.left = (rect.x + rect.width) + "px"
     document.body.appendChild(overlay1);
 

@@ -3690,14 +3690,19 @@ html {
   border-color: rgb(229 231 235 / var(--tw-border-opacity));
 }
 
-.border-black {
+.border-info {
   --tw-border-opacity: 1;
-  border-color: rgb(0 0 0 / var(--tw-border-opacity));
+  border-color: hsl(var(--in) / var(--tw-border-opacity));
 }
 
 .border-accent-focus {
   --tw-border-opacity: 1;
   border-color: hsl(var(--af, var(--a)) / var(--tw-border-opacity));
+}
+
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
 }
 
 .border-gray-400 {
@@ -3746,10 +3751,6 @@ html {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-\[\#ffffffaa\] {
-  background-color: #ffffffaa;
-}
-
 .bg-accent-focus {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--af, var(--a)) / var(--tw-bg-opacity));
@@ -3767,6 +3768,10 @@ html {
 
 .bg-transparent {
   background-color: transparent;
+}
+
+.fill-primary {
+  fill: hsl(var(--p));
 }
 
 .fill-black {

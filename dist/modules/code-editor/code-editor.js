@@ -168,7 +168,7 @@ class Tab{
         this.editor.session.setMode("ace/mode/python");
 
         // Change the gutter color too
-        this.editor.container.children[1].firstChild.classList.add("bg-base-300");
+        this.editor.container.children[1].firstChild.classList.add("bg-base-200");
         // this.editor.container.style.background = getComputedStyle(this.divEditor).backgroundColor;
 
         if(data != undefined){

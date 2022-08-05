@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html>
+<html data-theme="dark">
     <head>
         <title>Thumby Code</title>
         <meta charset="UTF-8">
@@ -11,92 +11,62 @@
         <link rel="stylesheet" type="text/css" href="/dist/css/pages/code/code.css">
     </head>
 
-    <body class="overflow-hidden dark:bg-black">
-        <div class="left-[256px] top-2 group inline-block relative">
-    <button class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border rounded-md w-28 h-8 duration-200">
-        <span>Project</span>
-    </button>
-    <ul class="z-20 absolute hidden text-gray-700 pt-1 group-hover:block">
-        <li>
-            <button class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Open from</span>
-            </button>
-        </li>
-        <li>
-            <button id="btnSaveProjectTo" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Save to</span>
-            </button>
-        </li>
-        <li>
-            <button id="btnProjectAddFiles" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Add Files</span>
-            </button>
-        </li>
-        <li>
-            <button class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Rename</span>
-            </button>
-        </li>
-    </ul>
-</div>
-        <div class="left-[260px] top-2 group inline-block relative">
-    <button class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200 rounded-md">
-        <span>View</span>
-    </button>
-    <ul class="z-20 absolute hidden text-gray-700 pt-1 group-hover:block">
-        <li>
-            <button id="btnResetLayout" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Reset Layout</span>
-            </button>
-        </li>
-        <li>
-            <button id="btnInvertTheme" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border w-28 h-8 duration-200">
-                <span>Invert Theme</span>
-            </button>
-        </li>
-    </ul>
-</div>
-        <div class="rounded-lg border border-black w-48 h-[37px] bg-white absolute left-[498px] xl:left-0 xl:m-auto right-0 top-[6px] flex items-center justify-around">
-    <button title="Switch to code editor" id="btnCode" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <body class="overflow-hidden">
+        
+        <!-- Project dropdown -->
+        <div class="dropdown dropdown-hover left-2 top-2">
+            <label tabindex="0" class="btn btn-primary btn-sm">Projects</label>
+            <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+                <li><a>Open from</a></li>
+                <li id="btnSaveProjectTo"><a>Save to</a></li>
+                <li id="btnProjectAddFiles"><a>Add Files</a></li>
+                <li><a>Rename</a></li>
+            </ul>
+        </div>
+
+        
+        <!-- View dropdown -->
+        <div class="dropdown dropdown-hover left-4 top-2">
+            <label tabindex="0" class="btn btn-primary btn-sm">View</label>
+            <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+                <li id="btnResetLayout"><a>Reset Layout</a></li>
+                <li id="btnInvertTheme"><a>Invert Theme</a></li>
+            </ul>
+        </div>
+
+
+        <div class="rounded-lg border border-accent w-48 h-[37px] bg-base-200 absolute left-[498px] xl:left-0 xl:m-auto right-0 top-[6px] flex items-center justify-around">
+    <button title="Switch to code editor" id="btnCode" class="mx-1 btn btn-primary btn-sm h-[30px] w-[30px] p-0 rounded-full min-h-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
     </button>
 
-    <button title="Switch to sprite editor" id="btnSprite" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Switch to sprite editor" id="btnSprite" class="mx-1 btn btn-primary btn-sm h-[30px] w-[30px] p-0 rounded-full min-h-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
         </svg>
     </button>
 
-    <button title="Switch to music editor" id="btnMusic" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Switch to music editor" id="btnMusic" class="mx-1 btn btn-primary btn-sm h-[30px] w-[30px] p-0 rounded-full min-h-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
-        </svg>
+       </svg>
     </button>
 </div>
 
-        <div class="flex absolute left-2 top-2 w-[240px] h-8 border  border-black bg-white  dark:border-white dark:bg-black">
-            <input type="text" value="Project Name" class="w-[221px] min-h-full focus:border-0">
-            <button class="bg-black hover:bg-white active:bg-black stroke-white hover:stroke-black active:stroke-white border-l-black  dark:bg-white dark:hover:bg-black dark:active:bg-white dark:stroke-black dark:hover:stroke-white dark:active:stroke-black dark:border-l-white  flex justify-center items-center min-w-[35px] min-h-full border-l duration-100">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-2/3 w-2/3" fill="none" viewBox="0 0 24 24" stroke="inherit" stroke-width="1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-            </button>
-        </div>
 
-
-        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-8 border border-black bg-white dark:border-white dark:bg-black">
+        <div id="divLayout" class="absolute left-2 top-12 right-2 bottom-8 border border-accent bg-base-100">
             <div id="main">
     <div class="resizable-left" id="win1">
         <div class="resizable-left" id="win3">
-            <div id="divProjectsLayoutPanel" class="min-w-full min-h-full bg-white">
-                <div class="w-full h-6 bg-black text-white dark:text-black dark:bg-white">
+            <div id="divProjectsLayoutPanel" class="min-w-full min-h-full bg-base-100">
+                <div class="w-full h-6 bg-accent text-white">
                     <div class="ml-1 select-none">
                         Projects
                     </div>
                 </div>
-                <div id="divProjects" class="absolute top-6 bottom-0 left-0 right-0 dark:bg-black">
+                <div id="divProjects" class="absolute top-6 bottom-0 left-0 right-0">
                     
                 </div>
             </div>
@@ -104,28 +74,27 @@
         <div class="resizable-right" id="win4">
             <div class="resizable-top" id="win5">
                 <div class="min-w-full min-h-full bg-white">
-                    <div id="divCode" class="absolute top-0 bottom-0 left-0 right-0">
+                    <div id="divCode" class="absolute top-0 bottom-0 left-0 right-0 bg-base-100">
                         <div class="min-w-full min-h-full">
-    <div id="divCodeEditor" class="absolute top-0 bottom-0 left-0 right-0 flex">
+    <div id="divCodeEditor" class="absolute top-0 bottom-0 left-0 right-[-1px] flex">
         
     </div>
 </div>
                     </div>
                     
-                    <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
-                        
+                    <div id="divSprite" class="absolute top-0 bottom-0 left-0 right-0 bg-base-100">
                         <div class="w-full h-full">
 
     <!-- Panel title -->
-    <div class="w-full h-6 bg-black text-white">
+    <div class="w-full h-6 bg-accent text-white">
         <div class="ml-1 select-none">
             Sprite Editor
         </div>
     </div>
 
     <!-- Tabs header container -->
-    <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-black">
-        <button id="btnCreateSprite" class="btn rounded-full min-w-[32px] min-h-[32px] border border-black ml-2 flex items-center justify-center">
+    <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-accent">
+        <button id="btnCreateSprite" class="btn btn-primary btn-circle btn-sm h-[30px] w-[30px] min-h-0 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
@@ -137,7 +106,7 @@
         <div id="divSpriteListParent" class="flex-auto w-[15%] flex flex-col">
 
             <!-- Frame List -->
-            <div id="divSpriteFrameList" class="h-full border border-black rounded-md relative overflow-auto bg-gray-50">
+            <div id="divSpriteFrameList" class="h-full border border-accent-focus rounded-md relative overflow-auto bg-base-100">
                 
             </div>
 
@@ -149,7 +118,7 @@
             </div>
 
             <!-- Frame animation preview -->
-            <div id="divSpriteFramePreview" class="overflow-hidden h-40 border border-black rounded-md relative overflow-auto bg-gray-50 flex items-center justify-center">
+            <div id="divSpriteFramePreview" class="overflow-hidden h-40 border border-accent-focus rounded-md relative overflow-auto bg-base-100 flex items-center justify-center">
                 <canvas id="canvasSpriteFramePreview" width="72" height="40" style="width:100%; aspect-ratio:72/40; margin:16px;" class="crisp-canvas">
                 </canvas>
             </div>
@@ -173,7 +142,7 @@
         <div id="divSpriteEditorParent" class="flex-auto w-[85%] flex flex-col">
             <div class="h-full w-full">
                 <!-- Sprite Editor -->
-                <div id="divSpriteEditor" class="h-full border border-black rounded-md relative overflow-hidden bg-gray-50">
+                <div id="divSpriteEditor" class="h-full border border-accent-focus rounded-md relative overflow-hidden bg-base-100">
                     <!-- Canvas -->
                 </div>
             </div>
@@ -183,44 +152,44 @@
                 <div class="h-full flex justify-around items-center overflow-hidden">
 
     <!-- Zoom in -->
-    <button id="btnSpriteEditorZoomIn" title="Zoom in [keybind: scroll wheel forwards/up]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button id="btnSpriteEditorZoomIn" title="Zoom in [keybind: scroll wheel forwards/up]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M5 8a1 1 0 011-1h1V6a1 1 0 012 0v1h1a1 1 0 110 2H9v1a1 1 0 11-2 0V9H6a1 1 0 01-1-1z" />
             <path fill-rule="evenodd" d="M2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8zm6-4a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Zoom out -->
-    <button id="btnSpriteEditorZoomOut" title="Zoom out [keybind: scroll wheel backwards/down]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button id="btnSpriteEditorZoomOut" title="Zoom out [keybind: scroll wheel backwards/down]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
             <path fill-rule="evenodd" d="M5 8a1 1 0 011-1h4a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Fit -->
-    <button id="btnSpriteEditorFitCanvas" title="Fit to view [keybind: f]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button id="btnSpriteEditorFitCanvas" title="Fit to view [keybind: f]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="m 9.0045472,8.0045472 a 1,1 0 0 1 -1,1 h -4 a 1,1 0 0 1 0,-2 h 1.586 l -2.293,-2.293 a 1,1 0 0 1 1.414,-1.414 l 2.293,2.293 v -1.586 a 1,1 0 0 1 2,0 z M 15.968514,7.0314859 a 1,1 0 1 1 0,2 h -4 a 1,1 0 0 1 -1,-1 v -4 a 1,1 0 1 1 2,0 v 1.586 l 2.293,-2.293 a 1,1 0 1 1 1.414,1.414 l -2.293,2.293 z M 9.0045472,15.995453 a 1,1 0 1 1 -2,0 v -1.586 l -2.293,2.293 a 1,1 0 0 1 -1.414,-1.414 l 2.293,-2.293 h -1.586 a 1,1 0 1 1 0,-2 h 4 a 1,1 0 0 1 1,1 z m 2.9909058,1 a 1,1 0 0 1 -1,-1 v -4 a 1,1 0 0 1 1,-1 h 4 a 1,1 0 1 1 0,2 h -1.586 l 2.293,2.293 a 1,1 0 0 1 -1.414,1.414 l -2.293,-2.293 v 1.586 a 1,1 0 0 1 -1,1 z" clip-rule="evenodd" />
         </svg>
     </button>
 
 
     <!-- Separator -->
-    <div class="w-0.5 h-[80%] bg-black">
+    <div class="w-0.5 h-[80%] bg-accent-focus">
 
     </div>
 
 
     <!-- Black/White selection -->
     <div class="w-40 h-8 flex flex-row">
-        <button title="Undo last operation [keybind: ctrl+z]" class="flex flex-row rounded-l-full w-20 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <button title="Undo last operation [keybind: ctrl+z]" class="flex flex-row rounded-l-full w-20 h-8 btn btn-secondary btn-sm min-h-0 p-0">
             <div class="w-full h-full flex items-center justify-center">
                 Undo
             </div>
         </button>
 
-        <button title="UNdo the last undo operation [keybind: shift+ctrl+z]" class="flex flex-row rounded-r-full w-20 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <button title="UNdo the last undo operation [keybind: shift+ctrl+z]" class="flex flex-row rounded-r-full w-20 h-8 btn btn-secondary btn-sm min-h-0 p-0">
             <div class="w-full h-full flex items-center justify-center">
                 Redo
             </div>
@@ -229,42 +198,42 @@
 
 
     <!-- Separator -->
-    <div class="w-0.5 h-[80%] bg-black">
+    <div class="w-0.5 h-[80%] bg-accent-focus">
 
     </div>
 
 
     <!-- Rectangle -->
-    <button title="Enable rectangle drawing tool [keybind: r]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Enable rectangle drawing tool [keybind: r]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 2.593,2.593 V 17.406 H 17.406 V 2.593 Z M 4.7842041,4.7842041 H 15.216125 V 15.216125 H 4.7842041 Z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Oval -->
-    <button title="Enable oval drawing tool [keybind: o]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Enable oval drawing tool [keybind: o]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 9.9999064 2.633431 A 7.3663845 7.3663845 0 0 0 2.633431 9.9999064 A 7.3663845 7.3663845 0 0 0 9.9999064 17.366382 A 7.3663845 7.3663845 0 0 0 17.366382 9.9999064 A 7.3663845 7.3663845 0 0 0 9.9999064 2.633431 z M 9.9999064 4.7206421 A 5.279242 5.279242 0 0 1 15.279171 9.9999064 A 5.279242 5.279242 0 0 1 9.9999064 15.279171 A 5.279242 5.279242 0 0 1 4.7206421 9.9999064 A 5.279242 5.279242 0 0 1 9.9999064 4.7206421 z " clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Line -->
-    <button title="Enable line drawing tool [keybind: l]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Enable line drawing tool [keybind: l]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 16.25,2.5 A 1.25,1.25 0 0 0 15.365234,2.8652344 L 2.8652344,15.365234 a 1.25,1.25 0 0 0 0,1.769532 1.25,1.25 0 0 0 1.7695312,0 L 17.134766,4.6347656 a 1.25,1.25 0 0 0 0,-1.7695312 A 1.25,1.25 0 0 0 16.25,2.5 Z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Bucket -->
-    <button title="Enable bucket fill tool [keybind: b]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Enable bucket fill tool [keybind: b]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="m 9.8554688,3.0014844 c -0.1056786,-0.0043 -0.2193177,3.094e-4 -0.3359376,0.019531 -0.2327103,0.038356 -0.4773087,0.1397148 -0.6855468,0.34375 a 0.12354945,0.12354945 0 0 0 -0.00391,0 L 8.5878906,3.6030469 a 0.12354945,0.12354945 0 0 0 -0.00195,0.00195 C 6.3742728,5.7393049 7.0705049,5.1067553 2.5371094,9.597188 c -0.4177863,0.413827 -0.399259,0.968454 -0.3320313,1.310547 0.071537,0.364601 0.2322867,0.732978 0.4355469,1.09375 0.4086023,0.728813 1.0590205,1.553779 1.8613281,2.349609 0.8034838,0.795868 1.6377551,1.441249 2.3730469,1.845703 0.3634224,0.200892 0.7354193,0.360873 1.1015625,0.431641 5.943e-4,1.15e-4 0.00136,-1.14e-4 0.00195,0 a 0.12354945,0.12354945 0 0 0 0,0.002 c 0.3414285,0.06454 0.8925433,0.07961 1.3105469,-0.328125 a 0.12354945,0.12354945 0 0 0 0.00977,-0.0039 L 15.041017,10.60896 c -0.005,0.09009 -0.0016,0.149978 -0.01367,0.271484 -0.03332,0.321279 -0.07633,0.747124 -0.08203,1.324219 a 0.12354945,0.12354945 0 0 0 0,0.002 c 0,0 0,0.002 0,0.002 v 0.134766 a 0.12354945,0.12354945 0 0 0 0.002,0.02344 c 2.81e-4,0.0015 0.0016,0.0025 0.002,0.0039 0.07096,0.837918 0.767572,1.314454 1.439453,1.314454 0.671881,0 1.368491,-0.476536 1.439453,-1.314454 3.02e-4,-0.0014 0.0017,-0.0025 0.002,-0.0039 a 0.12354945,0.12354945 0 0 0 0.002,-0.02344 v -0.05859 -0.002 -0.002 c 9.26e-4,-0.0464 1.88e-4,-0.09375 -0.0039,-0.144531 v -0.0039 C 17.76296,10.68973 17.042154,9.027566 15.701172,8.1030469 15.635908,7.9542441 15.565509,7.8058606 15.484375,7.6616406 15.074861,6.9340598 14.425015,6.1102868 13.621094,5.3139844 12.817142,4.517652 11.981697,3.8726904 11.246094,3.4682813 10.88396,3.2692604 10.515005,3.1107054 10.150391,3.0385937 c -0.0014,-2.706e-4 -0.0025,-0.00168 -0.0039,-0.00195 a 0.12354945,0.12354945 0 0 0 -0.002,-0.00195 C 10.058797,3.018481 9.9611473,3.0057825 9.8554688,3.0014844 Z m 0.8359372,2.2167969 c 0.497964,0.3157727 1.07536,0.7548416 1.671875,1.3457031 0.321662,0.3186134 0.575288,0.6268689 0.814453,0.9316406 -0.132205,0.00589 -0.264273,0.011776 -0.40039,0.035156 C 12.525537,7.3189937 12.282041,7.1017745 12.048828,6.870625 11.453228,6.2806707 11.009209,5.7107277 10.691406,5.2182813 Z M 8.9238281,5.7632031 c 0.00155,0.00281 0.00231,0.00498 0.00391,0.00781 0.4094992,0.7287176 1.0592761,1.5532234 1.8632819,2.3496094 0.802474,0.7959945 1.636515,1.4412105 2.373046,1.8457035 L 8.2324219,14.855001 C 8.1228796,14.826153 7.9715101,14.778459 7.7382812,14.649922 7.195376,14.350255 6.4769833,13.805674 5.7617188,13.097188 5.0472104,12.389451 4.4954641,11.680382 4.1933594,11.14211 c -2.192e-4,-3.91e-4 2.189e-4,-0.0016 0,-0.002 a 0.12354945,0.12354945 0 0 0 0,-0.002 C 4.0653358,10.909263 4.0146587,10.75836 3.9863281,10.653829 5.4025963,9.226563 6.292091,8.3326426 6.7617188,7.8628125 7.2547944,7.3695244 7.3905309,7.242492 7.3984375,7.2358594 c 0.00471,-0.00395 0.0288,-0.00829 0.2382813,-0.2070313 0.1681775,-0.1595559 0.6554501,-0.6415309 1.2871093,-1.265625 z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Black/White selection -->
     <div class="w-40 h-8 flex flex-row">
-        <button title="Switch to drawing black color [keybind: b]" class="flex flex-row rounded-l-full w-20 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <button title="Switch to drawing black color [keybind: b]" class="flex flex-row rounded-l-full w-20 h-8 btn btn-secondary btn-sm min-h-0 p-0 flex-nowrap">
             <div class="ml-2 w-4 h-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -275,7 +244,7 @@
             </div>
         </button>
 
-        <button title="Switch to drawing white color [keybind: w]" class="flex flex-row rounded-r-full w-20 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
+        <button title="Switch to drawing white color [keybind: w]" class="flex flex-row rounded-r-full w-20 h-8 btn btn-secondary btn-sm min-h-0 p-0 flex-nowrap">
             <div class="w-full h-full flex items-center justify-center">
                 White
             </div>
@@ -289,14 +258,14 @@
 
 
     <!-- Separator -->
-    <div class="w-0.5 h-[80%] bg-black">
+    <div class="w-0.5 h-[80%] bg-accent-focus">
 
     </div>
 
 
     <!-- Import image -->
-    <button title="Import image into sprite canvas [keybind: i]" class="h-8 w-8 rounded-full bg-black hover:bg-white fill-white hover:fill-black border border-black active:bg-black active:fill-white duration-200 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
+    <button title="Import image into sprite canvas [keybind: i]" class="h-8 w-8 rounded-full btn btn-secondary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
         </svg>
     </button>
@@ -309,10 +278,10 @@
 </div>
                     </div>
     
-                    <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                    <div id="divMusic" class="absolute top-0 bottom-0 left-0 right-0 bg-base-100">
                         <div class="min-w-full min-h-full">
     <!-- Panel title -->
-    <div class="w-full h-6 bg-black text-white">
+    <div class="w-full h-6 bg-accent text-white">
         <div class="ml-1">
             Music Editor
         </div>
@@ -323,13 +292,13 @@
             </div>
     
             <div class="resizable-bottom" id="win6">
-                <div class="min-w-full min-h-full bg-white">
-                    <div class="min-w-full min-h-full bg-white">
-                        <div id="divThumbyConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                <div class="min-w-full min-h-full bg-base-100">
+                    <div class="min-w-full min-h-full bg-base-100">
+                        <div id="divThumbyConsole" class="absolute top-0 bottom-0 left-0 right-0 bg-base-100">
                         </div>
                     </div>
-                    <div class="min-w-full min-h-full bg-white">
-                        <div id="divBrowserConsole" class="absolute top-0 bottom-0 left-0 right-0">
+                    <div class="min-w-full min-h-full bg-base-100">
+                        <div id="divBrowserConsole" class="absolute top-0 bottom-0 left-0 right-0 bg-base-100">
                         </div>
                     </div>
                 </div>
@@ -339,20 +308,20 @@
 
 
     <div class="resizable-right" id="win2">
-        <div class="min-w-full min-h-full bg-white dark:bg-black">
-            <div class="w-full h-6 bg-black text-white dark:bg-white dark:text-black flex">
-                <button id="btnThumbyConsole" class="btn w-1/2 min-h-full">Run on Thumby</button>
-                <button id="btnBrowserConsole" class="btn w-1/2 min-h-full">Run in browser</button>
+        <div class="min-w-full min-h-full bg-base-100">
+            <div class="w-full h-6 bg-base-100 text-white flex">
+                <button id="btnThumbyConsole" class="btn btn-accent btn-sm rounded-none w-1/2 min-h-0 h-6 border-0">Run on Thumby</button>
+                <button id="btnBrowserConsole" class="btn btn-accent btn-sm rounded-none w-1/2 min-h-0 h-6 border-0">Run in browser</button>
             </div>
 
             <div id="divRunOnThumby" class="absolute top-6 bottom-0 left-0 right-0 flex flex-col items-center">
-                <button id="btnRunOnThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
+                <button id="btnRunOnThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="btn btn-primary btn-sm mt-2">
                     Run
                 </button>
-                <button id="btnStartMainMenu" title="Starts the main menu on Thumby" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
+                <button id="btnStartMainMenu" title="Starts the main menu on Thumby" class="btn btn-primary btn-sm mt-2">
                     Main Menu
                 </button>
-                <button id="btnStopThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md mt-2 px-2 w-fit h-8 border duration-200">
+                <button id="btnStopThumby" title="Runs the current project on Thumby (saves then runs from /Games folder)" class="btn btn-primary btn-sm mt-2">
                     Stop
                 </button>
             </div>
@@ -360,40 +329,36 @@
                 <div class="w-full h-full flex">
     <div class="w-full h-full m-2 overflow-auto">
         <!-- Canvas parent -->
-        <div class="w-full h-fit aspect-[72/40] border border-black flex justify-center items-center overflow-hidden">
+        <div class="w-full h-fit aspect-[72/40] border border-accent flex justify-center items-center overflow-hidden">
             <canvas id="canvasEmulator" width="72" height="40" class="border border-dashed border-gray-200 crisp-canvas" style="width:144px; height:80px">
             </canvas>
         </div>
 
         <!-- Button top row parent -->
         <div class="w-full h-8 my-1 flex justify-center">
-            <button id="btnRunInBrowser" title="Runs the current project in the borwser emulator (saves then runs from /Games folder)" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  select-none rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnRunInBrowser" title="Runs the current project in the borwser emulator (saves then runs from /Games folder)" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 Run
             </button>
 
-            <button id="btnStopBrowser" title="Stops the currently running emulator script" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black select-none rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnStopBrowser" title="Stops the currently running emulator script" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 Stop
             </button>
 
-            <!-- <button id="btnMP" title="Stops the currently running emulator script" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black select-none rounded-md px-1 w-12 h-8 border duration-200">
-                MP
-            </button> -->
-
-            <button id="btnZoomInEmulator" title="Zooms the emulator in" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnZoomInEmulator" title="Zooms the emulator in" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M5 8a1 1 0 011-1h1V6a1 1 0 012 0v1h1a1 1 0 110 2H9v1a1 1 0 11-2 0V9H6a1 1 0 01-1-1z" />
                     <path fill-rule="evenodd" d="M2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8zm6-4a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd" />
                 </svg>
             </button>
 
-            <button id="btnZoomOutEmulator" title="Zooms the emulator out" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnZoomOutEmulator" title="Zooms the emulator out" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M5 8a1 1 0 011-1h4a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
                 </svg>
             </button>
 
-            <button id="btnRotateEmulator" title="Rotates the emulator counter-clockwise" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnRotateEmulator" title="Rotates the emulator counter-clockwise" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                 </svg>
@@ -402,19 +367,19 @@
 
         <!-- Button bottom row parent -->
         <div class="w-full h-8 my-1 flex justify-center">
-            <button id="btnEmulatorAudio" title="Mute or unmute emulator audio" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnEmulatorAudio" title="Mute or unmute emulator audio" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
                 </svg>
             </button>
 
-            <button id="btnEmulatorVideo" title="Toggle emulator video recording" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnEmulatorVideo" title="Toggle emulator video recording" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                 </svg>
             </button>
 
-            <button id="btnEmulatorScreenshot" title="Take screenshot of emulator" class="mx-1 bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black flex justify-center items-center rounded-md px-1 w-12 h-8 border duration-200">
+            <button id="btnEmulatorScreenshot" title="Take screenshot of emulator" class="mx-1 btn btn-primary btn-sm w-12 h-8">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
                 </svg>
@@ -430,26 +395,26 @@
 
         <div class="absolute left-2 right-2 bottom-1 h-6 flex flex row items-center">
             <div class="absolute left-0 right-0 h-full flex flex-row items-center">
-    <div id="divLoadingBar" class="h-full flex-1 border border-black  dark:border-white dark:bg-white  overflow-hidden">
-        <div class="h-full w-[0%] bg-black overflow-visible flex items-center">
+    <div id="divLoadingBar" class="h-full flex-1 border border-accent overflow-hidden">
+        <div class="h-full w-[0%] bg-accent overflow-visible flex items-center">
             <div class="ml-1 text-gray-400 whitespace-nowrap">
             </div>
         </div>
     </div>
     <div class="h-full flex-1 flex flex-row justify-evenly items-center">
-        <a href="https://thumby.us/" target="_blank" class="mx-3 whitespace-nowrap dark:text-white">
+        <a href="https://thumby.us/" target="_blank" class="mx-3 link">
             Thumby Documentation
         </a>
-        <a href="https://tinycircuits.com/products/thumby" target="_blank" class="mx-3 whitespace-nowrap dark:text-white">
+        <a href="https://tinycircuits.com/products/thumby" target="_blank" class="mx-3 link">
             Buy Thumby
         </a>
-        <a href="https://tinycircuits.com/" target="_blank" class="mx-3 whitespace-nowrap dark:text-white">
+        <a href="https://tinycircuits.com/" target="_blank" class="mx-3 link">
             TinyCircuits
         </a>
-        <a href="https://discord.gg/vzf3wQXVvm" target="_blank" class="mx-3 whitespace-nowrap dark:text-white">
+        <a href="https://discord.gg/vzf3wQXVvm" target="_blank" class="mx-3 link">
             Discord
         </a>
-        <a href="http://forum.tinycircuits.com/index.php" target="_blank" class="mx-3 whitespace-nowrap dark:text-white">
+        <a href="http://forum.tinycircuits.com/index.php" target="_blank" class="mx-3 link">
             Forums
         </a>
     </div>
@@ -457,14 +422,7 @@
         </div>
 
 
-        <button class="bg-black hover:bg-white fill-white hover:fill-black border-black active:bg-black active:fill-white  dark:bg-white dark:hover:bg-black dark:fill-black dark:hover:fill-white dark:border-white dark:active:bg-white dark:active:fill-black  border absolute left-[738px] lg:left-auto lg:right-2 top-[9px] h-8 w-8 rounded-full duration-200 p-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-            </svg>
-        </button>
-
-
-        <div id="divSaveToDialog" class="absolute z-30 left-0 right-0 top-0 bottom-0 bg-[#ffffffaa] opacity-0 invisible">
+        <div id="divSaveToDialog" class="absolute z-[51] left-0 right-0 top-0 bottom-0 bg-[#ffffffaa] opacity-0 invisible">
     <div class="absolute w-[525px] h-fit bg-white border-2 border-black border rounded-md m-auto left-0 right-0 top-0 bottom-0 z-40 flex flex-col p-2 opacity-100">
     
         <div class="relative w-full h-fit p-1 flex justify-center">

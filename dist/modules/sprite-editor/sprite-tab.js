@@ -53,7 +53,7 @@ class SpriteTab{
 
     #initTab(){
         this.divTab = document.createElement("div");
-        this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
+        this.divTab.classList = "btn btn-primary cursor-default normal-case flex items-center justify-evenly min-w-[48px] min-h-0 h-[40px] pl-4 pr-2 mx-2";
         this.divTab.title = this.filePath;
 
         this.divSpriteTabHeader.insertBefore(this.divTab, this.divSpriteTabHeader.lastElementChild);
@@ -80,10 +80,10 @@ class SpriteTab{
 
     #initTabCloseBtn(){
         this.btnClose = document.createElement("button");
-        this.btnClose.classList = "w-[15px] h-[15px] fill-slate-400 hover:fill-slate-200 duration-100 ml-1";
+        this.btnClose.classList = "btn btn-primary btn-sm min-h-0 p-0 w-[15px] h-[15px] ml-1 bg-transparent border-0";
         this.btnClose.innerHTML =
         `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
         `;
@@ -99,8 +99,8 @@ class SpriteTab{
     select(){
         this.tabUnselectAll();
 
-        this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full  bg-white hover:bg-white text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
-    
+        // this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full  bg-white hover:bg-white text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
+        this.divTab.classList.add("bg-base-100");
         this.selected = true;
         this.#saveTabData();
 
@@ -109,8 +109,8 @@ class SpriteTab{
 
 
     unselect(){
-        this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
-    
+        // this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
+        this.divTab.classList.remove("bg-base-100");
         this.selected = false;
         this.#saveTabData();
 

@@ -24,15 +24,18 @@ class WorkspaceSelection{
             entry[0].onclick = (event) => {
                 // Remove style edits to btns and hide all divs
                 for(let iex=0; iex<this.entryDictList.length; iex++){
-                    this.entryDictList[iex][0].style.backgroundColor = null;
-                    this.entryDictList[iex][0].style.fill = null;
-                    this.entryDictList[iex][0].style.color = null;
+                    // Change button style
+                    this.entryDictList[iex][0].classList.remove("bg-base-100");
+                    // this.entryDictList[iex][0].style.backgroundColor = null;
+                    // this.entryDictList[iex][0].style.fill = null;
+                    // this.entryDictList[iex][0].style.color = null;
 
                     // Call the hidden callback
                     if(this.entryDictList[iex][3] != undefined){
                         this.entryDictList[iex][3]();
                     }
 
+                    // Make all corresponding elements invisible
                     for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
                         // Change opacity as well to see change right away
                         this.entryDictList[iex][1][idx].style.opacity = 0;
@@ -41,11 +44,13 @@ class WorkspaceSelection{
                     }
                 }
 
-                // Add style edits and show these divs
-                entry[0].style.backgroundColor = "white";
-                entry[0].style.fill = "black";
-                entry[0].style.color = "black";
+                // Change button style to selected
+                entry[0].classList.add("bg-base-100");
+                // entry[0].style.backgroundColor = "white";
+                // entry[0].style.fill = "black";
+                // entry[0].style.color = "black";
 
+                // Go through list of elements that correspond to selection and make them not invisible (nothing to do with buttons)
                 for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){
                     entry[1][idx].style.opacity = 100;
                     entry[1][idx].classList.remove("invisible");

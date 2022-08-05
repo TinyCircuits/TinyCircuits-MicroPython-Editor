@@ -154,7 +154,7 @@ class SpriteTabCanvas{
         this.divSpriteFrameListMain.appendChild(this.divFrameListParent);
 
         this.btnAddFrame = document.createElement("button");
-        this.btnAddFrame.classList = "btn rounded-full min-w-[32px] min-h-[32px] border border-black mt-3 flex items-center justify-center"
+        this.btnAddFrame.classList = "btn btn-primary btn-circle btn-sm h-[30px] w-[30px] min-h-0 rounded-full mt-3"
         this.btnAddFrame.innerHTML = 
         `
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

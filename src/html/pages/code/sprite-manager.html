@@ -1,15 +1,15 @@
 <div class="w-full h-full">
 
     <!-- Panel title -->
-    <div class="w-full h-6 bg-black text-white">
+    <div class="w-full h-6 bg-accent text-white">
         <div class="ml-1 select-none">
             Sprite Editor
         </div>
     </div>
 
     <!-- Tabs header container -->
-    <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-black">
-        <button id="btnCreateSprite" class="btn rounded-full min-w-[32px] min-h-[32px] border border-black ml-2 flex items-center justify-center">
+    <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-accent">
+        <button id="btnCreateSprite" class="btn btn-primary btn-circle btn-sm h-[30px] w-[30px] min-h-0 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
@@ -21,7 +21,7 @@
         <div id="divSpriteListParent" class="flex-auto w-[15%] flex flex-col">
 
             <!-- Frame List -->
-            <div id="divSpriteFrameList" class="h-full border border-black rounded-md relative overflow-auto bg-gray-50">
+            <div id="divSpriteFrameList" class="h-full border border-accent-focus rounded-md relative overflow-auto bg-base-100">
                 
             </div>
 
@@ -33,7 +33,7 @@
             </div>
 
             <!-- Frame animation preview -->
-            <div id="divSpriteFramePreview" class="overflow-hidden h-40 border border-black rounded-md relative overflow-auto bg-gray-50 flex items-center justify-center">
+            <div id="divSpriteFramePreview" class="overflow-hidden h-40 border border-accent-focus rounded-md relative overflow-auto bg-base-100 flex items-center justify-center">
                 <canvas id="canvasSpriteFramePreview" width="72" height="40" style="width:100%; aspect-ratio:72/40; margin:16px;" class="crisp-canvas">
                 </canvas>
             </div>
@@ -57,7 +57,7 @@
         <div id="divSpriteEditorParent" class="flex-auto w-[85%] flex flex-col">
             <div class="h-full w-full">
                 <!-- Sprite Editor -->
-                <div id="divSpriteEditor" class="h-full border border-black rounded-md relative overflow-hidden bg-gray-50">
+                <div id="divSpriteEditor" class="h-full border border-accent-focus rounded-md relative overflow-hidden bg-base-100">
                     <!-- Canvas -->
                 </div>
             </div>

@@ -2,7 +2,6 @@ import { Layout } from "../../../modules/layout/layout.js";
 import { Console } from "../../../modules/console/console.js";
 import { WorkspaceSelection } from "../../../modules/workspace-selection/workspace-selection.js";
 import { Projects } from "../../../modules/projects/projects.js";
-import { SpriteEditor } from "../../../modules/sprite-editor/sprite-editor.js";
 import { CodeEditor } from "../../../modules/code-editor/code-editor.js";
 import { Serial } from "../../../modules/serial/serial.js";
 import { Repl } from "../../../modules/repl/repl.js";

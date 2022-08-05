@@ -68,24 +68,20 @@ class Row{
             }
 
             // Setup row and make sure bg changes on hover (also set when project sets rows to disabled)
-            this.rowDiv.classList = "min-w-full h-6 bg-gray-200 dark:bg-gray-800 cursor-pointer";
+            this.rowDiv.classList = "min-w-full h-6 bg-base-200 cursor-pointer";
             this.rowDiv.onmouseenter = (event) => {
                 if(this.rowDiv.disabled == false){
-                    this.rowDiv.classList.remove("bg-gray-200");
-                    this.rowDiv.classList.remove("dark:bg-gray-800");
+                    this.rowDiv.classList.remove("bg-base-200");
 
-                    this.rowDiv.classList.add("bg-gray-300");
-                    this.rowDiv.classList.add("dark:bg-gray-700");
+                    this.rowDiv.classList.add("bg-base-300");
                     this.optionsDiv.classList.remove("invisible");
                 }
             }
             this.rowDiv.onmouseleave = (event) => {
                 if(this.rowDiv.disabled == false){
                     this.rowDiv.classList.remove("bg-gray-300");
-                    this.rowDiv.classList.remove("dark:bg-gray-700");
 
-                    this.rowDiv.classList.add("bg-gray-200");
-                    this.rowDiv.classList.add("dark:bg-gray-800");
+                    this.rowDiv.classList.add("bg-base-200");
                     this.optionsDiv.classList.add("invisible");
                 }
             }
@@ -93,7 +89,7 @@ class Row{
             // Icon div can be a folder or file depending on flag
             // that is set by force or by adding children to a row
             this.iconDiv = document.createElement("div");
-            this.iconDiv.classList = "w-6 h-6 absolute left-0 mt-0.5 dark:fill-white";
+            this.iconDiv.classList = "w-6 h-6 absolute left-0 mt-0.5";
             this.iconDiv.style.marginLeft = ((this.parentCount - 1) * 16) + "px";
             if(this.isFolder){
                 this.useFolderIcon();
@@ -104,9 +100,9 @@ class Row{
 
             // Options div is always same and exists to indicate to the user that they can click it
             this.optionsDiv = document.createElement("div");
-            this.optionsDiv.classList = "w-6 h-6 absolute right-0 invisible mt-0.5 rounded-full hover:stroke-gray-300 dark:fill-white";
+            this.optionsDiv.classList = "w-6 h-6 absolute right-0 invisible mt-0.5 rounded-full hover:stroke-accent";
             this.optionsDiv.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
                     <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                 </svg>
             `;
@@ -117,7 +113,7 @@ class Row{
 
             // Text div is the div to the right of the icon div and contains folder/file name
             this.textDiv = document.createElement("div");
-            this.textDiv.classList = "min-w-fit h-6 text-black dark:text-white absolute select-none whitespace-nowrap";
+            this.textDiv.classList = "min-w-fit h-6 absolute select-none whitespace-nowrap";
             this.textDiv.style.marginLeft = 22 + ((this.parentCount - 1) * 16) + "px";
             this.textDiv.textContent = this.text;
             this.rowDiv.appendChild(this.textDiv);
@@ -192,13 +188,13 @@ class Row{
         if(this.iconDiv != undefined){
             if(!outline){
                 this.iconDiv.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
                         <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                     </svg>
                     `;
             }else{
                 this.iconDiv.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                     </svg>
                     `;
@@ -213,13 +209,13 @@ class Row{
         if(this.iconDiv != undefined){
             if(!outline){
                 this.iconDiv.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
                     </svg>
                     `;
             }else{
                 this.iconDiv.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     `;

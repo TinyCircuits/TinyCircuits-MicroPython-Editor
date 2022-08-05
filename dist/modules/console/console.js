@@ -23,9 +23,9 @@ class Console{
 
         // Set the terminal background to the page background color
         this.console.setOption('theme', {
-            background: '#ffffff',
-            cursor: "#000000",
-            foreground: "#000000"
+            background: getComputedStyle(consoleDiv).backgroundColor,
+            cursor: getComputedStyle(consoleDiv).color,
+            foreground: getComputedStyle(consoleDiv).color
         });
 
 

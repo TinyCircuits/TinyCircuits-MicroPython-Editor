@@ -94,7 +94,8 @@ class Tab{
         for(let itx=0; itx<this.tabManager.tabs.length; itx++){
             this.tabManager.tabs[itx].unselect();
         }
-        this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] border border-x-black px-1 flex flex-row justify-center items-center";
+        // this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] mb-[-1px] border border-x-black px-1 flex flex-row justify-center items-center";
+        this.divTab.classList.add("bg-base-100");
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-white duration-100";
         this.divEditor.classList.remove("invisible");
 
@@ -104,7 +105,8 @@ class Tab{
 
     
     unselect(){
-        this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] border border-black px-1 flex flex-row justify-center items-center bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200";
+        // this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] mb-[-1px] border border-black px-1 flex flex-row justify-center items-center bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200";
+        this.divTab.classList.remove("bg-base-100");
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-black duration-100";
         this.divEditor.classList.add("invisible");
 
@@ -129,7 +131,7 @@ class Tab{
         // The actual overall tab div
         this.divTab = document.createElement("div");
         this.divTab.title = this.filePath;
-        this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] border border-x-black px-1 flex flex-row justify-center items-center";
+        this.divTab.classList = "cursor-default btn rounded-none btn-accent ml-[-1px] mt-[-1px] min-h-0 h-[25px] px-1 flex flex-row justify-center items-center normal-case leading-normal"
         this.tabHeaderDiv.appendChild(this.divTab);
 
         this.divText = document.createElement("div");
@@ -141,10 +143,10 @@ class Tab{
         this.divTab.appendChild(this.divText);
 
         this.btnCloseTab = document.createElement("button");
-        this.btnCloseTab.classList = "w-[15px] h-[15px] fill-black active:fill-white duration-100";
+        this.btnCloseTab.classList = "btn btn-primary btn-sm w-[15px] h-[15px]";
         this.btnCloseTab.innerHTML =
         `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full fill-inherit stroke-1" viewBox="0 0 20 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
         `;
@@ -158,12 +160,16 @@ class Tab{
 
     #initEditor(data){
         this.divEditor = document.createElement("div");
-        this.divEditor.classList = "absolute left-0 right-0 bottom-0 top-0 flex";
+        this.divEditor.classList = "absolute left-0 right-0 bottom-0 top-0 flex bg-base-100";
         this.divCodeEditorParent.appendChild(this.divEditor);
 
         this.editor = ace.edit(this.divEditor);
-        this.editor.setTheme("ace/theme/chrome");
+        this.editor.setTheme("ace/theme/cobalt");
         this.editor.session.setMode("ace/mode/python");
+
+        // Change the gutter color too
+        this.editor.container.children[1].firstChild.classList.add("bg-base-300");
+        // this.editor.container.style.background = getComputedStyle(this.divEditor).backgroundColor;
 
         if(data != undefined){
             this.editor.setValue(data, 1);
@@ -187,12 +193,12 @@ class TabManager{
 
         // Setup the header for tabs to live in
         this.tabHeaderDiv = document.createElement("div");
-        this.tabHeaderDiv.classList = "w-full h-6 border border-b-black flex";
+        this.tabHeaderDiv.classList = "w-full h-[25px] border border-b-accent flex bg-base-100 mt-[-1px]";
         this.parentDiv.appendChild(this.tabHeaderDiv);
 
         // Set the space where each div for each code editor is placed on top of each other
         this.divCodeEditorParent = document.createElement("div");
-        this.divCodeEditorParent.classList = "absolute left-0 right-0 top-6 bottom-0";
+        this.divCodeEditorParent.classList = "absolute left-0 right-0 top-[25px] bottom-0";
         this.parentDiv.appendChild(this.divCodeEditorParent);
 
         // List of tabs

@@ -1,6 +1,7 @@
 .contentWindow{
   position: absolute;
-  background-color: #222222;
+  --tw-border-opacity: 1;
+  background-color: hsl(var(--a) / var(--tw-border-opacity));
 }
 
 .resizer{

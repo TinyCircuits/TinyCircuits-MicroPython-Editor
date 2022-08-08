@@ -175,22 +175,28 @@ let saveCurrentProject = async (callback = () => {}) => {
 }
 
 
+document.getElementById("btnSaveToDialogPC").onclick = (event) => {
+    savingMethod.method = "PC";
+    saveCurrentProject()
+};
+
+document.getElementById("btnSaveToDialogThumby").onclick = (event) => {
+    savingMethod.method = "Thumby";
+    saveCurrentProject()
+};
+
+
 document.addEventListener("keydown", (event) => {
     if(event.code == "KeyS" && event.ctrlKey){
         event.preventDefault();
         if(savingMethod.method == undefined){
-            window.showSaveToDialog(savingMethod, saveCurrentProject);
+            document.getElementById("btnSaveProjectTo").click()
         }else{
             console.log("Save to " + savingMethod.method);
             saveCurrentProject();
         }
     }
 });
-
-
-document.getElementById("btnSaveProjectTo").onclick = (event) => {
-    window.showSaveToDialog(savingMethod, saveCurrentProject);
-}
 
 
 document.getElementById("btnCreateSprite").onclick = (event) => {
@@ -210,5 +216,4 @@ document.getElementById("btnCreateSprite").onclick = (event) => {
             }
         });
     });
-    // spriteEditorManager.addTab("/Games/MyGame/MySprite.spr");
 }

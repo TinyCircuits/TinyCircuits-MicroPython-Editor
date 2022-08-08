@@ -313,48 +313,6 @@ window.folderSelectionShow = (dialog, closeCallback) => {
 }
 
 
-window.showSaveToDialog = (savingMethod, saveCallback) => {
-    // Change opacity to see change right away and make invisible for mouse clicks/selection
-    document.getElementById("divSaveToDialog").style.opacity = 100;
-    document.getElementById("divSaveToDialog").classList.remove("invisible");
-
-    let close = () => {
-        document.getElementById("divSaveToDialog").style.opacity = 0;
-        document.getElementById("divSaveToDialog").classList.add("invisible");
-        document.removeEventListener("keydown", escKeyPressed);
-    }
-
-    let escKeyPressed = (event) => {
-        if(event.code == "Escape"){
-            close();
-        }
-    }
-    document.addEventListener("keydown", escKeyPressed);
-
-    document.getElementById("btnSaveToDialogPC").onclick = (event) => {
-        savingMethod.method = "PC";
-        saveCallback();
-        close();
-    }
-
-    document.getElementById("btnSaveToDialogThumby").onclick = (event) => {
-        savingMethod.method = "Thumby";
-        saveCallback();
-        close();
-    }
-
-    document.getElementById("btnSaveToDialogGoogleDrive").onclick = (event) => {
-        savingMethod.method = "GoogleDrive"
-        saveCallback();
-        close();
-    }
-
-    document.getElementById("btnSaveToDialogExit").onclick = (event) => {
-        close();
-    }
-}
-
-
 window.load = (percent, text, increase=false) => {
     let divLoadingBar = document.getElementById("divLoadingBar");
 

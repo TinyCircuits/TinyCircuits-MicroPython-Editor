@@ -11,6 +11,10 @@
         <link rel="stylesheet" type="text/css" href="/dist/css/pages/code/code.css">
     </head>
 
+
+    @@include('./saveto-dialog.html')
+
+
     <body class="overflow-hidden">
         
         <!-- Project dropdown -->
@@ -18,7 +22,7 @@
             <label tabindex="0" class="btn btn-primary btn-sm">Projects</label>
             <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
                 <li><a>Open from</a></li>
-                <li id="btnSaveProjectTo"><a>Save to</a></li>
+                <li><label for="SaveToModal" id="btnSaveProjectTo">Save to</label></li>
                 <li id="btnProjectAddFiles"><a>Add Files</a></li>
                 <li><a>Rename</a></li>
             </ul>
@@ -45,9 +49,6 @@
         <div class="absolute left-2 right-2 bottom-1 h-6 flex flex row items-center">
             @@include('./footer.html')
         </div>
-
-
-        @@include('./saveto-dialog.html')
 
 
         <script src="/dist/modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>

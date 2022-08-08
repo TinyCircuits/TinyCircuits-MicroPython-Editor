@@ -22,7 +22,7 @@
 
         <div class="w-full h-[175px] flex flex-row justify-evenly items-center">
             <button id="btnSaveToDialogPC" class="btn btn-primary btn-sm min-h-0 p-0 w-[150px] h-[150px] rounded-md mx-4">
-                <label for="SaveToModal">
+                <label for="SaveToModal" class="cursor-pointer">
                     <div class="w-full h-[80%] flex justify-center items-center fill-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -34,7 +34,7 @@
                 </label>
             </button>
             <button id="btnSaveToDialogThumby" class="btn btn-primary btn-sm min-h-0 p-0 w-[150px] h-[150px] rounded-md">
-                <label for="SaveToModal">
+                <label for="SaveToModal" class="cursor-pointer">
                     <div class="w-full h-[80%] flex justify-center items-center fill-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
@@ -46,7 +46,7 @@
                 </label>
             </button>
             <button id="btnSaveToDialogGoogleDrive" class="btn btn-primary btn-sm min-h-0 p-0 w-[150px] h-[150px] rounded-md mx-4">
-                <label for="SaveToModal">
+                <label for="SaveToModal" class="cursor-pointer">
                     <div class="w-full h-[80%] flex justify-center items-center fill-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -60,6 +60,35 @@
         </div>
     </div>
 </div>
+
+
+    <input type="checkbox" id="modelAddToFolder" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative">
+            <label for="modelAddToFolder" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a folder
+            </div>
+        </div>
+    </div>
+
+
+    <input type="checkbox" id="modalRename" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative w-[300px]">
+            <label for="modalRename" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a new name:
+            </div>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                <input id="inputModalRename" type="text" placeholder="Type here" value="NewScript.py" class="input input-bordered input-secondary w-full max-w-xs" />
+            </div>
+            <div class="relative w-full h-fit p-1 flex justify-evenly font-bold select-none">
+                <label for="modalRename" id="btnModalConfirmRename" class="btn btn-sm btn-primary">Confirm</label>
+                <label for="modalRename" id="btnModalCancelRename" class="btn btn-sm btn-primary">Cancel</label>
+            </div>
+        </div>
+    </div>
 
 
     <body class="overflow-hidden">
@@ -81,7 +110,6 @@
             <label tabindex="0" class="btn btn-primary btn-sm">View</label>
             <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
                 <li id="btnResetLayout"><a>Reset Layout</a></li>
-                <li id="btnInvertTheme"><a>Invert Theme</a></li>
             </ul>
         </div>
 
@@ -145,10 +173,12 @@
 
     <!-- Tabs header container -->
     <div id="divSpriteTabHeader" class="w-full min-h-[49px] flex items-center justify-start border-b border-accent">
-        <button id="btnCreateSprite" class="btn btn-primary btn-circle btn-sm h-[30px] w-[30px] min-h-0 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
+        <button class="btn btn-primary btn-circle btn-sm h-[30px] w-[30px] min-h-0 rounded-full ml-2">
+            <label for="modelAddToFolder" id="btnCreateSprite" class="w-full h-full flex justify-center items-center cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+            </label>
         </button>
     </div>
 

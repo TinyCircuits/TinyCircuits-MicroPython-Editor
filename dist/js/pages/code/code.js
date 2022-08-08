@@ -78,15 +78,6 @@ document.getElementById("btnResetLayout").onclick = (event) => {
     emulator.resetLayoutSize();
 }
 
-// https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
-document.getElementById("btnInvertTheme").onclick = (event) => {{
-    if(document.documentElement.classList.contains("dark")){
-        document.documentElement.classList.remove('dark');
-    }else{
-        document.documentElement.classList.add('dark')
-    }
-}}
-
 
 document.getElementById("btnProjectAddFiles").onclick = (event) => {
     let input = document.createElement('input');
@@ -200,20 +191,20 @@ document.addEventListener("keydown", (event) => {
 
 
 document.getElementById("btnCreateSprite").onclick = (event) => {
-    let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the new sprite file", () => {
-        projects.unsetFromFolderSelectionMode();
-    });
+    // let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the new sprite file", () => {
+    //     projects.unsetFromFolderSelectionMode();
+    // });
 
-    projects.setToFolderSelectionMode([], (row) => {
-        projects.unsetFromFolderSelectionMode();
-        close();
+    // projects.setToFolderSelectionMode([], (row) => {
+    //     projects.unsetFromFolderSelectionMode();
+    //     close();
 
-        window.inputDialog("Enter a new name for the sprite file", "MySprite.spr", (value) => {
-            if(projects.projects[0].doesPathExist(row.filePath + "/" + value) == false){
-                row.addChild(value, false, true, true);
-            }else{
-                window.showError("File already exists, did not create it");
-            }
-        });
-    });
+    //     window.inputDialog("Enter a new name for the sprite file", "MySprite.spr", (value) => {
+    //         if(projects.projects[0].doesPathExist(row.filePath + "/" + value) == false){
+    //             row.addChild(value, false, true, true);
+    //         }else{
+    //             window.showError("File already exists, did not create it");
+    //         }
+    //     });
+    // });
 }

@@ -161,7 +161,7 @@ class Repl{
                 this.readUntil.activate(">", async () => {
                     this.busy = false;
                     callback();
-                }, false, 500);
+                }, false, 750);
 
                 if(data.length > 0){
                     // Send data 255 bytes at a time to always fill the buffer

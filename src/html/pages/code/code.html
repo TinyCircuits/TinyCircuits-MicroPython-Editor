@@ -15,6 +15,35 @@
     @@include('./saveto-dialog.html')
 
 
+    <input type="checkbox" id="modelAddToFolder" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative">
+            <label for="modelAddToFolder" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a folder
+            </div>
+        </div>
+    </div>
+
+
+    <input type="checkbox" id="modalRename" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative w-[300px]">
+            <label for="modalRename" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a new name:
+            </div>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                <input id="inputModalRename" type="text" placeholder="Type here" value="NewScript.py" class="input input-bordered input-secondary w-full max-w-xs" />
+            </div>
+            <div class="relative w-full h-fit p-1 flex justify-evenly font-bold select-none">
+                <label for="modalRename" id="btnModalConfirmRename" class="btn btn-sm btn-primary">Confirm</label>
+                <label for="modalRename" id="btnModalCancelRename" class="btn btn-sm btn-primary">Cancel</label>
+            </div>
+        </div>
+    </div>
+
+
     <body class="overflow-hidden">
         
         <!-- Project dropdown -->
@@ -34,7 +63,6 @@
             <label tabindex="0" class="btn btn-primary btn-sm">View</label>
             <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
                 <li id="btnResetLayout"><a>Reset Layout</a></li>
-                <li id="btnInvertTheme"><a>Invert Theme</a></li>
             </ul>
         </div>
 

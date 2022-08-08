@@ -58,6 +58,8 @@ class Project{
         this.projects.saveProjectNames();
 
         this.DB = await this.DB.rename(newName);
+
+        this.projectRow.filePath = "/" + newName;
     }
 
 

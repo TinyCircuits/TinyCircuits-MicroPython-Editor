@@ -296,183 +296,109 @@ class Row{
 
 
     #showOptionsDropdown(){
-        // Create square to cover area of clicked item
-        this.divOptionsDropdownSelector = document.createElement("div");
-        this.divOptionsDropdownSelector.classList = "absolute z-[100000]";
+        let setupRename = (value) => {
+            let btnModalConfirmRename = document.getElementById("btnModalConfirmRename");
+            let inputModalRename = document.getElementById("inputModalRename");
+            inputModalRename.value = value;
+            setTimeout(() => {inputModalRename.select()}, 750);
+            let btnModalCancelRename = document.getElementById("btnModalCancelRename");
 
-        // Create div to contain actual option buttons (defined based on if this is a folder or not or if root)
+            // Override global modal elements to rename in this context
+            btnModalConfirmRename.onclick = (event) => {
+                this.#rename(inputModalRename.value);
+            }
+            inputModalRename.onkeydown = (event) => {
+                if(event.key == "Enter"){
+                    this.#rename(inputModalRename.value);
+                    btnModalCancelRename.click();   // Not actually cancelling, just hiding
+                }
+            }
+        }
+
+        let newFolder = (event) => {
+            window.inputDialog("New folder name:", "NewFolder", (text) => {
+                // Check if path exists, if not, create new file under this folder
+                if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
+                    this.addChild(text, true, false);
+                }else{
+                    window.showError("This folder already exists, did not create");
+                }
+            });
+        }
+
+        let newFile = (event) => {
+            window.inputDialog("New file name:", "NewFile.py", (text) => {
+                // Check if path exists, if not, create new file under this folder
+                if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
+                    this.addChild(text, false, false);
+                }else{
+                    window.showError("This file already exists, did not create");
+                }
+            });
+        }
+
+        let deleteFileFolder = (event) => {
+            this.#askDelete();
+        }
+
         this.divOptionsDropdown = document.createElement("div");
-        this.divOptionsDropdown.classList = "w-20 h-fit bg-black absolute z-[100000] flex flex-col rounded-md";
+        this.divOptionsDropdown.classList = "absolute";
+        if(this.isFolder){
+            this.divOptionsDropdown.innerHTML = `
+            <div class="dropdown dropdown-open">
+                <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+                    <label for="modalRename"><li><a>Rename</a></li></label>
+                    <li><a>New Folder</a></li>
+                    <li><a>New File</a></li>
+                    <li><a>Delete</a></li>
+                </ul>
+            </div>
+            `
+
+            setupRename("NewFolder");
+            this.divOptionsDropdown.children[0].children[0].children[1].onclick = newFolder;
+            this.divOptionsDropdown.children[0].children[0].children[2].onclick = newFile;
+            this.divOptionsDropdown.children[0].children[0].children[3].onclick = deleteFileFolder;
+        }else{
+            this.divOptionsDropdown.innerHTML = `
+            <div class="dropdown dropdown-open">
+                <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+                <label for="modalRename"><li><a>Rename</a></li></label>
+                    <li><a>Delete</a></li>
+                </ul>
+            </div>
+            `
+
+            setupRename("NewScript.py");
+            this.divOptionsDropdown.children[0].children[0].children[1].onclick = deleteFileFolder;
+        }
+        document.body.appendChild(this.divOptionsDropdown);
 
         // Get the rect of the clicked div to cover with selector
         let optionsDivRect = this.optionsDiv.getBoundingClientRect();
 
-        // Cover clicked div and move to same location
-        this.divOptionsDropdownSelector.style.width = optionsDivRect.width + "px";
-        this.divOptionsDropdownSelector.style.height = optionsDivRect.height + "px";
-        this.divOptionsDropdownSelector.style.left = optionsDivRect.x + "px";
-        this.divOptionsDropdownSelector.style.top = optionsDivRect.y + "px";
-
         // Position the dropdown
         this.divOptionsDropdown.style.left = optionsDivRect.x + "px";
-        this.divOptionsDropdown.style.top = optionsDivRect.y + optionsDivRect.height + "px";
-
-        // Set track of mouse leaving both divs and then hiding them
-        this.isMouseOverDropdownSelector = false;
-        this.isMouseOverDropdown = false;
-        this.divOptionsDropdownSelector.onmouseenter = (event) => {
-            this.isMouseOverDropdownSelector = true;
-        }
-        this.divOptionsDropdownSelector.onmouseleave = (event) => {
-            this.isMouseOverDropdownSelector = false;
-
-            // Need to give the mouse some time to jump to the other div
-            setTimeout(() => {
-                if(!this.isMouseOverDropdownSelector && !this.isMouseOverDropdown){
-                    this.#hideOptionsDropdown();
-                }
-            }, 50);
-        }
-        this.divOptionsDropdown.onmouseenter = (event) => {
-            this.isMouseOverDropdown = true;
-        }
-        this.divOptionsDropdown.onmouseleave = (event) => {
-            this.isMouseOverDropdown = false;
-
-            // Need to give the mouse some time to jump to the other div
-            setTimeout(() => {
-                if(!this.isMouseOverDropdownSelector && !this.isMouseOverDropdown){
-                    this.#hideOptionsDropdown();
-                }
-            }, 50);
-        }
-
-        // Add selector and dropdown button container to DOM
-        document.body.appendChild(this.divOptionsDropdownSelector);
-        document.body.appendChild(this.divOptionsDropdown);
-
-
-        this.renameButton = document.createElement("button");
-        this.renameButton.innerHTML = `
-        <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-            <span>Rename</span>
-        </button>
-        `
-        this.renameButton.onclick = (event) => {
-            window.inputDialog("New name:", this.text, (text) => {
-                this.#rename(text);
-            });
-        }
-        this.divOptionsDropdown.appendChild(this.renameButton);
-
-
-        // If folder, it gets extra button to add file
-        if(this.isFolder){
-            this.newFileButton = document.createElement("button");
-            this.newFileButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>New File</span>
-            </button>
-            `
-            this.newFileButton.onclick = (event) => {
-                window.inputDialog("New file name:", "NewFile.py", (text) => {
-                    // Check if path exists, if not, create new file under this folder
-                    if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
-                        this.addChild(text, false, false);
-                    }else{
-                        window.showError("This file already exists, did not create");
-                    }
-                });
-            }
-            this.divOptionsDropdown.appendChild(this.newFileButton);
-
-            this.newFolderButton = document.createElement("button");
-            this.newFolderButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>New Folder</span>
-            </button>
-            `
-            this.newFolderButton.onclick = (event) => {
-                window.inputDialog("New folder name:", "NewFolder", (text) => {
-                    // Check if path exists, if not, create new file under this folder
-                    if(this.project.doesPathExist(this.getPath() + this.text + "/" + text) == false){
-                        this.addChild(text, true, false);
-                    }else{
-                        window.showError("This folder already exists, did not create");
-                    }
-                });
-            }
-            this.divOptionsDropdown.appendChild(this.newFolderButton);
-        }
-
-        if(this.parent.isRoot == false){
-            this.copyButton = document.createElement("button");
-            this.copyButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Copy</span>
-            </button>
-            `
-            this.divOptionsDropdown.appendChild(this.copyButton);
-
-            this.cutButton = document.createElement("button");
-            this.cutButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Cut</span>
-            </button>
-            `
-            this.divOptionsDropdown.appendChild(this.cutButton);
-        }
-
-        this.pasteButton = document.createElement("button");
-        this.pasteButton.innerHTML = `
-        <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-            <span>Paste</span>
-        </button>
-        `
-        this.divOptionsDropdown.appendChild(this.pasteButton);
-
-
-        if(this.parent.isRoot == false){
-            this.deleteButton = document.createElement("button");
-            this.deleteButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Delete</span>
-            </button>
-            `
-            this.deleteButton.onclick = (event) => {
-                this.#askDelete();
-            }
-            this.divOptionsDropdown.appendChild(this.deleteButton);
-        }
-
-        if(this.parent.isRoot == false && this.isFolder == false){
-            this.downloadFileButton = document.createElement("button");
-            this.downloadFileButton.innerHTML = `
-            <button class="border-b border-b-white w-28 h-8 bg-black hover:bg-white text-white hover:text-black border border-black active:bg-black active:text-white duration-200">
-                <span>Download</span>
-            </button>
-            `
-            this.downloadFileButton.onclick = (event) => {
-                this.project.DB.getFile(this.filePath, (data) => {
-                    let a = document.createElement("a");
-
-                    let blob = new Blob([data], {type: "octet/stream"});
-                    let url = window.URL.createObjectURL(blob);
-                    a.href = url;
-                    a.download = this.filePath.slice(this.filePath.lastIndexOf("/")+1);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
-            }
-            this.divOptionsDropdown.appendChild(this.downloadFileButton);
-        }
-
-        // Set tracking flag used to prohibit removing 
-        // a second time if the cursor flies past both
-        this.optionsDropdownShown = true;
+        this.divOptionsDropdown.style.top = optionsDivRect.y - optionsDivRect.height + "px";
 
         // Keep the row highlighted for now
         this.rowDiv.style.filter = "brightness(85%)";
+
+        this.divOptionsDropdown.onmouseleave = (event) => {
+            this.#hideOptionsDropdown();
+        }
+    }
+
+
+    #hideOptionsDropdown(){
+        if(this.divOptionsDropdown){
+            // Remove options dropdown
+            document.body.removeChild(this.divOptionsDropdown);
+            delete this.divOptionsDropdown;
+
+            // Un-highlight the row
+            this.rowDiv.style.filter = "brightness(100%)";
+        }
     }
 
 
@@ -521,26 +447,6 @@ class Row{
         window.confirm("Are you sure you want to delete this? It will not be recoverable in any way.\n\nThis also means the selected will be erased from its location on your PC, Thumby, or Google Drive next time the project is saved.", () => {
             this.#delete();
         });
-    }
-
-
-    #hideOptionsDropdown(){
-        // If not already removed/hidden, remove and delete unneeded
-        if(this.optionsDropdownShown){
-            document.body.removeChild(this.divOptionsDropdownSelector);
-            document.body.removeChild(this.divOptionsDropdown);
-
-            delete this.divOptionsDropdownSelector;
-            delete this.divOptionsDropdown;
-
-            delete this.isMouseOverDropdownSelector;
-            delete this.isMouseOverDropdown;
-
-            this.optionsDropdownShown = false;
-
-            // Un-highlight the row
-            this.rowDiv.style.filter = "brightness(100%)";
-        }
     }
 }
 

@@ -296,23 +296,8 @@ class Row{
 
 
     #showOptionsDropdown(){
-        let setupRename = (value) => {
-            let btnModalConfirmRename = document.getElementById("btnModalConfirmRename");
-            let inputModalRename = document.getElementById("inputModalRename");
-            inputModalRename.value = value;
-            setTimeout(() => {inputModalRename.select()}, 750);
-            let btnModalCancelRename = document.getElementById("btnModalCancelRename");
-
-            // Override global modal elements to rename in this context
-            btnModalConfirmRename.onclick = (event) => {
-                this.#rename(inputModalRename.value);
-            }
-            inputModalRename.onkeydown = (event) => {
-                if(event.key == "Enter"){
-                    this.#rename(inputModalRename.value);
-                    btnModalCancelRename.click();   // Not actually cancelling, just hiding
-                }
-            }
+        let rename = (dialog, defaultValue) => {
+            window.inputDialog(dialog, defaultValue, this.#rename.bind(this))
         }
 
         let newFolder = (event) => {
@@ -347,15 +332,15 @@ class Row{
             this.divOptionsDropdown.innerHTML = `
             <div class="dropdown dropdown-open">
                 <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
-                    <label for="modalRename"><li><a>Rename</a></li></label>
-                    <li><a>New Folder</a></li>
-                    <li><a>New File</a></li>
-                    <li><a>Delete</a></li>
+                    <label for="modalInput"><li><a>Rename</a></li></label>
+                    <label for="modalInput"><li><a>New Folder</a></li></label>
+                    <label for="modalInput"><li><a>New File</a></li></label>
+                    <label for="modalConfirm"><li><a>Delete</a></li></label>
                 </ul>
             </div>
             `
 
-            setupRename("NewFolder");
+            this.divOptionsDropdown.children[0].children[0].children[0].onclick = () => {rename("Rename folder to:", this.text)};
             this.divOptionsDropdown.children[0].children[0].children[1].onclick = newFolder;
             this.divOptionsDropdown.children[0].children[0].children[2].onclick = newFile;
             this.divOptionsDropdown.children[0].children[0].children[3].onclick = deleteFileFolder;
@@ -363,13 +348,13 @@ class Row{
             this.divOptionsDropdown.innerHTML = `
             <div class="dropdown dropdown-open">
                 <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
-                <label for="modalRename"><li><a>Rename</a></li></label>
-                    <li><a>Delete</a></li>
+                    <label for="modalInput"><li><a>Rename</a></li></label>
+                    <label for="modalConfirm"><li><a>Delete</a></li></label>
                 </ul>
             </div>
             `
 
-            setupRename("NewScript.py");
+            this.divOptionsDropdown.children[0].children[0].children[0].onclick = () => {rename("Rename file to:", this.text)};
             this.divOptionsDropdown.children[0].children[0].children[1].onclick = deleteFileFolder;
         }
         document.body.appendChild(this.divOptionsDropdown);

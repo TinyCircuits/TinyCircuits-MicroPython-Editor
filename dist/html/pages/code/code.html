@@ -15,7 +15,7 @@
     <input type="checkbox" id="SaveToModal" class="modal-toggle" />
 <div class="modal">
     <div class="modal-box relative">
-        <label for="SaveToModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+        <label for="SaveToModal" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
         <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
             What location would you like to save this project to?
         </div>
@@ -65,7 +65,7 @@
     <input type="checkbox" id="modelAddToFolder" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative">
-            <label for="modelAddToFolder" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <label for="modelAddToFolder" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a folder
             </div>
@@ -73,19 +73,34 @@
     </div>
 
 
-    <input type="checkbox" id="modalRename" class="modal-toggle" />
+    <input type="checkbox" id="modalInput" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative w-[300px]">
-            <label for="modalRename" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+            <label for="modalInput" id="btnModalInputExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
+            <div id="divModalInputQuestion" class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a new name:
             </div>
             <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
-                <input id="inputModalRename" type="text" placeholder="Type here" value="NewScript.py" class="input input-bordered input-secondary w-full max-w-xs" />
+                <input id="inputModalInput" type="text" placeholder="Type here" value="NewScript.py" class="input input-bordered input-secondary w-full max-w-xs" />
             </div>
             <div class="relative w-full h-fit p-1 flex justify-evenly font-bold select-none">
-                <label for="modalRename" id="btnModalConfirmRename" class="btn btn-sm btn-primary">Confirm</label>
-                <label for="modalRename" id="btnModalCancelRename" class="btn btn-sm btn-primary">Cancel</label>
+                <label for="modalInput" id="btnModalConfirmInput" class="btn btn-sm btn-primary">Confirm</label>
+                <label for="modalInput" id="btnModalCancelInput" class="btn btn-sm btn-primary">Cancel</label>
+            </div>
+        </div>
+    </div>
+
+
+    <input type="checkbox" id="modalConfirm" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative w-[300px]">
+            <label for="modalConfirm" id="btnModalConfirmExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
+            <div id="divModalConfirmQuestion" class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a new name:
+            </div>
+            <div class="relative w-full h-fit p-1 flex justify-evenly font-bold select-none">
+                <label for="modalConfirm" id="btnModalConfirm" class="btn btn-sm btn-primary">Confirm</label>
+                <label for="modalConfirm" id="btnModalCancel" class="btn btn-sm btn-primary">Cancel</label>
             </div>
         </div>
     </div>

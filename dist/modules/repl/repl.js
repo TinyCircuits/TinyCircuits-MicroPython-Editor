@@ -8,6 +8,9 @@ class Repl{
 
         // Make a read until object for processing incoming data
         this.readUntil = new ReadUntil();
+        this.readUntil.onCtrlCHang = () => {
+            this.sendCmd("\x03");
+        }
     }
 
 
@@ -158,7 +161,7 @@ class Repl{
                 this.readUntil.activate(">", async () => {
                     this.busy = false;
                     callback();
-                });
+                }, false, 500);
 
                 if(data.length > 0){
                     // Send data 255 bytes at a time to always fill the buffer

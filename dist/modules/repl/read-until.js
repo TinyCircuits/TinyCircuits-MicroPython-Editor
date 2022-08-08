@@ -26,10 +26,17 @@ class ReadUntil{
 
         // Number of bytes accumulated
         this.accumulatedDataLength = undefined;
+
+        // Sometimes the repl will hang waiting for another character, send a ctrl-c after hanging for ctrlCTimeoutTime
+        this.ctrlCTimeoutTime = undefined;
+        this.ctrlCTimeout = undefined;
+
+        // External module should define this to send the ctrl-c char code to the device
+        this.onCtrlCHang = () => {};
     }
 
 
-    activate(readUntilString, callback, forceOutput){
+    activate(readUntilString, callback, forceOutput, ctrlCTimeoutTime){
         this.isActive = true;
         this.readUntilString = readUntilString;
         this.callback = callback;
@@ -37,6 +44,7 @@ class ReadUntil{
         this.searchingString = this.searchingString == undefined ? "" : this.searchingString;
         this.accumulatedData = [];
         this.accumulatedDataLength = 0;
+        this.ctrlCTimeoutTime = ctrlCTimeoutTime;
 
         // Call this as soon as this is activated since extra data may have been pushed into the searchIngString
         // and contains the string data this activation needs to invoke the callback
@@ -54,12 +62,25 @@ class ReadUntil{
         this.searchingString = extraData != undefined ? this.decoder.decode(extraData) : undefined;
         this.accumulatedData = undefined;
         this.accumulatedDataLength = undefined;
+        this.ctrlCTimeoutTime = undefined;
+        if(this.ctrlCTimeout) clearTimeout(this.ctrlCTimeout);  // Clear this since done
+        this.ctrlCTimeout = undefined;
 
         callbackCopy(finalData, extraData);
     }
 
 
     evaluate(data){
+
+        // If the timeout time is not undefined, clear the last timeout since we have new data and start another one
+        if(this.ctrlCTimeoutTime != undefined){
+            if(this.ctrlCTimeout) clearTimeout(this.ctrlCTimeout);
+            this.ctrlCTimeout = setTimeout(() => {
+                this.onCtrlCHang();
+                console.error("Had to use hang hack...");
+            }, this.ctrlCTimeoutTime);
+        }
+
         this.searchingString += this.decoder.decode(data);
         
         // console.log("%c " + this.searchingString + " %c " + this.readUntilString, 'color: red', 'color: lime');

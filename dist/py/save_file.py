@@ -15,6 +15,8 @@ def start_save(file_path, byte_count_to_read):
 
         rbc = 0
         while(1):
+            print(rbc)
+
             # Always read 255 bytes at a time since that is always sent
             rbc = rbc + sys.stdin.buffer.readinto(buffer, 255)
 

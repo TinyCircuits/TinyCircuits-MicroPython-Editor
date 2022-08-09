@@ -99,8 +99,8 @@ class SpriteTab{
     select(){
         this.tabUnselectAll();
 
-        // this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full  bg-white hover:bg-white text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
-        this.divTab.classList.add("bg-base-100");
+        this.divTab.classList.remove("btn-primary");
+        this.divTab.classList.add("btn-primary-focus");
         this.selected = true;
         this.#saveTabData();
 
@@ -109,8 +109,8 @@ class SpriteTab{
 
 
     unselect(){
-        // this.divTab.classList = "select-none flex items-center justify-evenly min-w-[48px] min-h-[40px] px-4 mx-2 rounded-full bg-black hover:bg-white text-white hover:text-black border-black active:bg-black active:text-white  dark:bg-white dark:hover:bg-black dark:text-black dark:hover:text-white dark:border-white dark:active:bg-white dark:active:text-black  border duration-200";
-        this.divTab.classList.remove("bg-base-100");
+        this.divTab.classList.add("btn-primary");
+        this.divTab.classList.remove("btn-primary-focus");
         this.selected = false;
         this.#saveTabData();
 

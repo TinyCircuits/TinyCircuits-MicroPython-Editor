@@ -20,14 +20,7 @@ class Console{
         // Function to be defined and used externally but called internally
         this.onType = (data) => {};
 
-
-        // Set the terminal background to the page background color
-        this.console.setOption('theme', {
-            background: getComputedStyle(consoleDiv).backgroundColor,
-            cursor: getComputedStyle(consoleDiv).color,
-            foreground: getComputedStyle(consoleDiv).color
-        });
-
+        this.updateTheme();
 
         this.console.onData((data) => {
             if(data == ''){
@@ -40,6 +33,16 @@ class Console{
         if(message != undefined){
             this.write(message);
         }
+    }
+
+
+    updateTheme(){
+        // Set the terminal background to the page background color
+        this.console.setOption('theme', {
+            background: getComputedStyle(this.consoleDiv).backgroundColor,
+            cursor: getComputedStyle(this.consoleDiv).color,
+            foreground: getComputedStyle(this.consoleDiv).color
+        });
     }
 
 

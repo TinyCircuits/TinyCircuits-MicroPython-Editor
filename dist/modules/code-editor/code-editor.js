@@ -94,8 +94,8 @@ class Tab{
         for(let itx=0; itx<this.tabManager.tabs.length; itx++){
             this.tabManager.tabs[itx].unselect();
         }
-        // this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] mb-[-1px] border border-x-black px-1 flex flex-row justify-center items-center";
-        this.divTab.classList.add("bg-base-100");
+        this.divTab.classList.remove("btn-accent");
+        this.divTab.classList.add("btn-accent-focus");
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-white duration-100";
         this.divEditor.classList.remove("invisible");
 
@@ -105,8 +105,8 @@ class Tab{
 
     
     unselect(){
-        // this.divTab.classList = "select-none w-fit h-[23px] ml-[-1px] mt-[-1px] mb-[-1px] border border-black px-1 flex flex-row justify-center items-center bg-black hover:bg-white text-white hover:text-black active:bg-black active:text-white duration-200";
-        this.divTab.classList.remove("bg-base-100");
+        this.divTab.classList.add("btn-accent");
+        this.divTab.classList.remove("btn-accent-focus");;
         this.btnCloseTab.classList = "w-[15px] h-[15px] fill-stone-400 active:fill-black duration-100";
         this.divEditor.classList.add("invisible");
 
@@ -131,7 +131,7 @@ class Tab{
         // The actual overall tab div
         this.divTab = document.createElement("div");
         this.divTab.title = this.filePath;
-        this.divTab.classList = "cursor-default btn rounded-none btn-accent ml-[-1px] mt-[-1px] min-h-0 h-[25px] px-1 flex flex-row justify-center items-center normal-case leading-normal"
+        this.divTab.classList = "cursor-default btn rounded-none btn-accent ml-[-1px] mt-[-1px] min-h-0 h-[24px] px-1 flex flex-row justify-center items-center normal-case leading-normal"
         this.tabHeaderDiv.appendChild(this.divTab);
 
         this.divText = document.createElement("div");

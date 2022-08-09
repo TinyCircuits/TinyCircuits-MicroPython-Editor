@@ -218,3 +218,61 @@ document.getElementById("btnCreateSprite").onclick = (event) => {
         document.getElementById("divProjectsLayoutPanel").appendChild(projects.projects[0].div);
     }
 }
+
+
+
+document.getElementById("btnThemeDark").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "dark");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeCupcake").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "cupcake");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeRetro").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "retro");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeGarden").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "garden");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeCyberpunk").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "cyberpunk");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeValentine").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "valentine");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeAqua").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "aqua");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeFantasy").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "fantasy");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeAutumn").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "autumn");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeAcid").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "acid");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeCoffee").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "coffee");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}

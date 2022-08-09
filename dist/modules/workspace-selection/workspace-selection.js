@@ -25,10 +25,13 @@ class WorkspaceSelection{
                 // Remove style edits to btns and hide all divs
                 for(let iex=0; iex<this.entryDictList.length; iex++){
                     // Change button style
-                    this.entryDictList[iex][0].classList.remove("bg-base-100");
-                    // this.entryDictList[iex][0].style.backgroundColor = null;
-                    // this.entryDictList[iex][0].style.fill = null;
-                    // this.entryDictList[iex][0].style.color = null;
+                    if(this.entryDictList[iex][0].classList.contains("btn-primary-focus")){
+                        this.entryDictList[iex][0].classList.add("btn-primary");
+                        this.entryDictList[iex][0].classList.remove("btn-primary-focus");
+                    }else if(this.entryDictList[iex][0].classList.contains("btn-accent-focus")){
+                        this.entryDictList[iex][0].classList.add("btn-accent");
+                        this.entryDictList[iex][0].classList.remove("btn-accent-focus");
+                    }
 
                     // Call the hidden callback
                     if(this.entryDictList[iex][3] != undefined){
@@ -45,10 +48,14 @@ class WorkspaceSelection{
                 }
 
                 // Change button style to selected
-                entry[0].classList.add("bg-base-100");
-                // entry[0].style.backgroundColor = "white";
-                // entry[0].style.fill = "black";
-                // entry[0].style.color = "black";
+                if(entry[0].classList.contains("btn-primary")){
+                    entry[0].classList.remove("btn-primary");
+                    entry[0].classList.add("btn-primary-focus");
+                }else if(entry[0].classList.contains("btn-accent")){
+                    entry[0].classList.remove("btn-accent");
+                    entry[0].classList.add("btn-accent-focus");
+                }
+                
 
                 // Go through list of elements that correspond to selection and make them not invisible (nothing to do with buttons)
                 for(let idx=0; idx<this.btnDivNameListList[ibx][1].length; idx++){

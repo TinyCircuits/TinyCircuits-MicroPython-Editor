@@ -231,13 +231,28 @@ document.getElementById("btnThemeCupcake").onclick = (event) => {
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
 }
-document.getElementById("btnThemeRetro").onclick = (event) => {
-    document.documentElement.setAttribute("data-theme", "retro");
+document.getElementById("btnThemeBumblebee").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "bumblebee");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
 }
-document.getElementById("btnThemeGarden").onclick = (event) => {
-    document.documentElement.setAttribute("data-theme", "garden");
+document.getElementById("btnThemeEmerald").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "emerald");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeCorporate").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "corporate");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeSynthwave").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "synthwave");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeRetro").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "retro");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
 }
@@ -248,6 +263,21 @@ document.getElementById("btnThemeCyberpunk").onclick = (event) => {
 }
 document.getElementById("btnThemeValentine").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "valentine");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeHalloween").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "halloween");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeGarden").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "garden");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
+document.getElementById("btnThemeForest").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "forest");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
 }

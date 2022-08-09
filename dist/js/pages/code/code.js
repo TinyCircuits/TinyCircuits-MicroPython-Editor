@@ -225,89 +225,114 @@ document.getElementById("btnThemeLight").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "light");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "light");
 }
 document.getElementById("btnThemeDark").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "dark");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "dark");
 }
 document.getElementById("btnThemeCupcake").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "cupcake");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "cupcake");
 }
 document.getElementById("btnThemeBumblebee").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "bumblebee");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "bumblebee");
 }
 document.getElementById("btnThemeEmerald").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "emerald");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "emerald");
 }
 document.getElementById("btnThemeCorporate").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "corporate");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "corporate");
 }
 document.getElementById("btnThemeSynthwave").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "synthwave");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "synthwave");
 }
 document.getElementById("btnThemeRetro").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "retro");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "retro");
 }
 document.getElementById("btnThemeCyberpunk").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "cyberpunk");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "cyberpunk");
 }
 document.getElementById("btnThemeValentine").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "valentine");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "valentine");
 }
 document.getElementById("btnThemeHalloween").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "halloween");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "halloween");
 }
 document.getElementById("btnThemeGarden").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "garden");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "garden");
 }
 document.getElementById("btnThemeForest").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "forest");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "forest");
 }
 document.getElementById("btnThemeAqua").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "aqua");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "aqua");
 }
 document.getElementById("btnThemeFantasy").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "fantasy");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "fantasy");
 }
 document.getElementById("btnThemeAutumn").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "autumn");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "autumn");
 }
 document.getElementById("btnThemeAcid").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "acid");
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "acid");
 }
 document.getElementById("btnThemeCoffee").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "coffee");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+    localStorage.setItem("pageTheme", "coffee");
+}
+
+let theme = localStorage.getItem("pageTheme");
+if(theme != null){
+    document.documentElement.setAttribute("data-theme", theme);
     thumbyConsole.updateTheme();
     browserConsole.updateTheme();
 }

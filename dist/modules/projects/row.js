@@ -330,7 +330,7 @@ class Row{
         this.divOptionsDropdown.classList = "absolute";
         if(this.isFolder){
             this.divOptionsDropdown.innerHTML = `
-            <div class="dropdown dropdown-open">
+            <div class="dropdown dropdown-open z-[1000]">
                 <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
                     <label for="modalInput"><li><a>Rename</a></li></label>
                     <label for="modalInput"><li><a>New Folder</a></li></label>
@@ -346,7 +346,7 @@ class Row{
             this.divOptionsDropdown.children[0].children[0].children[3].onclick = deleteFileFolder;
         }else{
             this.divOptionsDropdown.innerHTML = `
-            <div class="dropdown dropdown-open">
+            <div class="dropdown dropdown-open z-[1000]">
                 <ul tabindex="0" class="dropdown-content menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
                     <label for="modalInput"><li><a>Rename</a></li></label>
                     <label for="modalConfirm"><li><a>Delete</a></li></label>

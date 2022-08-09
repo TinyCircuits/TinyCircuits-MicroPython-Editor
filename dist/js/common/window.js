@@ -28,15 +28,6 @@ window.inputDialog = (question, defaultValue, callback = (value) => {}) => {
 }
 
 
-{/* <div id="divModalConfirmQuestion" class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
-    Choose a new name:
-</div>
-<div class="relative w-full h-fit p-1 flex justify-evenly font-bold select-none">
-    <label for="modalConfirm" id="btnModalConfirm" class="btn btn-sm btn-primary">Confirm</label>
-    <label for="modalConfirm" id="btnModalCancel" class="btn btn-sm btn-primary">Cancel</label>
-</div> */}
-
-
 window.confirm = (question, callback = () => {}) => {
     return new Promise((resolve) => {
         let divModalConfirmQuestion = document.getElementById("divModalConfirmQuestion");

@@ -64,10 +64,13 @@
 
     <input type="checkbox" id="modelAddToFolder" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative">
-            <label for="modelAddToFolder" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
+        <div class="modal-box relative min-h-[400px] h-[400px]">
+            <label for="modelAddToFolder" id="divModelAddToFolderExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a folder
+            </div>
+            <div id="divModelAddToFolderView" class="relative w-full h-fit rounded-md">
+                
             </div>
         </div>
     </div>

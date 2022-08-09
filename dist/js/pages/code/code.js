@@ -191,6 +191,33 @@ document.addEventListener("keydown", (event) => {
 
 
 document.getElementById("btnCreateSprite").onclick = (event) => {
+    projects.setToFolderSelectionMode([], (row) => {
+        // Reset projects selection view, put tree back in place, and hide selection view
+        projects.unsetFromFolderSelectionMode();
+        document.getElementById("divProjectsLayoutPanel").appendChild(projects.projects[0].div);
+        document.getElementById("modelAddToFolder").click();
+
+        // Show the input dialog and set/use it
+        document.getElementById("modalInput").click();
+        window.inputDialog("New sprite file name:", "MySprite.spr", (value) => {
+            if(projects.projects[0].doesPathExist(row.filePath + "/" + value) == false){
+                row.addChild(value, false, true, true);
+            }else{
+                window.showError("File already exists, did not create it");
+            }
+        });
+    });
+
+    // Move the projects file tree to this selection window
+    let divModelAddToFolderView = document.getElementById("divModelAddToFolderView");
+    divModelAddToFolderView.appendChild(projects.projects[0].div);
+
+    // Simply put the projects tree back in its place on exit
+    document.getElementById("divModelAddToFolderExit").onclick = (event) => {
+        projects.unsetFromFolderSelectionMode();
+        document.getElementById("divProjectsLayoutPanel").appendChild(projects.projects[0].div);
+    }
+    
     // let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the new sprite file", () => {
     //     projects.unsetFromFolderSelectionMode();
     // });

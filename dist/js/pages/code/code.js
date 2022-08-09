@@ -221,6 +221,11 @@ document.getElementById("btnCreateSprite").onclick = (event) => {
 
 
 
+document.getElementById("btnThemeLight").onclick = (event) => {
+    document.documentElement.setAttribute("data-theme", "light");
+    thumbyConsole.updateTheme();
+    browserConsole.updateTheme();
+}
 document.getElementById("btnThemeDark").onclick = (event) => {
     document.documentElement.setAttribute("data-theme", "dark");
     thumbyConsole.updateTheme();

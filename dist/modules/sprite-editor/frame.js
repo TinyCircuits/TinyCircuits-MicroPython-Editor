@@ -1,5 +1,5 @@
 class Frame{
-    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}){        
+    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}, deleteCallback = (index) => {}){        
         // The leading element is where this frame should input itself,
         // and the index is the index in teh frameList of the module that
         // uses this frame
@@ -10,12 +10,16 @@ class Frame{
         this.height = height;
 
         this.openCallback = openCallback;
+        this.deleteCallback = deleteCallback;
 
         // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
         this.divFrameContainer = document.createElement("div");
-        this.divFrameContainer.classList = "border border-gray-400 min-w-full mt-3";
+        this.divFrameContainer.classList = "border border-gray-400 min-w-full mt-3 relative";
         this.divFrameContainer.onclick = (event) => {
-            this.select();
+            // Make sure this is the actual frame container div being clicked and not the options div
+            if(event.target.toString() == "[object HTMLCanvasElement]"){
+                this.select();
+            }
         }
 
         // leadingElement.parentElement.appendChild(this.divFrameContainer);
@@ -43,6 +47,70 @@ class Frame{
 
         // Add the canvas to the canvas parent div
         this.divFrameContainer.appendChild(this.canvas);
+
+        this.divFrameIndexIndicator = document.createElement("div");
+        this.divFrameIndexIndicator.innerHTML = `
+        <div class="absolute bg-transparent top-0 left-0 w-fit h-fit px-1 opacity-0 transition-all ease-linear duration-100 rounded-br-md select-none">
+            ` + this.getFrameIndex() + `
+        </div>
+        `
+        this.divFrameContainer.appendChild(this.divFrameIndexIndicator);
+
+
+        // Options div is always same and exists to indicate to the user that they can click it
+        this.optionsDiv = document.createElement("div");
+        this.optionsDiv.classList = "w-6 h-6 absolute opacity-0 right-0 top-0 mt-0.5 rounded-full hover:stroke-accent";
+        this.optionsDiv.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
+                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+        `;
+        this.optionsDiv.onclick = (event) => {
+            let rect = this.optionsDiv.getBoundingClientRect();
+            this.divOptionsDropdown.style.left = rect.x + "px";
+            this.divOptionsDropdown.style.top = rect.y + "px";
+            this.divOptionsDropdown.classList.remove("invisible");
+        }
+        this.divFrameContainer.appendChild(this.optionsDiv);
+
+
+        this.divOptionsDropdown = document.createElement("div");
+        this.divOptionsDropdown.classList = "absolute z-[1000] invisible";
+        this.divOptionsDropdown.innerHTML = `
+        <ul tabindex="0" class="menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+            <label><li><a>Delete</a></li></label>
+        </ul>
+        `
+        this.divOptionsDropdown.onmouseleave = (event) => {
+            this.divOptionsDropdown.classList.add("invisible");
+        }
+        this.divOptionsDropdown.children[0].children[0].onclick = (event) => {
+            this.divOptionsDropdown.classList.add("invisible");
+            this.deleteCallback(this.getFrameIndex());
+
+        }
+        document.body.appendChild(this.divOptionsDropdown);
+
+
+        // Show/hide frame index and options div on mouse hover over frame
+        this.divFrameContainer.onmouseenter = (event) => {
+            this.divFrameIndexIndicator.children[0].classList.add("opacity-100");
+            this.divFrameIndexIndicator.children[0].classList.remove("opacity-0");
+            this.optionsDiv.classList.add("opacity-100");
+            this.optionsDiv.classList.remove("opacity-0");
+        }
+        this.divFrameContainer.onmouseleave = (event) => {
+            this.divFrameIndexIndicator.children[0].classList.remove("opacity-100");
+            this.divFrameIndexIndicator.children[0].classList.add("opacity-0");
+            this.optionsDiv.classList.remove("opacity-100");
+            this.optionsDiv.classList.add("opacity-0");
+        }
+    }
+
+
+    // Gets index from dom
+    getFrameIndex(){
+        return Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer);
     }
 
 
@@ -59,8 +127,7 @@ class Frame{
         this.divFrameContainer.classList.add("outline-2");
         this.divFrameContainer.classList.add("outline-gray-400");
 
-        let frameIndex = Array.prototype.indexOf.call(this.leadingElement.parentElement.children, this.divFrameContainer);
-        this.openCallback(this.canvas, this.context, frameIndex);
+        this.openCallback(this.canvas, this.context, this.getFrameIndex());
     }
 
 

@@ -106,6 +106,31 @@ class SpriteTabCanvas{
     }
 
 
+    // Typically called from a frame object to remove the frame from the dom and the sprite data
+    #deleteFrameAtIndex(frameIndex){
+        // Remove the portion of data containing the the frame's data
+        const frameByteLength = this.#getFrameLength();
+        let frameByteOffset = 17 + (frameByteLength * frameIndex);
+        let newSpriteData = new Uint8Array(this.spriteData.length - frameByteLength);               // The sprite data will end up being its length minus one frame
+        newSpriteData.set(this.spriteData.slice(0, frameByteOffset));                               // Copy over portion of sprite data before the frame
+        newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset); // Copy over portion of sprite data after the frame
+
+        this.spriteData = newSpriteData;
+
+        // Decrease the sprite data's frame count
+        this.spriteData[14] = this.spriteData[14] - 1;
+
+        // Save the edits to the sprite data
+        this.saveCallback(this.spriteData);
+
+        // Remove the frame from the dom list
+        this.divFrameListParent.removeChild(this.divFrameListParent.children[frameIndex]);
+
+        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+        this.#updateFrameList();
+    }
+
+
     // Add frame behind the leading element (typically the add frame button)
     #addFrameToList(frameIndex){
         const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
@@ -114,7 +139,7 @@ class SpriteTabCanvas{
         let frameByteOffset = 17 + (frameByteLength * frameIndex);
         let frameData = this.spriteData.slice(frameByteOffset, frameByteOffset + frameByteLength);
 
-        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this));
+        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this), this.#deleteFrameAtIndex.bind(this));
         newFrame.update(frameData);
 
         return newFrame;
@@ -161,7 +186,12 @@ class SpriteTabCanvas{
             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
         </svg>
         `
-        this.btnAddFrame.onclick = (event) => {this.#addFrameToData(this.btnAddFrame)};
+        this.btnAddFrame.onclick = (event) => {
+            this.#addFrameToData();
+
+            // Scroll to end automatically
+            this.divFrameListParent.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        };
         this.divFrameListParent.appendChild(this.btnAddFrame);
 
         this.#updateFrameList();
@@ -268,6 +298,8 @@ class SpriteTabCanvas{
 
         let frameByteOffset = frameByteLength * this.frameIndex;
         this.spriteData.set(frame, 17 + frameByteOffset);
+
+        // Save the update
         this.saveCallback(this.spriteData);
     }
 

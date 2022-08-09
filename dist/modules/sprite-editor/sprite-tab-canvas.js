@@ -103,6 +103,11 @@ class SpriteTabCanvas{
 
         // Set the selected from index for this file
         localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+
+        // When a frame is deleted the canvas is hidden, but now that a new canvas is clicked un-hide it
+        if(this.canvas.classList.contains("invisible")){
+            this.canvas.classList.remove("invisible");
+        }
     }
 
 
@@ -128,6 +133,8 @@ class SpriteTabCanvas{
 
         // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
         this.#updateFrameList();
+
+        this.canvas.classList.add("invisible");
     }
 
 

@@ -217,21 +217,4 @@ document.getElementById("btnCreateSprite").onclick = (event) => {
         projects.unsetFromFolderSelectionMode();
         document.getElementById("divProjectsLayoutPanel").appendChild(projects.projects[0].div);
     }
-    
-    // let close = window.folderSelectionShow("Use the \"Projects\" panel on the left to choose a folder for the new sprite file", () => {
-    //     projects.unsetFromFolderSelectionMode();
-    // });
-
-    // projects.setToFolderSelectionMode([], (row) => {
-    //     projects.unsetFromFolderSelectionMode();
-    //     close();
-
-    //     window.inputDialog("Enter a new name for the sprite file", "MySprite.spr", (value) => {
-    //         if(projects.projects[0].doesPathExist(row.filePath + "/" + value) == false){
-    //             row.addChild(value, false, true, true);
-    //         }else{
-    //             window.showError("File already exists, did not create it");
-    //         }
-    //     });
-    // });
 }

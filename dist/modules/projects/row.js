@@ -117,6 +117,43 @@ class Row{
             this.textDiv.style.marginLeft = 22 + ((this.parentCount - 1) * 16) + "px";
             this.textDiv.textContent = this.text;
             this.rowDiv.appendChild(this.textDiv);
+
+            // If this is a new folder and the project is in selection mode, set
+            // this project to selection mode using information from parent
+            if(this.isFolder && this.project.inSelectionMode){
+                this.setToSelectionMode(this.parent.files, this.parent.selectedCallback);
+            }
+        }
+    }
+
+
+    // Sets to selection mode for use when user is selecting a folder
+    setToSelectionMode(files, selectedCallback){
+        // Save this for any new child rows to use to set their own callback
+        this.files = files;
+        this.selectedCallback = selectedCallback;
+
+        if(this.isRoot == false){
+            this.rowDiv.onclick = async (event) => {
+                // Make sure to only select this row if it is actually clicked and not an element on top
+                if(event.target.toString() == "[object HTMLDivElement]"){
+
+                    // If there are files, add them under this row
+                    for(let ifx=0; ifx<files.length; ifx++){
+                        // First check that the new incoming file doesn't exist here
+                        let path = this.getPath() + this.text + "/" + files[ifx].name;
+                        if(this.doesPathExist(path, row) == false){
+                            let newRow = this.addChild(files[ifx].name, false);
+                            let buffer = new Uint8Array(await files[ifx].arrayBuffer());
+                            this.project.DB.addFile(buffer, newRow.filePath);
+                        }else{
+                            window.showError("Could not add file, file with name '" + files[ifx].name + "' already exists in the directory");
+                        }
+                    }
+
+                    selectedCallback(this);
+                }
+            }
         }
     }
 

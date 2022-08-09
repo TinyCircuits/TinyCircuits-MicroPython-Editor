@@ -3139,6 +3139,30 @@ body[dir="rtl"] .checkbox:checked,
   padding: 0px;
 }
 
+.range-xs {
+  height: 1rem;
+}
+
+.range-xs::-webkit-slider-runnable-track {
+  height: 0.25rem;
+}
+
+.range-xs::-moz-range-track {
+  height: 0.25rem;
+}
+
+.range-xs::-webkit-slider-thumb {
+  height: 1rem;
+  width: 1rem;
+  --filler-offset: 0.4rem;
+}
+
+.range-xs::-moz-range-thumb {
+  height: 1rem;
+  width: 1rem;
+  --filler-offset: 0.4rem;
+}
+
 .steps-horizontal .step {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -3493,10 +3517,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-40 {
   height: 10rem;
-}
-
-.h-1 {
-  height: 0.25rem;
 }
 
 .h-9 {

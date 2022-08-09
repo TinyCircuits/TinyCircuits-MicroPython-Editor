@@ -135,24 +135,7 @@ class Project{
 
     // Projects will call this when user has picked files to add to the project
     setToFolderSelectionMode(row, files, selectedCallback){
-        if(row.isRoot == false){
-            row.rowDiv.onclick = async (event) => {
-                
-                for(let ifx=0; ifx<files.length; ifx++){
-                    // First check that the new incoming file doesn't exist here
-                    let path = row.getPath() + row.text + "/" + files[ifx].name;
-                    if(this.doesPathExist(path, row) == false){
-                        let newRow = row.addChild(files[ifx].name, false);
-                        let buffer = new Uint8Array(await files[ifx].arrayBuffer());
-                        this.DB.addFile(buffer, newRow.filePath);
-                    }else{
-                        window.showError("Could not add file, file with name '" + files[ifx].name + "' already exists in the directory");
-                    }
-                }
-
-                selectedCallback(row);
-            }
-        }
+        row.setToSelectionMode(files, selectedCallback);
 
         for(let icx=0; icx<row.childRows.length; icx++){
             if(row.childRows[icx].isFolder){
@@ -163,6 +146,8 @@ class Project{
                 row.childRows[icx].rowDiv.style.backgroundColor = "rgb(107 114 128)";
             }
         }
+
+        this.inSelectionMode = true;
     }
 
     // Projects will call this when user picked a location to add the files to
@@ -180,6 +165,8 @@ class Project{
                 row.childRows[icx].rowDiv.style.backgroundColor = null;
             }
         }
+
+        this.inSelectionMode = false;
     }
 
 

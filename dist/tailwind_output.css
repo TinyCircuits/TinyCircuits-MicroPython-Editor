@@ -3621,6 +3621,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 30px;
 }
 
+.h-\[17px\] {
+  height: 17px;
+}
+
 .h-40 {
   height: 10rem;
 }
@@ -3739,6 +3743,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-\[15\%\] {
   width: 15%;
+}
+
+.w-\[17px\] {
+  width: 17px;
 }
 
 .w-4 {

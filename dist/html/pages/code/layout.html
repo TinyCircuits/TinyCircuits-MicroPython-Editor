@@ -90,9 +90,23 @@
                 </div>
             </div>
 
-            <!-- Drawing tools parent -->
+            Drawing tools parent
             <div class="h-9 w-full mt-2">
                 <div class="h-full flex justify-around items-center overflow-hidden">
+
+    <div class="form-control w-fit">
+        <label class="label">
+            <span class="label-text mr-1">Width:</span>
+            <input type="number" value="72" step="1" min="0" max="9999" class="input input-bordered input-xs w-11" />
+        </label>
+    </div>
+
+    <div class="form-control w-fit">
+        <label class="label">
+            <span class="label-text mr-1">Height:</span>
+            <input type="number" value="40" step="1" min="0" max="9999" class="input input-bordered input-xs w-11" />
+        </label>
+    </div>
 
     <!-- Zoom in -->
     <button id="btnSpriteEditorZoomIn" title="Zoom in [keybind: scroll wheel forwards/up]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">

@@ -9,6 +9,29 @@ class SpriteEditorManager{
         this.spriteAnimationPreview = new SpriteAnimationPreview();
 
         this.tabs = [];
+
+        // Restore last clicked tool and color (set in sprite-tab-canvas.js), otherwise choose a default
+        let lastEnabledTool = localStorage.getItem("SpriteEditorLastEnabledTool");
+        let lastEnabledColor = localStorage.getItem("SpriteEditorLastEnabledColor");
+        if(lastEnabledTool != null){
+            document.getElementById(lastEnabledTool).classList.replace("btn-primary", "btn-primary-focus");
+        }else{
+            document.getElementById("btnSpriteEditorBrushTool").classList.replace("btn-primary", "btn-primary-focus");
+        }
+        if(lastEnabledColor != null){
+            document.getElementById(lastEnabledColor).classList.replace("btn-primary", "btn-primary-focus");
+        }else{
+            document.getElementById("btnSpriteEditorWhite").classList.replace("btn-primary", "btn-primary-focus");
+        }
+
+        // Track, save, and restore the filled checkbox state here
+        let filled = localStorage.getItem("SpriteEditorFilled");
+        if(filled != null && filled == "false"){
+            document.getElementById("checkboxSpriteEditorFilled").checked = false;
+        }
+        document.getElementById("checkboxSpriteEditorFilled").onclick = (event) => {
+            localStorage.setItem("SpriteEditorFilled", event.currentTarget.checked);
+        }
     }
 
 

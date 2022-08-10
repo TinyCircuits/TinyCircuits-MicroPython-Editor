@@ -37,7 +37,7 @@ class SpriteAnimationPreview{
 
     #animate(newtime){
         let dt = newtime - this.t0;
-        if(this.frameListParent != undefined && dt >= this.fpsInterval){
+        if(this.frameListParent != undefined && dt >= this.fpsInterval && this.frameListParent.children.length > 1){
             // Loop back to first frame at end of list of frames (minus one to not include add button)
             if(this.frameIndex >= this.frameListParent.children.length-1){
                 this.frameIndex = 0;

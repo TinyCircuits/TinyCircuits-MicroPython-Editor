@@ -2,7 +2,7 @@
 
     <!-- Panel title -->
     <div class="w-full h-6 bg-accent text-white">
-        <div class="ml-1 select-none text-base-content">
+        <div class="ml-1 select-none text-secondary-content">
             Sprite Editor
         </div>
     </div>
@@ -98,7 +98,7 @@
     </div>
 
 
-    <!-- Black/White selection -->
+    <!-- Undo/Redo -->
     <div class="w-40 h-8 flex flex-row">
         <button title="Undo last operation [keybind: ctrl+z]" class="flex flex-row rounded-l-full w-20 h-8 btn btn-primary btn-sm min-h-0 p-0">
             <div class="w-full h-full flex items-center justify-center">
@@ -119,30 +119,52 @@
 
     </div>
 
+    
+    <!-- Fill checkbox -->
+    <div class="form-control">
+        <label class="label cursor-pointer">
+            <span class="label-text">Filled</span> 
+            <input id="checkboxSpriteEditorFilled" title="Toggle filling rectangle or oval draw operations" type="checkbox" checked="checked" class="checkbox checkbox-sm checkbox-primary ml-2" />
+        </label>
+    </div>
 
     <!-- Rectangle -->
-    <button title="Enable rectangle drawing tool [keybind: r]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
+    <button id="btnSpriteEditorRectangle" title="Toggle rectangle drawing tool [keybind: r]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 2.593,2.593 V 17.406 H 17.406 V 2.593 Z M 4.7842041,4.7842041 H 15.216125 V 15.216125 H 4.7842041 Z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Oval -->
-    <button title="Enable oval drawing tool [keybind: o]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
+    <button id="btnSpriteEditorOval" title="Toggle oval drawing tool [keybind: o]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 9.9999064 2.633431 A 7.3663845 7.3663845 0 0 0 2.633431 9.9999064 A 7.3663845 7.3663845 0 0 0 9.9999064 17.366382 A 7.3663845 7.3663845 0 0 0 17.366382 9.9999064 A 7.3663845 7.3663845 0 0 0 9.9999064 2.633431 z M 9.9999064 4.7206421 A 5.279242 5.279242 0 0 1 15.279171 9.9999064 A 5.279242 5.279242 0 0 1 9.9999064 15.279171 A 5.279242 5.279242 0 0 1 4.7206421 9.9999064 A 5.279242 5.279242 0 0 1 9.9999064 4.7206421 z " clip-rule="evenodd" />
         </svg>
     </button>
 
+
+    <!-- Separator -->
+    <div class="w-[1px] h-[80%] bg-accent-focus">
+
+    </div>
+
+
+    <!-- Pixel brush tool -->
+    <button id="btnSpriteEditorBrushTool" title="Toggle pixel brush drawing tool [keybind: p]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <rect x="7.5198" y="7.5198" width="5" height="5" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width=".026458"/>
+        </svg>
+    </button>
+
     <!-- Line -->
-    <button title="Enable line drawing tool [keybind: l]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
+    <button id="btnSpriteEditorLine" title="Toggle line drawing tool [keybind: l]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M 16.25,2.5 A 1.25,1.25 0 0 0 15.365234,2.8652344 L 2.8652344,15.365234 a 1.25,1.25 0 0 0 0,1.769532 1.25,1.25 0 0 0 1.7695312,0 L 17.134766,4.6347656 a 1.25,1.25 0 0 0 0,-1.7695312 A 1.25,1.25 0 0 0 16.25,2.5 Z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <!-- Bucket -->
-    <button title="Enable bucket fill tool [keybind: b]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
+    <button id="btnSpriteEditorBucket" title="Toggle bucket fill tool [keybind: b]" class="h-8 w-8 rounded-full btn btn-primary btn-sm p-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="m 9.8554688,3.0014844 c -0.1056786,-0.0043 -0.2193177,3.094e-4 -0.3359376,0.019531 -0.2327103,0.038356 -0.4773087,0.1397148 -0.6855468,0.34375 a 0.12354945,0.12354945 0 0 0 -0.00391,0 L 8.5878906,3.6030469 a 0.12354945,0.12354945 0 0 0 -0.00195,0.00195 C 6.3742728,5.7393049 7.0705049,5.1067553 2.5371094,9.597188 c -0.4177863,0.413827 -0.399259,0.968454 -0.3320313,1.310547 0.071537,0.364601 0.2322867,0.732978 0.4355469,1.09375 0.4086023,0.728813 1.0590205,1.553779 1.8613281,2.349609 0.8034838,0.795868 1.6377551,1.441249 2.3730469,1.845703 0.3634224,0.200892 0.7354193,0.360873 1.1015625,0.431641 5.943e-4,1.15e-4 0.00136,-1.14e-4 0.00195,0 a 0.12354945,0.12354945 0 0 0 0,0.002 c 0.3414285,0.06454 0.8925433,0.07961 1.3105469,-0.328125 a 0.12354945,0.12354945 0 0 0 0.00977,-0.0039 L 15.041017,10.60896 c -0.005,0.09009 -0.0016,0.149978 -0.01367,0.271484 -0.03332,0.321279 -0.07633,0.747124 -0.08203,1.324219 a 0.12354945,0.12354945 0 0 0 0,0.002 c 0,0 0,0.002 0,0.002 v 0.134766 a 0.12354945,0.12354945 0 0 0 0.002,0.02344 c 2.81e-4,0.0015 0.0016,0.0025 0.002,0.0039 0.07096,0.837918 0.767572,1.314454 1.439453,1.314454 0.671881,0 1.368491,-0.476536 1.439453,-1.314454 3.02e-4,-0.0014 0.0017,-0.0025 0.002,-0.0039 a 0.12354945,0.12354945 0 0 0 0.002,-0.02344 v -0.05859 -0.002 -0.002 c 9.26e-4,-0.0464 1.88e-4,-0.09375 -0.0039,-0.144531 v -0.0039 C 17.76296,10.68973 17.042154,9.027566 15.701172,8.1030469 15.635908,7.9542441 15.565509,7.8058606 15.484375,7.6616406 15.074861,6.9340598 14.425015,6.1102868 13.621094,5.3139844 12.817142,4.517652 11.981697,3.8726904 11.246094,3.4682813 10.88396,3.2692604 10.515005,3.1107054 10.150391,3.0385937 c -0.0014,-2.706e-4 -0.0025,-0.00168 -0.0039,-0.00195 a 0.12354945,0.12354945 0 0 0 -0.002,-0.00195 C 10.058797,3.018481 9.9611473,3.0057825 9.8554688,3.0014844 Z m 0.8359372,2.2167969 c 0.497964,0.3157727 1.07536,0.7548416 1.671875,1.3457031 0.321662,0.3186134 0.575288,0.6268689 0.814453,0.9316406 -0.132205,0.00589 -0.264273,0.011776 -0.40039,0.035156 C 12.525537,7.3189937 12.282041,7.1017745 12.048828,6.870625 11.453228,6.2806707 11.009209,5.7107277 10.691406,5.2182813 Z M 8.9238281,5.7632031 c 0.00155,0.00281 0.00231,0.00498 0.00391,0.00781 0.4094992,0.7287176 1.0592761,1.5532234 1.8632819,2.3496094 0.802474,0.7959945 1.636515,1.4412105 2.373046,1.8457035 L 8.2324219,14.855001 C 8.1228796,14.826153 7.9715101,14.778459 7.7382812,14.649922 7.195376,14.350255 6.4769833,13.805674 5.7617188,13.097188 5.0472104,12.389451 4.4954641,11.680382 4.1933594,11.14211 c -2.192e-4,-3.91e-4 2.189e-4,-0.0016 0,-0.002 a 0.12354945,0.12354945 0 0 0 0,-0.002 C 4.0653358,10.909263 4.0146587,10.75836 3.9863281,10.653829 5.4025963,9.226563 6.292091,8.3326426 6.7617188,7.8628125 7.2547944,7.3695244 7.3905309,7.242492 7.3984375,7.2358594 c 0.00471,-0.00395 0.0288,-0.00829 0.2382813,-0.2070313 0.1681775,-0.1595559 0.6554501,-0.6415309 1.2871093,-1.265625 z" clip-rule="evenodd" />
         </svg>
@@ -150,25 +172,15 @@
 
     <!-- Black/White selection -->
     <div class="w-40 h-8 flex flex-row">
-        <button title="Switch to drawing black color [keybind: b]" class="flex flex-row rounded-l-full w-20 h-8 btn btn-primary btn-sm min-h-0 p-0 flex-nowrap">
-            <div class="ml-2 w-4 h-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-            </div>
+        <button id="btnSpriteEditorBlack" title="Undo last operation [keybind: ctrl+z]" class="flex flex-row rounded-l-full w-20 h-8 btn btn-primary btn-sm min-h-0 p-0">
             <div class="w-full h-full flex items-center justify-center">
                 Black
             </div>
         </button>
 
-        <button title="Switch to drawing white color [keybind: w]" class="flex flex-row rounded-r-full w-20 h-8 btn btn-primary btn-sm min-h-0 p-0 flex-nowrap">
+        <button id="btnSpriteEditorWhite" title="Undo the last undo operation [keybind: shift+ctrl+z]" class="flex flex-row rounded-r-full w-20 h-8 btn btn-primary btn-sm min-h-0 p-0">
             <div class="w-full h-full flex items-center justify-center">
                 White
-            </div>
-            <div class="mr-2 w-4 h-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
             </div>
         </button>
     </div>

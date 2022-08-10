@@ -24,9 +24,72 @@ class SpriteTabCanvas{
         document.getElementById("btnSpriteEditorZoomIn").addEventListener("click", this.listenerZoomIn);
         document.getElementById("btnSpriteEditorZoomOut").addEventListener("click", this.listenerZoomOut);
         document.getElementById("btnSpriteEditorFitCanvas").addEventListener("click", this.listenerFitCanvas);
+        
+        this.btnSpriteEditorBrushTool = document.getElementById("btnSpriteEditorBrushTool");
+        this.btnSpriteEditorRectangle = document.getElementById("btnSpriteEditorRectangle");
+        this.btnSpriteEditorOval = document.getElementById("btnSpriteEditorOval");
+        this.btnSpriteEditorLine = document.getElementById("btnSpriteEditorLine");
+        this.btnSpriteEditorBucket = document.getElementById("btnSpriteEditorBucket");
+        this.btnSpriteEditorBlack = document.getElementById("btnSpriteEditorBlack");
+        this.btnSpriteEditorWhite = document.getElementById("btnSpriteEditorWhite");
+
+        this.btnSpriteEditorBrushTool.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorRectangle.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorOval.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorLine.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBucket.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBlack.addEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorWhite.addEventListener("click", this.#updateColorStates.bind(this));
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
+    }
+
+
+    // Keep track of which tool is toggle for this drawing canvas in relation to global element button presses
+    #updateToolState(event){
+        this.btnSpriteEditorBrushTool.classList.replace("btn-primary-focus", "btn-primary");
+        this.btnSpriteEditorRectangle.classList.replace("btn-primary-focus", "btn-primary");
+        this.btnSpriteEditorOval.classList.replace("btn-primary-focus", "btn-primary");
+        this.btnSpriteEditorLine.classList.replace("btn-primary-focus", "btn-primary");
+        this.btnSpriteEditorBucket.classList.replace("btn-primary-focus", "btn-primary");
+
+        if(event.currentTarget.id == "btnSpriteEditorBrushTool"){
+            this.btnSpriteEditorBrushTool.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorBrushTool.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBrushTool");
+        }else if(event.currentTarget.id == "btnSpriteEditorRectangle"){
+            this.btnSpriteEditorRectangle.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorRectangle.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorRectangle");
+        }else if(event.currentTarget.id == "btnSpriteEditorOval"){
+            this.btnSpriteEditorOval.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorOval.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorOval");
+        }else if(event.currentTarget.id == "btnSpriteEditorLine"){
+            this.btnSpriteEditorLine.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorLine.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorLine");
+        }else if(event.currentTarget.id == "btnSpriteEditorBucket"){
+            this.btnSpriteEditorBucket.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorBucket.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBucket");
+        }
+    }
+
+    #updateColorStates(event){
+        this.btnSpriteEditorBlack.classList.replace("btn-primary-focus", "btn-primary");
+        this.btnSpriteEditorWhite.classList.replace("btn-primary-focus", "btn-primary");
+
+        if(event.currentTarget.id == "btnSpriteEditorBlack"){
+            this.btnSpriteEditorBlack.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorBlack.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorBlack");
+        }else if(event.currentTarget.id == "btnSpriteEditorWhite"){
+            this.btnSpriteEditorWhite.classList.toggle("btn-primary-focus");
+            this.btnSpriteEditorWhite.classList.toggle("btn-primary");
+            if(this.btnSpriteEditorWhite.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorWhite");
+        }
     }
 
 
@@ -104,7 +167,7 @@ class SpriteTabCanvas{
         // Set the selected from index for this file
         localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
 
-        // When a frame is deleted the canvas is hidden, but now that a new canvas is clicked un-hide it
+        // When a selected frame is deleted the canvas is hidden, but now that a new canvas is clicked un-hide it
         if(this.canvas.classList.contains("invisible")){
             this.canvas.classList.remove("invisible");
         }
@@ -131,10 +194,17 @@ class SpriteTabCanvas{
         // Remove the frame from the dom list
         this.divFrameListParent.removeChild(this.divFrameListParent.children[frameIndex]);
 
+        // Only hide the canvas if the last opened/edited frame is the same as this one being deleted
+        if(this.frameIndex == frameIndex){
+            this.canvas.classList.add("invisible");
+        }
+
+        // Update the frame index and save it so updateFrameList selects the correct frame
+        this.frameIndex = this.frameIndex - 1;
+        localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+
         // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
         this.#updateFrameList();
-
-        this.canvas.classList.add("invisible");
     }
 
 
@@ -337,13 +407,31 @@ class SpriteTabCanvas{
             this.context.stroke();
 
             if(event.buttons == 1){
-                this.context.beginPath();
-                this.context.fillStyle = "white";
-                this.context.fillRect(x, y, 1, 1);
-                this.context.stroke();
+                if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
 
-                this.lastColor = this.context.getImageData(x, y, 1, 1).data;
-                this.#updateSpriteFrame();
+                }else if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")){
+
+                }else if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")){
+
+                }else if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")){
+
+                }else if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")){
+                    this.context.beginPath();
+                    this.context.fillStyle = "black";
+                    this.context.fillRect(x, y, 1, 1);
+                    this.context.stroke();
+    
+                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+                    this.#updateSpriteFrame();
+                }else{
+                    this.context.beginPath();
+                    this.context.fillStyle = "white";
+                    this.context.fillRect(x, y, 1, 1);
+                    this.context.stroke();
+
+                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+                    this.#updateSpriteFrame();
+                }
             }
 
             this.lastX = x;
@@ -559,6 +647,13 @@ class SpriteTabCanvas{
         document.getElementById("btnSpriteEditorZoomIn").removeEventListener("click", this.listenerZoomIn);
         document.getElementById("btnSpriteEditorZoomOut").removeEventListener("click", this.listenerZoomOut);
         document.getElementById("btnSpriteEditorFitCanvas").removeEventListener("click", this.listenerFitCanvas);
+        this.btnSpriteEditorBrushTool.removeEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorRectangle.removeEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorOval.removeEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorLine.removeEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBucket.removeEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBlack.removeEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorWhite.removeEventListener("click", this.#updateColorStates.bind(this));
     }
 }
 

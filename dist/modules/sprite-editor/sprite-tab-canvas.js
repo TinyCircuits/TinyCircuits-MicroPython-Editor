@@ -422,6 +422,44 @@ class SpriteTabCanvas{
                 // If in brush mode, a click should place a pixel
                 if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
                     this.context.fillRect(x, y, 1, 1);
+                }else if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")){
+                    // Recursively look for pixels to set and then look around for more pixels
+                    let newImageData = this.context.getImageData(0, 0, frameWidth, frameHeight);
+
+                    let getPixelColor = (newX, newY) => {
+                        return newImageData.data[(frameWidth * newY + newX)*4];
+                    }
+
+                    // The color to make into fill color and spread from
+                    let baseColor = getPixelColor(x, y);
+                    let fillColor = this.context.fillStyle == '#000000' ? 0 : 255;
+
+                    if(baseColor != fillColor){
+                        let setPixelToFill = (newX, newY) => {
+                            let xyi = (frameWidth * newY + newX)*4;
+                            newImageData.data[xyi] = fillColor;
+                            newImageData.data[xyi+1] = fillColor;
+                            newImageData.data[xyi+2] = fillColor;
+                        }
+                        let spreadPixels = (newX, newY) => {
+                            // Set this pixel to the fill or stroke color
+                            setPixelToFill(newX, newY);
+                            if(newX+1 < frameWidth && getPixelColor(newX+1, newY) == baseColor){
+                                spreadPixels(newX+1, newY);
+                            }
+                            if(newY+1 < frameHeight && getPixelColor(newX, newY+1) == baseColor){
+                                spreadPixels(newX, newY+1);
+                            }
+                            if(newX-1 >= 0 && getPixelColor(newX-1, newY) == baseColor){
+                                spreadPixels(newX-1, newY);
+                            }
+                            if(newY-1 >= 0 && getPixelColor(newX, newY-1) == baseColor){
+                                spreadPixels(newX, newY-1);
+                            }
+                        }
+                        spreadPixels(x, y);
+                        this.context.putImageData(newImageData, 0, 0);
+                    }
                 }
             }else if(event.type == "mousemove"){
                 if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
@@ -442,7 +480,7 @@ class SpriteTabCanvas{
                         this.context.fillRect(smallestX+width, smallestY, 1, height+1);     // Right
                     }
                 }else if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")){
-                    // If in oval mode, restore from start frame
+                    // Oval mode
                     this.context.lineWidth = 0.1;
                     this.context.putImageData(this.drawingStartFrame, 0, 0);
 
@@ -476,12 +514,9 @@ class SpriteTabCanvas{
                     // If in brush mode, place pixels as the mouse moves
                     this.context.fillRect(x, y, 1, 1);
                 }else if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")){
-                    // If in line mode, restore from start frame
+                    // Line mode
                     this.context.lineWidth = 0.1;
                     this.context.putImageData(this.drawingStartFrame, 0, 0);
-
-                    // this.context.moveTo(this.drawingStartX, this.drawingStartY);
-                    // this.context.lineTo(x, y);
 
                     let smallestX = x < this.drawingStartX ? x : this.drawingStartX;
                     let smallestY = y < this.drawingStartY ? y : this.drawingStartY;

@@ -303,12 +303,16 @@ class SpriteTabCanvas{
         this.canvas.height = frameHeight;
 
         // Get the context for drawing and disable any smoothing
-        this.context = this.canvas.getContext('2d', { alpha: false });
+        this.context = this.canvas.getContext('2d', {alpha: false });
         this.context.imageSmoothingEnabled = false;
         this.context.mozImageSmoothingEnabled = false;
         this.context.oImageSmoothingEnabled = false;
         this.context.webkitImageSmoothingEnabled = false;
         this.context.msImageSmoothingEnabled = false;
+
+        // Used for post-processing canvas drawing functions since they add alpha
+        this.offscreenToolCanvas = new OffscreenCanvas(72, 40);
+        this.offscreenToolContext = this.offscreenToolCanvas.getContext('2d', {alpha: false });
 
         // Add the canvas to the canvas parent div
         this.divCanvasParent.appendChild(this.canvas);
@@ -392,6 +396,7 @@ class SpriteTabCanvas{
     #handleDrawing(event){
         // Start this drawing operation
         this.context.beginPath();
+        this.offscreenToolContext.beginPath();
 
         // Set this drawing operation's color using the focus of the current color button for state
         if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")){
@@ -417,14 +422,9 @@ class SpriteTabCanvas{
                 // If in brush mode, a click should place a pixel
                 if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
                     this.context.fillRect(x, y, 1, 1);
-                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
                 }
             }else if(event.type == "mousemove"){
-                if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
-                    // If in brush mode, place pixels as the mouse moves
-                    this.context.fillRect(x, y, 1, 1);
-                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
-                }else if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
+                if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
                     // If in rectangle mode, restore from start frame, find top-left coordinate, find
                     // width and height, then draw filled or outline rectangle depending on the checkbox
                     this.context.putImageData(this.drawingStartFrame, 0, 0);
@@ -443,9 +443,73 @@ class SpriteTabCanvas{
                     }
                 }else if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")){
                     // If in oval mode, restore from start frame
-                    this.context.lineWidth = 0.5;
+                    this.context.lineWidth = 0.1;
                     this.context.putImageData(this.drawingStartFrame, 0, 0);
-                    this.context.ellipse(x, y, 10, 15, Math.PI / 4, 0, 2 * Math.PI);
+
+                    let smallestX = x < this.drawingStartX ? x : this.drawingStartX;
+                    let smallestY = y < this.drawingStartY ? y : this.drawingStartY;
+                    let width = Math.abs(x - this.drawingStartX)+1;
+                    let height = Math.abs(y - this.drawingStartY)+1;
+
+                    this.offscreenToolCanvas.width = width;
+                    this.offscreenToolCanvas.height = height;
+
+                    this.offscreenToolContext.lineWidth = this.context.lineWidth;
+                    this.offscreenToolContext.fillStyle = "red";
+                    this.offscreenToolContext.strokeStyle = "red";
+
+                    this.offscreenToolContext.ellipse(width/2, height/2, width/2, height/2, 0, 0, 2 * Math.PI);
+                    this.offscreenToolContext.stroke();
+                    if(this.checkboxSpriteEditorFilled.checked){
+                        this.offscreenToolContext.fill();
+                    }
+
+                    let offscreenToolImageData = this.offscreenToolContext.getImageData(0, 0, width, height);
+                    for(let ipx = 0; ipx<offscreenToolImageData.data.length; ipx += 4) {
+                        if(offscreenToolImageData.data[ipx] > 7){
+                            let py = Math.floor((ipx/4)/width);
+                            let px = (ipx/4) % width; 
+                            this.context.fillRect(smallestX+px, smallestY+py, 1, 1);
+                        }
+                    }
+                }if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
+                    // If in brush mode, place pixels as the mouse moves
+                    this.context.fillRect(x, y, 1, 1);
+                }else if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")){
+                    // If in line mode, restore from start frame
+                    this.context.lineWidth = 0.1;
+                    this.context.putImageData(this.drawingStartFrame, 0, 0);
+
+                    // this.context.moveTo(this.drawingStartX, this.drawingStartY);
+                    // this.context.lineTo(x, y);
+
+                    let smallestX = x < this.drawingStartX ? x : this.drawingStartX;
+                    let smallestY = y < this.drawingStartY ? y : this.drawingStartY;
+                    let width = Math.abs(x - this.drawingStartX)+1;
+                    let height = Math.abs(y - this.drawingStartY)+1;
+
+                    this.offscreenToolCanvas.width = width;
+                    this.offscreenToolCanvas.height = height;
+
+                    this.offscreenToolContext.lineWidth = this.context.lineWidth;
+                    this.offscreenToolContext.fillStyle = "red";
+                    this.offscreenToolContext.strokeStyle = "red";
+
+                    this.offscreenToolContext.moveTo(this.drawingStartX-smallestX, this.drawingStartY-smallestY);
+                    this.offscreenToolContext.lineTo(x-smallestX, y-smallestY);
+                    this.offscreenToolContext.stroke();
+                    if(this.checkboxSpriteEditorFilled.checked){
+                        this.offscreenToolContext.fill();
+                    }
+
+                    let offscreenToolImageData = this.offscreenToolContext.getImageData(0, 0, width, height);
+                    for(let ipx = 0; ipx<offscreenToolImageData.data.length; ipx += 4) {
+                        if(offscreenToolImageData.data[ipx] > 12){
+                            let py = Math.floor((ipx/4)/width);
+                            let px = (ipx/4) % width; 
+                            this.context.fillRect(smallestX+px, smallestY+py, 1, 1);
+                        }
+                    }
                 }
             }else if(event.type == "mouseup"){
 
@@ -454,7 +518,9 @@ class SpriteTabCanvas{
 
         // End this drawing operation
         this.context.stroke();
-
+        if(this.checkboxSpriteEditorFilled.checked){
+            this.context.fill();
+        }
         this.#updateSpriteFrame();
     }
 

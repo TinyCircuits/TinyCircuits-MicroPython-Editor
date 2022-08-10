@@ -28,6 +28,8 @@ class WorkspaceSelection{
                     if(this.entryDictList[iex][0].classList.contains("btn-primary-focus")){
                         this.entryDictList[iex][0].classList.add("btn-primary");
                         this.entryDictList[iex][0].classList.remove("btn-primary-focus");
+                        this.entryDictList[iex][0].classList.remove("border");
+                        this.entryDictList[iex][0].classList.remove("border-primary-focus");
                     }else if(this.entryDictList[iex][0].classList.contains("btn-accent-focus")){
                         this.entryDictList[iex][0].classList.add("btn-accent");
                         this.entryDictList[iex][0].classList.remove("btn-accent-focus");
@@ -51,6 +53,8 @@ class WorkspaceSelection{
                 if(entry[0].classList.contains("btn-primary")){
                     entry[0].classList.remove("btn-primary");
                     entry[0].classList.add("btn-primary-focus");
+                    entry[0].classList.add("border");
+                    entry[0].classList.add("border-primary-focus");
                 }else if(entry[0].classList.contains("btn-accent")){
                     entry[0].classList.remove("btn-accent");
                     entry[0].classList.add("btn-accent-focus");

@@ -101,6 +101,8 @@ class SpriteTab{
 
         this.divTab.classList.remove("btn-primary");
         this.divTab.classList.add("btn-primary-focus");
+        this.divTab.classList.add("border");
+        this.divTab.classList.add("border-primary-focus");
         this.selected = true;
         this.#saveTabData();
 
@@ -111,6 +113,8 @@ class SpriteTab{
     unselect(){
         this.divTab.classList.add("btn-primary");
         this.divTab.classList.remove("btn-primary-focus");
+        this.divTab.classList.remove("border");
+        this.divTab.classList.remove("border-primary-focus");
         this.selected = false;
         this.#saveTabData();
 

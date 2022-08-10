@@ -25,6 +25,8 @@ class SpriteTabCanvas{
         document.getElementById("btnSpriteEditorZoomOut").addEventListener("click", this.listenerZoomOut);
         document.getElementById("btnSpriteEditorFitCanvas").addEventListener("click", this.listenerFitCanvas);
         
+        this.checkboxSpriteEditorFilled = document.getElementById("checkboxSpriteEditorFilled");
+
         this.btnSpriteEditorBrushTool = document.getElementById("btnSpriteEditorBrushTool");
         this.btnSpriteEditorRectangle = document.getElementById("btnSpriteEditorRectangle");
         this.btnSpriteEditorOval = document.getElementById("btnSpriteEditorOval");
@@ -45,49 +47,54 @@ class SpriteTabCanvas{
         this.#setupFrameList();
     }
 
+    #toolFocusReplace(element){
+        element.classList.replace("btn-primary-focus", "btn-primary");
+        element.classList.remove("border");
+        element.classList.remove("border-primary-focus");
+    }
+
+    #toolFocusToggle(element){
+        element.classList.toggle("btn-primary-focus");
+        element.classList.toggle("btn-primary");
+        element.classList.toggle("border");
+        element.classList.toggle("border-primary-focus");
+    }
 
     // Keep track of which tool is toggle for this drawing canvas in relation to global element button presses
     #updateToolState(event){
-        this.btnSpriteEditorBrushTool.classList.replace("btn-primary-focus", "btn-primary");
-        this.btnSpriteEditorRectangle.classList.replace("btn-primary-focus", "btn-primary");
-        this.btnSpriteEditorOval.classList.replace("btn-primary-focus", "btn-primary");
-        this.btnSpriteEditorLine.classList.replace("btn-primary-focus", "btn-primary");
-        this.btnSpriteEditorBucket.classList.replace("btn-primary-focus", "btn-primary");
+        this.#toolFocusReplace(this.btnSpriteEditorBrushTool);
+        this.#toolFocusReplace(this.btnSpriteEditorRectangle);
+        this.#toolFocusReplace(this.btnSpriteEditorOval);
+        this.#toolFocusReplace(this.btnSpriteEditorLine);
+        this.#toolFocusReplace(this.btnSpriteEditorBucket);
 
         if(event.currentTarget.id == "btnSpriteEditorBrushTool"){
-            this.btnSpriteEditorBrushTool.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorBrushTool.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorBrushTool);
             if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBrushTool");
         }else if(event.currentTarget.id == "btnSpriteEditorRectangle"){
-            this.btnSpriteEditorRectangle.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorRectangle.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorRectangle);
             if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorRectangle");
         }else if(event.currentTarget.id == "btnSpriteEditorOval"){
-            this.btnSpriteEditorOval.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorOval.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorOval);
             if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorOval");
         }else if(event.currentTarget.id == "btnSpriteEditorLine"){
-            this.btnSpriteEditorLine.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorLine.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorLine);
             if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorLine");
         }else if(event.currentTarget.id == "btnSpriteEditorBucket"){
-            this.btnSpriteEditorBucket.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorBucket.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorBucket);
             if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBucket");
         }
     }
 
     #updateColorStates(event){
-        this.btnSpriteEditorBlack.classList.replace("btn-primary-focus", "btn-primary");
-        this.btnSpriteEditorWhite.classList.replace("btn-primary-focus", "btn-primary");
+        this.#toolFocusReplace(this.btnSpriteEditorBlack);
+        this.#toolFocusReplace(this.btnSpriteEditorWhite);
 
         if(event.currentTarget.id == "btnSpriteEditorBlack"){
-            this.btnSpriteEditorBlack.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorBlack.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorBlack);
             if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorBlack");
         }else if(event.currentTarget.id == "btnSpriteEditorWhite"){
-            this.btnSpriteEditorWhite.classList.toggle("btn-primary-focus");
-            this.btnSpriteEditorWhite.classList.toggle("btn-primary");
+            this.#toolFocusToggle(this.btnSpriteEditorWhite);
             if(this.btnSpriteEditorWhite.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorWhite");
         }
     }
@@ -381,95 +388,135 @@ class SpriteTabCanvas{
     }
 
 
+    // Handles draw start (mouse down), move, and end (mouse up)
+    #handleDrawing(event){
+        // Start this drawing operation
+        this.context.beginPath();
+
+        // Set this drawing operation's color using the focus of the current color button for state
+        if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")){
+            this.context.fillStyle = "black";
+            this.context.strokeStyle = "black";
+        }else{
+            this.context.fillStyle = "white";
+            this.context.strokeStyle = "white";
+        }
+
+        // Get the cursor's x and y canvas coordinates
+        let [x, y] = this.#getCanvasXY(event);
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+
+        // Only track mouse events if left-click
+        if(event.buttons == 1){
+            if(event.type == "mousedown"){
+                // On mouse down, save the coordinates for reference in end, and save the frame to restore from as previews are drawn
+                this.drawingStartX = x;
+                this.drawingStartY = y;
+                this.drawingStartFrame = this.context.getImageData(0, 0, frameWidth, frameHeight);
+
+                // If in brush mode, a click should place a pixel
+                if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
+                    this.context.fillRect(x, y, 1, 1);
+                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+                }
+            }else if(event.type == "mousemove"){
+                if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")){
+                    // If in brush mode, place pixels as the mouse moves
+                    this.context.fillRect(x, y, 1, 1);
+                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+                }else if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
+                    // If in rectangle mode, restore from start frame, find top-left coordinate, find
+                    // width and height, then draw filled or outline rectangle depending on the checkbox
+                    this.context.putImageData(this.drawingStartFrame, 0, 0);
+                    let smallestX = x < this.drawingStartX ? x : this.drawingStartX;
+                    let smallestY = y < this.drawingStartY ? y : this.drawingStartY;
+                    let width = Math.abs(x - this.drawingStartX)+1;
+                    let height = Math.abs(y - this.drawingStartY)+1;
+
+                    if(this.checkboxSpriteEditorFilled.checked){
+                        this.context.fillRect(smallestX, smallestY, width, height);
+                    }else{
+                        this.context.fillRect(smallestX, smallestY, width, 1);              // Top
+                        this.context.fillRect(smallestX, smallestY+height, width, 1);       // Bottom
+                        this.context.fillRect(smallestX, smallestY, 1, height);             // Left
+                        this.context.fillRect(smallestX+width, smallestY, 1, height+1);     // Right
+                    }
+                }else if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")){
+                    // If in oval mode, restore from start frame
+                    this.context.lineWidth = 0.5;
+                    this.context.putImageData(this.drawingStartFrame, 0, 0);
+                    this.context.ellipse(x, y, 10, 15, Math.PI / 4, 0, 2 * Math.PI);
+                }
+            }else if(event.type == "mouseup"){
+
+            }
+        }
+
+        // End this drawing operation
+        this.context.stroke();
+
+        this.#updateSpriteFrame();
+    }
+
+
     #setupDrawing(){
         this.canvas.onmousemove = (event) => {
             const [x, y] = this.#getCanvasXY(event);
 
-            // Clear the last drawn gray pixel if it exists
-            if(this.lastColor != undefined){
-                if(this.lastColor[0] == 255){
-                    this.context.fillStyle = "white";
-                }else{
-                    this.context.fillStyle = "black";
-                }
-                this.context.beginPath();
-                this.context.fillRect(this.lastX, this.lastY, 1, 1);
-                this.context.stroke();
-            }
+            // // Clear the last drawn gray pixel if it exists
+            // if(this.lastColor != undefined){
+            //     if(this.lastColor[0] == 255){
+            //         this.context.fillStyle = "white";
+            //     }else{
+            //         this.context.fillStyle = "black";
+            //     }
+            //     this.context.beginPath();
+            //     this.context.fillRect(this.lastX, this.lastY, 1, 1);
+            //     this.context.stroke();
+            // }
 
-            // Before drawing the gray pixel, get the color under it
-            this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+            // // Before drawing the gray pixel, get the color under it
+            // this.lastColor = this.context.getImageData(x, y, 1, 1).data;
 
-            // Draw the gray/selected pixel
-            this.context.beginPath();
-            this.context.fillStyle = "gray";
-            this.context.fillRect(x, y, 1, 1);
-            this.context.stroke();
+            // // Draw the gray/selected pixel
+            // this.context.beginPath();
+            // this.context.fillStyle = "gray";
+            // this.context.fillRect(x, y, 1, 1);
+            // this.context.stroke();
 
-            if(event.buttons == 1){
-                if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")){
+            this.#handleDrawing(event);
 
-                }else if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")){
-
-                }else if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")){
-
-                }else if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")){
-
-                }else if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")){
-                    this.context.beginPath();
-                    this.context.fillStyle = "black";
-                    this.context.fillRect(x, y, 1, 1);
-                    this.context.stroke();
-    
-                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
-                    this.#updateSpriteFrame();
-                }else{
-                    this.context.beginPath();
-                    this.context.fillStyle = "white";
-                    this.context.fillRect(x, y, 1, 1);
-                    this.context.stroke();
-
-                    this.lastColor = this.context.getImageData(x, y, 1, 1).data;
-                    this.#updateSpriteFrame();
-                }
-            }
-
-            this.lastX = x;
-            this.lastY = y;
+            // this.lastX = x;
+            // this.lastY = y;
         }
         this.canvas.oncontextmenu = (event) => {
             // Prevent right-click since leaves gray pixel (hacky solution)
             event.preventDefault();
         }
         this.canvas.onmousedown = (event) => {
-            const [x, y] = this.#getCanvasXY(event);
+            // const [x, y] = this.#getCanvasXY(event);
 
-            if(event.buttons == 1){
-                this.context.beginPath();
-                this.context.fillStyle = "white";
-                this.context.fillRect(x, y, 1, 1);
-                this.context.stroke();
-                this.lastColor = this.context.getImageData(x, y, 1, 1).data;
+            this.#handleDrawing(event);
 
-                this.#updateSpriteFrame();
-            }
-
-            this.frameContext.drawImage(this.canvas, 0, 0);
-            this.lastX = x;
-            this.lastY = y;
+            // this.frameContext.drawImage(this.canvas, 0, 0);
+            // this.lastX = x;
+            // this.lastY = y;
+        }
+        this.canvas.onmouseup = (event) => {
+            this.#handleDrawing(event);
         }
         this.canvas.onmouseleave = (event) => {
-            // Clear the last drawn gray pixel if it exists
-            if(this.lastColor != undefined){
-                if(this.lastColor[0] == 255){
-                    this.context.fillStyle = "white";
-                }else{
-                    this.context.fillStyle = "black";
-                }
-                this.context.beginPath();
-                this.context.fillRect(this.lastX, this.lastY, 1, 1);
-                this.context.stroke();
-            }
+            // // Clear the last drawn gray pixel if it exists
+            // if(this.lastColor != undefined){
+            //     if(this.lastColor[0] == 255){
+            //         this.context.fillStyle = "white";
+            //     }else{
+            //         this.context.fillStyle = "black";
+            //     }
+            //     this.context.beginPath();
+            //     this.context.fillRect(this.lastX, this.lastY, 1, 1);
+            //     this.context.stroke();
+            // }
         }
     }
 

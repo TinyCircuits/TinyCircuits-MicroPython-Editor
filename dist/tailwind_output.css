@@ -3613,6 +3613,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 20%;
 }
 
+.h-\[40\%\] {
+  height: 40%;
+}
+
 .h-\[30px\] {
   height: 30px;
 }
@@ -3921,6 +3925,11 @@ body[dir="rtl"] .checkbox:checked,
 .border-black {
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
+}
+
+.border-primary-focus {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--pf, var(--p)) / var(--tw-border-opacity));
 }
 
 .border-gray-400 {

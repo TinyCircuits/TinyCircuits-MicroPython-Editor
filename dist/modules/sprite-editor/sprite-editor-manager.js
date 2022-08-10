@@ -15,13 +15,21 @@ class SpriteEditorManager{
         let lastEnabledColor = localStorage.getItem("SpriteEditorLastEnabledColor");
         if(lastEnabledTool != null){
             document.getElementById(lastEnabledTool).classList.replace("btn-primary", "btn-primary-focus");
+            document.getElementById(lastEnabledTool).classList.add("border");
+            document.getElementById(lastEnabledTool).classList.add("border-primary-focus");
         }else{
             document.getElementById("btnSpriteEditorBrushTool").classList.replace("btn-primary", "btn-primary-focus");
+            document.getElementById("btnSpriteEditorBrushTool").classList.add("border");
+            document.getElementById("btnSpriteEditorBrushTool").classList.add("border-primary-focus");
         }
         if(lastEnabledColor != null){
             document.getElementById(lastEnabledColor).classList.replace("btn-primary", "btn-primary-focus");
+            document.getElementById(lastEnabledColor).classList.add("border");
+            document.getElementById(lastEnabledColor).classList.add("border-primary-focus");
         }else{
             document.getElementById("btnSpriteEditorWhite").classList.replace("btn-primary", "btn-primary-focus");
+            document.getElementById("btnSpriteEditorWhite").classList.add("border");
+            document.getElementById("btnSpriteEditorWhite").classList.add("border-primary-focus");
         }
 
         // Track, save, and restore the filled checkbox state here

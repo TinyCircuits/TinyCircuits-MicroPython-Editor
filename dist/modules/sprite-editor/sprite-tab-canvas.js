@@ -73,43 +73,51 @@ class SpriteTabCanvas{
         const newFrameByteLength = this.#getFrameLength();  // Set the width and height above, this will be in terms of the new size
         const newSize = 17 + (newFrameByteLength * frameCount);
 
-        // Make the new sprite data array and copy over initial non-frame data (width and height was already set in old data array)
+        // Make the new sprite data array and copy over initial non-frame
+        // data (width and height was already set in old data array)
         let newSpriteData = new Uint8Array(newSize);
         newSpriteData.set(this.spriteData.slice(0, 17), 0);
 
-        // Loop through each frame in the old data, trim
-        // or expand with black, and copy to new data array
-        for(let ifx=0; ifx<frameCount; ifx++){
-            let newFrameByteOffset = 17 + (newFrameByteLength * ifx);
-            let oldFrameByteOffset = 17 + (oldFrameByteLength * ifx);
+        // Go through the frame list (that contains frames before resizing), and resize each one
+        const frameList = this.btnAddFrame.parentElement.children;
+        for(let icx=0; icx<frameList.length-1; icx++){
+            // Get this this frame's canvas and context
+            const frameCanvas = frameList[icx].children[0];
+            const context = frameCanvas.getContext('2d', {alpha: false });
 
-            // For each row, loop through each column and just copy
-            // icx < oldWidth. newHeight is in terms of pixels
-            // when in fact each byte is 8 vertical pixels (VLSB),
-            // so skip by 8 for each row index
-            for(let irx=0; irx<oldHeight; irx+=8){
-                // For each column of 8 pixels in each row
-                for(let icx=0; icx<oldWidth; icx++){
-                    // This is the index into the new sprite data
-                    let newSpriteDataIndex = icx + newWidth + (irx/8);
-                    let oldSpriteDataIndex = icx + oldWidth + (irx/8);
-                    
-                    let oldSpriteDataByte = this.spriteData[oldFrameByteOffset + oldSpriteDataIndex];
+            // Get the image data as it is now, resize the canvas (clears it), and repaint with old (auto cropped with top-left as anchor)
+            let oldImageData = context.getImageData(0, 0, oldWidth, oldHeight)
+            frameCanvas.width = newWidth;
+            frameCanvas.height = newHeight;
+            context.putImageData(oldImageData, 0, 0);
 
-                    // // If on the last row and some of the pixels/bits in these last row bytes
-                    // // exceed the dimensions of the frame, make them black too
-                    // if(irx+8 >= newHeight){
-                    //     // Figure out vertical start and end bit indices
-
-                    // }
-
-                    newSpriteData[newFrameByteOffset + newSpriteDataIndex] = oldSpriteDataByte;
-                }
-            }
+            // Put the frame data in teh new sprite data at the correct location
+            let newFrameByteOffset = 17 + (newFrameByteLength * icx);
+            newSpriteData.set(this.#imageDataToVLSB(newWidth, newHeight, newFrameByteLength, context.getImageData(0, 0, newWidth, newHeight).data), newFrameByteOffset);
         }
 
+        // Overwrite the old sprite data with the new, update all frames, and save the resized sprite data
         this.spriteData = newSpriteData;
         this.#updateFrameList();
+        this.saveCallback(this.spriteData);
+
+        // Calculate how much the width and height have changed
+        let wfactor = newWidth / parseInt(this.canvas.width);
+        let hfactor = newHeight / parseInt(this.canvas.height);
+
+        // Apply the new canvas dimensions (this clears it)
+        this.canvas.width = newWidth;
+        this.canvas.height = newHeight;
+
+        // Resize the HTML
+        this.canvas.style.width = (parseFloat(this.canvas.style.width) * wfactor) + "px";
+        this.canvas.style.height = (parseFloat(this.canvas.style.height) * hfactor) + "px";
+
+        // Repaint the drawing canvas
+        this.context.putImageData(frameList[this.frameIndex].children[0].getContext('2d', {alpha: false }).getImageData(0, 0, newWidth, newHeight), 0, 0);
+
+        // Store the canvas dimensions and position for later restoration
+        localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
     }
 
 
@@ -248,7 +256,7 @@ class SpriteTabCanvas{
         // Set the selected from index for this file
         localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
 
-        // When a selected frame is deleted the canvas is hidden, but now that a new canvas is clicked un-hide it
+        // When a *selected* frame is deleted the canvas is hidden, but now that a new canvas is clicked un-hide it
         if(this.canvas.classList.contains("invisible")){
             this.canvas.classList.remove("invisible");
         }
@@ -429,17 +437,8 @@ class SpriteTabCanvas{
     }
 
 
-    #updateSpriteFrame(){
-        // Quickly show the edits
-        this.frameContext.drawImage(this.canvas, 0, 0);
-
-        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
-        const frameByteLength = this.#getFrameLength();
-
+    #imageDataToVLSB(frameWidth, frameHeight, frameByteLength, imageData){
         let frame = new Uint8Array(frameByteLength);
-
-        // Update the frame in the file
-        let imageData = this.context.getImageData(0, 0, frameWidth, frameHeight).data;
 
         let ib = 0;
         for(let row=0; row < frameHeight; row+=8){
@@ -458,8 +457,19 @@ class SpriteTabCanvas{
             }
         }
 
+        return frame;
+    }
+
+
+    #updateSpriteFrame(){
+        // Quickly show the edits
+        this.frameContext.drawImage(this.canvas, 0, 0);
+
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+        const frameByteLength = this.#getFrameLength();
+
         let frameByteOffset = frameByteLength * this.frameIndex;
-        this.spriteData.set(frame, 17 + frameByteOffset);
+        this.spriteData.set(this.#imageDataToVLSB(frameWidth, frameHeight, frameByteLength, this.context.getImageData(0, 0, frameWidth, frameHeight).data), 17 + frameByteOffset);
 
         // Save the update
         this.saveCallback(this.spriteData);

@@ -34,6 +34,8 @@ class SpriteTabCanvas{
         this.btnSpriteEditorBucket = document.getElementById("btnSpriteEditorBucket");
         this.btnSpriteEditorBlack = document.getElementById("btnSpriteEditorBlack");
         this.btnSpriteEditorWhite = document.getElementById("btnSpriteEditorWhite");
+        this.btnSpriteEditorResize = document.getElementById("btnSpriteEditorResize");
+        this.btnSpriteEditorResizeConfirm = document.getElementById("btnSpriteEditorResizeConfirm");
 
         this.btnSpriteEditorBrushTool.addEventListener("click", this.#updateToolState.bind(this));
         this.btnSpriteEditorRectangle.addEventListener("click", this.#updateToolState.bind(this));
@@ -42,10 +44,82 @@ class SpriteTabCanvas{
         this.btnSpriteEditorBucket.addEventListener("click", this.#updateToolState.bind(this));
         this.btnSpriteEditorBlack.addEventListener("click", this.#updateColorStates.bind(this));
         this.btnSpriteEditorWhite.addEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorResize.addEventListener("click", this.#fillResizePrompt.bind(this));
+        this.btnSpriteEditorResizeConfirm.addEventListener("click", this.#resizeFrames.bind(this));
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
     }
+
+
+    #resizeFrames(newWidth, newHeight){
+        // If the width or height are undefined, must have been called
+        // from resize confirm, grab those values instead (see code.html)
+        if(newWidth == undefined || newHeight == undefined){
+            newWidth = parseInt(document.getElementById("inputModalSpriteEditorWidth").value);
+            newHeight = parseInt(document.getElementById("inputModalSpriteEditorHeight").value);
+        }
+        
+        // Grab the old frame width and height
+        const [ oldWidth, oldHeight ] = this.#getFrameWidthHeight();
+        const oldFrameByteLength = this.#getFrameLength();
+
+        // Set the new width and height in what is now the old data
+        this.spriteData[15] = newWidth;
+        this.spriteData[16] = newHeight;
+
+        // Calculate the new spriteData size since the frame size changed
+        const frameCount = this.spriteData[14];
+        const newFrameByteLength = this.#getFrameLength();  // Set the width and height above, this will be in terms of the new size
+        const newSize = 17 + (newFrameByteLength * frameCount);
+
+        // Make the new sprite data array and copy over initial non-frame data (width and height was already set in old data array)
+        let newSpriteData = new Uint8Array(newSize);
+        newSpriteData.set(this.spriteData.slice(0, 17), 0);
+
+        // Loop through each frame in the old data, trim
+        // or expand with black, and copy to new data array
+        for(let ifx=0; ifx<frameCount; ifx++){
+            let newFrameByteOffset = 17 + (newFrameByteLength * ifx);
+            let oldFrameByteOffset = 17 + (oldFrameByteLength * ifx);
+
+            // For each row, loop through each column and just copy
+            // icx < oldWidth. newHeight is in terms of pixels
+            // when in fact each byte is 8 vertical pixels (VLSB),
+            // so skip by 8 for each row index
+            for(let irx=0; irx<oldHeight; irx+=8){
+                // For each column of 8 pixels in each row
+                for(let icx=0; icx<oldWidth; icx++){
+                    // This is the index into the new sprite data
+                    let newSpriteDataIndex = icx + newWidth + (irx/8);
+                    let oldSpriteDataIndex = icx + oldWidth + (irx/8);
+                    
+                    let oldSpriteDataByte = this.spriteData[oldFrameByteOffset + oldSpriteDataIndex];
+
+                    // // If on the last row and some of the pixels/bits in these last row bytes
+                    // // exceed the dimensions of the frame, make them black too
+                    // if(irx+8 >= newHeight){
+                    //     // Figure out vertical start and end bit indices
+
+                    // }
+
+                    newSpriteData[newFrameByteOffset + newSpriteDataIndex] = oldSpriteDataByte;
+                }
+            }
+        }
+
+        this.spriteData = newSpriteData;
+        this.#updateFrameList();
+    }
+
+
+    // Get input elements in prompt defined in code.html and fill in values
+    #fillResizePrompt(event){
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+        document.getElementById("inputModalSpriteEditorWidth").value = frameWidth;
+        document.getElementById("inputModalSpriteEditorHeight").value = frameHeight;
+    }
+
 
     #toolFocusReplace(element){
         element.classList.replace("btn-primary-focus", "btn-primary");
@@ -802,6 +876,8 @@ class SpriteTabCanvas{
         this.btnSpriteEditorBucket.removeEventListener("click", this.#updateToolState.bind(this));
         this.btnSpriteEditorBlack.removeEventListener("click", this.#updateColorStates.bind(this));
         this.btnSpriteEditorWhite.removeEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorResize.removeEventListener("click", this.#fillResizePrompt.bind(this));
+        this.btnSpriteEditorResizeConfirm.removeEventListener("click", this.#resizeFrames.bind(this));
     }
 }
 

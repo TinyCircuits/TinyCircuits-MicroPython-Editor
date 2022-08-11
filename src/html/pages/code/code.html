@@ -15,9 +15,34 @@
     @@include('./saveto-dialog.html')
 
 
+    <input type="checkbox" id="modelResizeSprite" class="modal-toggle" />
+    <div class="modal">
+        <div class="modal-box relative w-[325px] border border-primary-focus">
+            <label for="modelResizeSprite" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
+            <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
+                Choose a new width and height then press confirm
+            </div>
+            <div class="flex justify-evenly items-center w-full h-fit">
+                <label class="input-group input-group-xs">
+                    <span class="select-none">Width</span>
+                    <input id="inputModalSpriteEditorWidth" type="number" value="0" class="input input-bordered input-sm w-[60px]" />
+                </label>
+                <label class="input-group input-group-xs">
+                    <span class="select-none">Height</span>
+                    <input id="inputModalSpriteEditorHeight" type="number" value="0" class="input input-bordered input-sm w-[60px]" />
+                </label>
+            </div>
+            <div class="relative w-full h-fit mt-4 flex justify-evenly font-bold select-none">
+                <label for="modelResizeSprite" id="btnSpriteEditorResizeConfirm" class="btn btn-sm btn-primary">Confirm</label>
+                <label for="modelResizeSprite" class="btn btn-sm btn-primary">Cancel</label>
+            </div>
+        </div>
+    </div>
+
+
     <input type="checkbox" id="modelAddToFolder" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative min-h-[400px] h-[400px]">
+        <div class="modal-box relative min-h-[400px] h-[400px] border border-primary-focus">
             <label for="modelAddToFolder" id="divModelAddToFolderExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <div class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a folder
@@ -31,7 +56,7 @@
 
     <input type="checkbox" id="modalInput" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative w-[300px]">
+        <div class="modal-box relative w-[300px] border border-primary-focus">
             <label for="modalInput" id="btnModalInputExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <div id="divModalInputQuestion" class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a new name:
@@ -49,7 +74,7 @@
 
     <input type="checkbox" id="modalConfirm" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative w-[300px]">
+        <div class="modal-box relative w-[300px] border border-primary-focus">
             <label for="modalConfirm" id="btnModalConfirmExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <div id="divModalConfirmQuestion" class="relative w-full h-fit p-1 flex justify-center font-bold select-none">
                 Choose a new name:

@@ -1895,6 +1895,12 @@ html {
   border-radius: var(--rounded-btn, 0.5rem);
 }
 
+.input-group {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
 .input-group > .input {
   isolation: isolate;
 }
@@ -1902,6 +1908,35 @@ html {
 .input-group > *, 
   .input-group > .input {
   border-radius: 0px;
+}
+
+.input-group-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+}
+
+.input-group :where(span) {
+  display: flex;
+  align-items: center;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.input-group :first-child {
+  border-top-left-radius: var(--rounded-btn, 0.5rem);
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--rounded-btn, 0.5rem);
+  border-bottom-right-radius: 0;
+}
+
+.input-group :last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: var(--rounded-btn, 0.5rem);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: var(--rounded-btn, 0.5rem);
 }
 
 .link {
@@ -3236,18 +3271,17 @@ body[dir="rtl"] .checkbox:checked,
   padding: 0px;
 }
 
-.checkbox-sm {
-  height: 1.25rem;
-  width: 1.25rem;
+.checkbox-xs {
+  height: 1rem;
+  width: 1rem;
 }
 
-.input-xs {
-  height: 1.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  line-height: 1.625;
+.input-sm {
+  height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 2rem;
 }
 
 .range-xs {
@@ -3503,6 +3537,11 @@ body[dir="rtl"] .checkbox:checked,
   margin-right: 1rem;
 }
 
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -3512,16 +3551,16 @@ body[dir="rtl"] .checkbox:checked,
   margin-left: 1rem;
 }
 
+.mt-4 {
+  margin-top: 1rem;
+}
+
 .ml-1 {
   margin-left: 0.25rem;
 }
 
 .mt-2 {
   margin-top: 0.5rem;
-}
-
-.mr-1 {
-  margin-right: 0.25rem;
 }
 
 .ml-2 {
@@ -3538,6 +3577,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .mt-\[-1px\] {
   margin-top: -1px;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
 }
 
 .mt-\[-3px\] {
@@ -3584,14 +3627,14 @@ body[dir="rtl"] .checkbox:checked,
   height: 2rem;
 }
 
-.h-\[400px\] {
-  height: 400px;
-}
-
 .h-fit {
   height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
+}
+
+.h-\[400px\] {
+  height: 400px;
 }
 
 .h-6 {
@@ -3622,8 +3665,12 @@ body[dir="rtl"] .checkbox:checked,
   height: 20%;
 }
 
-.h-\[40\%\] {
-  height: 40%;
+.h-\[50\%\] {
+  height: 50%;
+}
+
+.h-\[32px\] {
+  height: 32px;
 }
 
 .h-\[30px\] {
@@ -3636,10 +3683,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-40 {
   height: 10rem;
-}
-
-.h-9 {
-  height: 2.25rem;
 }
 
 .h-\[37px\] {
@@ -3692,8 +3735,16 @@ body[dir="rtl"] .checkbox:checked,
   width: 2rem;
 }
 
+.w-\[325px\] {
+  width: 325px;
+}
+
 .w-full {
   width: 100%;
+}
+
+.w-\[60px\] {
+  width: 60px;
 }
 
 .w-\[300px\] {
@@ -3726,28 +3777,16 @@ body[dir="rtl"] .checkbox:checked,
   width: 150px;
 }
 
-.w-11 {
-  width: 2.75rem;
+.w-\[32px\] {
+  width: 32px;
 }
 
-.w-0\.5 {
-  width: 0.125rem;
+.w-\[42\%\] {
+  width: 42%;
 }
 
-.w-0 {
-  width: 0px;
-}
-
-.w-40 {
-  width: 10rem;
-}
-
-.w-20 {
-  width: 5rem;
-}
-
-.w-\[1px\] {
-  width: 1px;
+.w-\[84\%\] {
+  width: 84%;
 }
 
 .w-\[30px\] {
@@ -3766,8 +3805,8 @@ body[dir="rtl"] .checkbox:checked,
   width: 1rem;
 }
 
-.w-\[85\%\] {
-  width: 85%;
+.w-\[75\%\] {
+  width: 75%;
 }
 
 .w-48 {
@@ -3850,6 +3889,10 @@ body[dir="rtl"] .checkbox:checked,
   justify-content: flex-start;
 }
 
+.justify-end {
+  justify-content: flex-end;
+}
+
 .justify-center {
   justify-content: center;
 }
@@ -3928,6 +3971,11 @@ body[dir="rtl"] .checkbox:checked,
   border-style: dashed;
 }
 
+.border-primary-focus {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--pf, var(--p)) / var(--tw-border-opacity));
+}
+
 .border-accent {
   --tw-border-opacity: 1;
   border-color: hsl(var(--a) / var(--tw-border-opacity));
@@ -3946,11 +3994,6 @@ body[dir="rtl"] .checkbox:checked,
 .border-black {
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
-}
-
-.border-primary-focus {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--pf, var(--p)) / var(--tw-border-opacity));
 }
 
 .border-gray-400 {
@@ -3986,11 +4029,6 @@ body[dir="rtl"] .checkbox:checked,
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
-.bg-accent-focus {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--af, var(--a)) / var(--tw-bg-opacity));
 }
 
 .bg-base-200 {

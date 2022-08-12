@@ -297,6 +297,87 @@ class SpriteTabCanvas{
     }
 
 
+    // Copies the frame at frameIndex and places it in front of the current frameIndex
+    #duplicateFrameAtIndex(frameIndex){
+        const frameByteLength = this.#getFrameLength();
+        let frameByteOffset = 17 + (frameByteLength * frameIndex);
+        let newSpriteData = new Uint8Array(this.spriteData.length + frameByteLength);                                                   // The sprite data will end up being its length plus one frame
+        newSpriteData.set(this.spriteData.slice(0, frameByteOffset+frameByteLength));                                                   // Copy over portion of sprite data before the duplicated frame
+        newSpriteData.set(this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength), frameByteOffset+frameByteLength);    // Duplicate frame
+        newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset+(frameByteLength*2));                 // Copy over portion of sprite data after duplicated frame
+    
+        this.spriteData = newSpriteData;
+
+        // Increase the sprite data's frame count
+        this.spriteData[14] = this.spriteData[14] + 1;
+
+        // Save the edits to the sprite data
+        this.saveCallback(this.spriteData);
+
+        if(frameIndex < this.frameIndex){
+            // Update the frame index and save it so updateFrameList selects the correct frame
+            this.frameIndex = this.frameIndex + 1;
+            localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+        }
+
+        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+        this.#updateFrameList();
+    }
+
+
+    // Moves the frame up or down depending on if moveUp is true or false
+    #moveFrame(frameIndex, moveUp){
+        const frameCount = this.spriteData[14];
+
+        // Get number of bytes in a frame and it's byte offset from the start of the data
+        const frameByteLength = this.#getFrameLength();
+        let frameByteOffset = 17 + (frameByteLength * frameIndex);
+
+        // Get the frame that is moving to a new location
+        let frameDataToMove = this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength);
+
+        let toMoveToOffsetStart = undefined;
+        let toMoveToOffsetEnd = undefined;
+
+        // Figure out which way to move the frame
+        if(moveUp == true && frameIndex > 0){         // Up
+            toMoveToOffsetStart = frameByteOffset-frameByteLength;
+            toMoveToOffsetEnd = frameByteOffset;
+
+            // Follow the moving frame if it is selected
+            if(this.frameIndex == frameIndex){
+                this.frameIndex = this.frameIndex - 1;
+            }
+        }else if(moveUp == false && frameIndex < frameCount-1){  // Down
+            toMoveToOffsetStart = frameByteOffset+frameByteLength;
+            toMoveToOffsetEnd = frameByteOffset+(frameByteLength*2);
+
+            // Follow the moving frame if it is selected
+            if(this.frameIndex == frameIndex){
+                this.frameIndex = this.frameIndex + 1;
+            }
+        }else{
+            window.showError("Moving the sprite frame this way would make it go out of bounds");
+            return;
+        }
+
+        // Grab the frame data the position the frameIndex frame is swapping places with
+        let frameDataToMoveTo = this.spriteData.slice(toMoveToOffsetStart, toMoveToOffsetEnd);
+
+        // Switch the frames
+        this.spriteData.set(frameDataToMove, toMoveToOffsetStart);
+        this.spriteData.set(frameDataToMoveTo, frameByteOffset);
+
+        this.saveCallback(this.spriteData);
+
+        // Save the frame index since it may have moved to follow the moved frame if selected
+        localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+
+        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+        this.#updateFrameList();
+    }
+
+
     // Add frame behind the leading element (typically the add frame button)
     #addFrameToList(frameIndex){
         const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
@@ -305,7 +386,7 @@ class SpriteTabCanvas{
         let frameByteOffset = 17 + (frameByteLength * frameIndex);
         let frameData = this.spriteData.slice(frameByteOffset, frameByteOffset + frameByteLength);
 
-        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this), this.#deleteFrameAtIndex.bind(this));
+        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this), this.#deleteFrameAtIndex.bind(this), this.#duplicateFrameAtIndex.bind(this), this.#moveFrame.bind(this));
         newFrame.update(frameData);
 
         return newFrame;
@@ -334,18 +415,6 @@ class SpriteTabCanvas{
                 frame.select();
             }
         }
-
-        // Update the animation preview aspect and width or height
-        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
-        let canvasSpriteFramePreview = document.getElementById("canvasSpriteFramePreview");
-
-        // if(frameWidth >= frameHeight){
-        //     // canvasSpriteFramePreview.classList.remove("h-full");
-        //     // canvasSpriteFramePreview.classList.add("w-full");
-        // }else{
-        //     // canvasSpriteFramePreview.classList.add("h-full");
-        //     // canvasSpriteFramePreview.classList.remove("w-full");
-        // }
     }
 
 

@@ -1,5 +1,5 @@
 class Frame{
-    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}, deleteCallback = (index) => {}){        
+    constructor(leadingElement, width, height, openCallback = (frameCanvas, frameContext, index) => {}, deleteCallback = (index) => {}, duplicateCallback = (index) => {}, moveFrameCallback = (index, moveUp) => {}){        
         // The leading element is where this frame should input itself,
         // and the index is the index in teh frameList of the module that
         // uses this frame
@@ -11,13 +11,15 @@ class Frame{
 
         this.openCallback = openCallback;
         this.deleteCallback = deleteCallback;
+        this.duplicateCallback = duplicateCallback;
+        this.moveFrameCallback = moveFrameCallback;
 
         // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
         this.divFrameContainer = document.createElement("div");
         this.divFrameContainer.classList = "border border-gray-400 min-w-full max-w-full mt-3 relative aspect-square flex justify-center items-center bg-base-200";
         this.divFrameContainer.onclick = (event) => {
-            // Make sure this is the actual frame container div being clicked and not the options div
-            if(event.target.toString() == "[object HTMLCanvasElement]"){
+            // Make sure clicking the options (three dots) doesn't select the frame (annoying)
+            if(event.target.toString() != "[object SVGSVGElement]" && event.target.toString() != "[object SVGPathElement]"){
                 this.select();
             }
         }
@@ -29,6 +31,7 @@ class Frame{
         this.canvas = document.createElement("canvas");
         this.canvas.classList = "crisp-canvas";
 
+        // When the frame is recreated on list update, figure out with size to use
         if(this.width >= this.height){
             this.canvas.classList.add("min-w-full");
         }else if(this.width < this.height){
@@ -63,6 +66,7 @@ class Frame{
 
         // Options div is always same and exists to indicate to the user that they can click it
         this.optionsDiv = document.createElement("div");
+        this.optionsDiv.title = "Frame options";
         this.optionsDiv.classList = "w-6 h-6 absolute opacity-0 right-0 top-0 mt-0.5 rounded-full hover:stroke-accent";
         this.optionsDiv.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
@@ -81,18 +85,43 @@ class Frame{
         this.divOptionsDropdown = document.createElement("div");
         this.divOptionsDropdown.classList = "absolute z-[1000] invisible";
         this.divOptionsDropdown.innerHTML = `
-        <ul tabindex="0" class="menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap">
+        <ul tabindex="0" class="menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap flex flex-col items-center">
+            <label><li><a>Duplicate</a></li></label>
+            <label><li><a>Move up</a></li></label>
+            <label><li><a>Move down</a></li></label>
+            <div class="divider mt-0 mb-0"></div>
             <label><li><a>Delete</a></li></label>
+            
         </ul>
         `
         this.divOptionsDropdown.onmouseleave = (event) => {
             this.divOptionsDropdown.classList.add("invisible");
         }
+
+        // Handle the duplicate button
         this.divOptionsDropdown.children[0].children[0].onclick = (event) => {
             this.divOptionsDropdown.classList.add("invisible");
-            this.deleteCallback(this.getFrameIndex());
-
+            this.duplicateCallback(this.getFrameIndex());
         }
+
+        // Handle the move up button
+        this.divOptionsDropdown.children[0].children[1].onclick = (event) => {
+            this.divOptionsDropdown.classList.add("invisible");
+            this.moveFrameCallback(this.getFrameIndex(), true);
+        }
+
+        // Handle the move down button
+        this.divOptionsDropdown.children[0].children[2].onclick = (event) => {
+            this.divOptionsDropdown.classList.add("invisible");
+            this.moveFrameCallback(this.getFrameIndex(), false);
+        }
+
+        // Handle the delete button
+        this.divOptionsDropdown.children[0].children[4].onclick = (event) => {
+            this.divOptionsDropdown.classList.add("invisible");
+            this.deleteCallback(this.getFrameIndex());
+        }
+
         document.body.appendChild(this.divOptionsDropdown);
 
 

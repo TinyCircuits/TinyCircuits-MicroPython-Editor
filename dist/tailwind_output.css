@@ -1788,6 +1788,25 @@ html {
   border-radius: var(--rounded-btn, 0.5rem);
 }
 
+.divider {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: stretch;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  height: 1rem;
+  white-space: nowrap;
+}
+
+.divider:before,
+  .divider:after {
+  content: "";
+  flex-grow: 1;
+  height: 0.125rem;
+  width: 100%;
+}
+
 .dropdown {
   position: relative;
   display: inline-block;
@@ -2665,6 +2684,20 @@ body[dir="rtl"] .checkbox:checked,
     body[dir="rtl"] .checkbox[checked="true"],
     body[dir="rtl"] .checkbox[aria-checked=true] {
   background-image: linear-gradient(45deg, transparent 65%, hsl(var(--chkbg)) 65.99%), linear-gradient(-45deg, transparent 75%, hsl(var(--chkbg)) 75.99%), linear-gradient(45deg, hsl(var(--chkbg)) 40%, transparent 40.99%), linear-gradient(-45deg, hsl(var(--chkbg)) 30%, hsl(var(--chkfg)) 30.99%, hsl(var(--chkfg)) 40%, transparent 40.99%), linear-gradient(45deg, hsl(var(--chkfg)) 50%, hsl(var(--chkbg)) 50.99%);
+}
+
+.divider:before {
+  background-color: hsl(var(--bc) / var(--tw-bg-opacity));
+  --tw-bg-opacity: 0.1;
+}
+
+.divider:after {
+  background-color: hsl(var(--bc) / var(--tw-bg-opacity));
+  --tw-bg-opacity: 0.1;
+}
+
+.divider:not(:empty) {
+  gap: 1rem;
 }
 
 .drawer-toggle:focus-visible ~ .drawer-content .drawer-button.btn-primary {
@@ -3601,6 +3634,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .mt-3 {
   margin-top: 0.75rem;
+}
+
+.mb-0 {
+  margin-bottom: 0px;
 }
 
 .block {

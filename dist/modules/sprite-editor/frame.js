@@ -14,7 +14,7 @@ class Frame{
 
         // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
         this.divFrameContainer = document.createElement("div");
-        this.divFrameContainer.classList = "border border-gray-400 min-w-full mt-3 relative";
+        this.divFrameContainer.classList = "border border-gray-400 min-w-full max-w-full mt-3 relative aspect-square flex justify-center items-center bg-base-200";
         this.divFrameContainer.onclick = (event) => {
             // Make sure this is the actual frame container div being clicked and not the options div
             if(event.target.toString() == "[object HTMLCanvasElement]"){
@@ -25,15 +25,19 @@ class Frame{
         // leadingElement.parentElement.appendChild(this.divFrameContainer);
         leadingElement.parentElement.insertBefore(this.divFrameContainer, this.leadingElement);
 
-        this.#resize();
-
         // The canvas all the drawing is done on
         this.canvas = document.createElement("canvas");
         this.canvas.classList = "crisp-canvas";
 
+        if(this.width >= this.height){
+            this.canvas.classList.add("min-w-full");
+        }else if(this.width < this.height){
+            this.canvas.classList.add("min-h-full");
+        }
+
         // Setup default dimensions
-        this.canvas.style.width = "100%";
-        this.canvas.style.height = "100%";
+        // this.canvas.style.width = "100%";
+        // this.canvas.style.height = "100%";
         this.canvas.width = this.width;
         this.canvas.height = this.height;
 
@@ -128,11 +132,6 @@ class Frame{
         this.divFrameContainer.classList.add("outline-gray-400");
 
         this.openCallback(this.canvas, this.context, this.getFrameIndex());
-    }
-
-
-    #resize(){
-        this.divFrameContainer.style.aspectRatio = this.width + "/" + this.height;
     }
 
 

@@ -46,7 +46,7 @@
 
     <!-- Main editor container where tab contents get shown/hidden -->
     <div class="absolute top-[89px] bottom-4 left-4 right-4 flex flex-row">
-        <div id="divSpriteListParent" class="flex-auto w-[15%] flex flex-col">
+        <div id="divSpriteListParent" class="w-[15%] flex flex-col">
 
             <!-- Frame List -->
             <div id="divSpriteFrameList" class="h-full border border-accent-focus rounded-md relative overflow-auto bg-base-100">
@@ -61,9 +61,13 @@
             </div>
 
             <!-- Frame animation preview -->
-            <div id="divSpriteFramePreview" class="overflow-hidden h-40 border border-accent-focus rounded-md relative overflow-auto bg-base-100 flex items-center justify-center">
-                <canvas id="canvasSpriteFramePreview" width="72" height="40" style="width:100%; aspect-ratio:72/40; margin:16px;" class="crisp-canvas">
-                </canvas>
+            <div id="divSpriteFramePreview" class="h-40 border border-accent-focus rounded-md relative overflow-hidden bg-base-100">
+                <div class="absolute top-2 left-2 bottom-2 right-2">
+                    <div class="h-full w-full flex items-center justify-center min-w-full max-w-full min-h-full max-h-full">
+                        <canvas id="canvasSpriteFramePreview" width="72" height="40" class="crisp-canvas w-full h-full object-contain">
+                        </canvas>
+                    </div>
+                </div>
             </div>
 
             <!-- Animation playback controls parent -->
@@ -89,8 +93,6 @@
                     <!-- Canvas -->
                 </div>
             </div>
-
-            
         </div>
 
         <!-- Drawing tools parent -->
@@ -234,7 +236,6 @@
 </div>
         </div>
     </div>
-
 </div>
                     </div>
     

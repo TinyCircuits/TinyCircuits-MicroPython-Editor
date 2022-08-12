@@ -334,6 +334,18 @@ class SpriteTabCanvas{
                 frame.select();
             }
         }
+
+        // Update the animation preview aspect and width or height
+        const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
+        let canvasSpriteFramePreview = document.getElementById("canvasSpriteFramePreview");
+
+        // if(frameWidth >= frameHeight){
+        //     // canvasSpriteFramePreview.classList.remove("h-full");
+        //     // canvasSpriteFramePreview.classList.add("w-full");
+        // }else{
+        //     // canvasSpriteFramePreview.classList.add("h-full");
+        //     // canvasSpriteFramePreview.classList.remove("w-full");
+        // }
     }
 
 

@@ -1,4 +1,5 @@
 import { Frame } from "./frame.js";
+import { DB } from "../db/js/db.js";
 
 class SpriteTabCanvas{
     constructor(filePath, spriteData, divEditorMainID, divSpriteFrameListMainID, saveCallback, spriteAnimationPreview){
@@ -34,90 +35,127 @@ class SpriteTabCanvas{
         this.btnSpriteEditorBucket = document.getElementById("btnSpriteEditorBucket");
         this.btnSpriteEditorBlack = document.getElementById("btnSpriteEditorBlack");
         this.btnSpriteEditorWhite = document.getElementById("btnSpriteEditorWhite");
+
+        this.btnSpriteEditorUndo = document.getElementById("btnSpriteEditorUndo");
+        this.btnSpriteEditorRedo = document.getElementById("btnSpriteEditorRedo");
         this.btnSpriteEditorResize = document.getElementById("btnSpriteEditorResize");
         this.btnSpriteEditorResizeConfirm = document.getElementById("btnSpriteEditorResizeConfirm");
 
-        this.btnSpriteEditorBrushTool.addEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorRectangle.addEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorOval.addEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorLine.addEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorBucket.addEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorBlack.addEventListener("click", this.#updateColorStates.bind(this));
-        this.btnSpriteEditorWhite.addEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorUndo.addEventListener("click", this.#undo.bind(this));
+        this.btnSpriteEditorRedo.addEventListener("click", this.#redo.bind(this));
         this.btnSpriteEditorResize.addEventListener("click", this.#fillResizePrompt.bind(this));
         this.btnSpriteEditorResizeConfirm.addEventListener("click", this.#resizeFrames.bind(this));
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
+
+        // Undo list is stored in a database since raw frames are often stored (remove forward slashes and periods for keypath)
+        this.undoDB = new DB("spriteUndoList" + this.filePath.replaceAll("/", "").replaceAll(".", ""));
+    }
+
+
+    #undo(event){
+        if(this.shown){
+            console.warn(this.filePath);
+        }
+    }
+
+
+    #redo(event){
+        if(this.shown){
+            console.warn(this.filePath);
+        }
+    }
+
+
+    #addUndoInstance(){
+        // // First, get the undo count and increase it
+        // this.undoDB.getFile("undoCount", (data) => {
+        //     let undoIndex = data;
+
+        //     if(undoIndex == undefined){
+        //         undoIndex = 1;
+        //     }else{
+        //         undoIndex = undoIndex + 1;
+        //     }
+        //     this.undoDB.addFile(undoIndex, "undoCount");
+            
+        //     // Second, make another undo instance with this new undo count/index
+        //     let instance = {index: undoIndex, spriteData: this.spriteData};
+
+        //     this.undoDB.addFile(JSON.stringify(instance), undoIndex);
+        // });
     }
 
 
     #resizeFrames(newWidth, newHeight){
-        // If the width or height are undefined, must have been called
-        // from resize confirm, grab those values instead (see code.html)
-        if(newWidth == undefined || newHeight == undefined){
-            newWidth = parseInt(document.getElementById("inputModalSpriteEditorWidth").value);
-            newHeight = parseInt(document.getElementById("inputModalSpriteEditorHeight").value);
+        if(this.shown){
+            // If the width or height are undefined, must have been called
+            // from resize confirm, grab those values instead (see code.html)
+            if(newWidth == undefined || newHeight == undefined){
+                newWidth = parseInt(document.getElementById("inputModalSpriteEditorWidth").value);
+                newHeight = parseInt(document.getElementById("inputModalSpriteEditorHeight").value);
+            }
+            
+            // Grab the old frame width and height
+            const [ oldWidth, oldHeight ] = this.#getFrameWidthHeight();
+            const oldFrameByteLength = this.#getFrameLength();
+
+            // Set the new width and height in what is now the old data
+            this.spriteData[15] = newWidth;
+            this.spriteData[16] = newHeight;
+
+            // Calculate the new spriteData size since the frame size changed
+            const frameCount = this.spriteData[14];
+            const newFrameByteLength = this.#getFrameLength();  // Set the width and height above, this will be in terms of the new size
+            const newSize = 17 + (newFrameByteLength * frameCount);
+
+            // Make the new sprite data array and copy over initial non-frame
+            // data (width and height was already set in old data array)
+            let newSpriteData = new Uint8Array(newSize);
+            newSpriteData.set(this.spriteData.slice(0, 17), 0);
+
+            // Go through the frame list (that contains frames before resizing), and resize each one
+            const frameList = this.btnAddFrame.parentElement.children;
+            for(let icx=0; icx<frameList.length-1; icx++){
+                // Get this this frame's canvas and context
+                const frameCanvas = frameList[icx].children[0];
+                const context = frameCanvas.getContext('2d', {alpha: false });
+
+                // Get the image data as it is now, resize the canvas (clears it), and repaint with old (auto cropped with top-left as anchor)
+                let oldImageData = context.getImageData(0, 0, oldWidth, oldHeight)
+                frameCanvas.width = newWidth;
+                frameCanvas.height = newHeight;
+                context.putImageData(oldImageData, 0, 0);
+
+                // Put the frame data in teh new sprite data at the correct location
+                let newFrameByteOffset = 17 + (newFrameByteLength * icx);
+                newSpriteData.set(this.#imageDataToVLSB(newWidth, newHeight, newFrameByteLength, context.getImageData(0, 0, newWidth, newHeight).data), newFrameByteOffset);
+            }
+
+            // Overwrite the old sprite data with the new, update all frames, and save the resized sprite data
+            this.spriteData = newSpriteData;
+            this.#updateFrameList();
+            this.saveCallback(this.spriteData);
+
+            // Calculate how much the width and height have changed
+            let wfactor = newWidth / parseInt(this.canvas.width);
+            let hfactor = newHeight / parseInt(this.canvas.height);
+
+            // Apply the new canvas dimensions (this clears it)
+            this.canvas.width = newWidth;
+            this.canvas.height = newHeight;
+
+            // Resize the HTML
+            this.canvas.style.width = (parseFloat(this.canvas.style.width) * wfactor) + "px";
+            this.canvas.style.height = (parseFloat(this.canvas.style.height) * hfactor) + "px";
+
+            // Repaint the drawing canvas
+            this.context.putImageData(frameList[this.frameIndex].children[0].getContext('2d', {alpha: false }).getImageData(0, 0, newWidth, newHeight), 0, 0);
+
+            // Store the canvas dimensions and position for later restoration
+            localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
         }
-        
-        // Grab the old frame width and height
-        const [ oldWidth, oldHeight ] = this.#getFrameWidthHeight();
-        const oldFrameByteLength = this.#getFrameLength();
-
-        // Set the new width and height in what is now the old data
-        this.spriteData[15] = newWidth;
-        this.spriteData[16] = newHeight;
-
-        // Calculate the new spriteData size since the frame size changed
-        const frameCount = this.spriteData[14];
-        const newFrameByteLength = this.#getFrameLength();  // Set the width and height above, this will be in terms of the new size
-        const newSize = 17 + (newFrameByteLength * frameCount);
-
-        // Make the new sprite data array and copy over initial non-frame
-        // data (width and height was already set in old data array)
-        let newSpriteData = new Uint8Array(newSize);
-        newSpriteData.set(this.spriteData.slice(0, 17), 0);
-
-        // Go through the frame list (that contains frames before resizing), and resize each one
-        const frameList = this.btnAddFrame.parentElement.children;
-        for(let icx=0; icx<frameList.length-1; icx++){
-            // Get this this frame's canvas and context
-            const frameCanvas = frameList[icx].children[0];
-            const context = frameCanvas.getContext('2d', {alpha: false });
-
-            // Get the image data as it is now, resize the canvas (clears it), and repaint with old (auto cropped with top-left as anchor)
-            let oldImageData = context.getImageData(0, 0, oldWidth, oldHeight)
-            frameCanvas.width = newWidth;
-            frameCanvas.height = newHeight;
-            context.putImageData(oldImageData, 0, 0);
-
-            // Put the frame data in teh new sprite data at the correct location
-            let newFrameByteOffset = 17 + (newFrameByteLength * icx);
-            newSpriteData.set(this.#imageDataToVLSB(newWidth, newHeight, newFrameByteLength, context.getImageData(0, 0, newWidth, newHeight).data), newFrameByteOffset);
-        }
-
-        // Overwrite the old sprite data with the new, update all frames, and save the resized sprite data
-        this.spriteData = newSpriteData;
-        this.#updateFrameList();
-        this.saveCallback(this.spriteData);
-
-        // Calculate how much the width and height have changed
-        let wfactor = newWidth / parseInt(this.canvas.width);
-        let hfactor = newHeight / parseInt(this.canvas.height);
-
-        // Apply the new canvas dimensions (this clears it)
-        this.canvas.width = newWidth;
-        this.canvas.height = newHeight;
-
-        // Resize the HTML
-        this.canvas.style.width = (parseFloat(this.canvas.style.width) * wfactor) + "px";
-        this.canvas.style.height = (parseFloat(this.canvas.style.height) * hfactor) + "px";
-
-        // Repaint the drawing canvas
-        this.context.putImageData(frameList[this.frameIndex].children[0].getContext('2d', {alpha: false }).getImageData(0, 0, newWidth, newHeight), 0, 0);
-
-        // Store the canvas dimensions and position for later restoration
-        localStorage.setItem("SpriteEditorCanvasDimensionsPosition" + this.filePath, JSON.stringify([this.canvas.style.width, this.canvas.style.height, this.canvas.style.left, this.canvas.style.top]));
     }
 
 
@@ -126,59 +164,6 @@ class SpriteTabCanvas{
         const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
         document.getElementById("inputModalSpriteEditorWidth").value = frameWidth;
         document.getElementById("inputModalSpriteEditorHeight").value = frameHeight;
-    }
-
-
-    #toolFocusReplace(element){
-        element.classList.replace("btn-primary-focus", "btn-primary");
-        element.classList.remove("border");
-        element.classList.remove("border-primary-focus");
-    }
-
-    #toolFocusToggle(element){
-        element.classList.toggle("btn-primary-focus");
-        element.classList.toggle("btn-primary");
-        element.classList.toggle("border");
-        element.classList.toggle("border-primary-focus");
-    }
-
-    // Keep track of which tool is toggle for this drawing canvas in relation to global element button presses
-    #updateToolState(event){
-        this.#toolFocusReplace(this.btnSpriteEditorBrushTool);
-        this.#toolFocusReplace(this.btnSpriteEditorRectangle);
-        this.#toolFocusReplace(this.btnSpriteEditorOval);
-        this.#toolFocusReplace(this.btnSpriteEditorLine);
-        this.#toolFocusReplace(this.btnSpriteEditorBucket);
-
-        if(event.currentTarget.id == "btnSpriteEditorBrushTool"){
-            this.#toolFocusToggle(this.btnSpriteEditorBrushTool);
-            if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBrushTool");
-        }else if(event.currentTarget.id == "btnSpriteEditorRectangle"){
-            this.#toolFocusToggle(this.btnSpriteEditorRectangle);
-            if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorRectangle");
-        }else if(event.currentTarget.id == "btnSpriteEditorOval"){
-            this.#toolFocusToggle(this.btnSpriteEditorOval);
-            if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorOval");
-        }else if(event.currentTarget.id == "btnSpriteEditorLine"){
-            this.#toolFocusToggle(this.btnSpriteEditorLine);
-            if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorLine");
-        }else if(event.currentTarget.id == "btnSpriteEditorBucket"){
-            this.#toolFocusToggle(this.btnSpriteEditorBucket);
-            if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBucket");
-        }
-    }
-
-    #updateColorStates(event){
-        this.#toolFocusReplace(this.btnSpriteEditorBlack);
-        this.#toolFocusReplace(this.btnSpriteEditorWhite);
-
-        if(event.currentTarget.id == "btnSpriteEditorBlack"){
-            this.#toolFocusToggle(this.btnSpriteEditorBlack);
-            if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorBlack");
-        }else if(event.currentTarget.id == "btnSpriteEditorWhite"){
-            this.#toolFocusToggle(this.btnSpriteEditorWhite);
-            if(this.btnSpriteEditorWhite.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorWhite");
-        }
     }
 
 
@@ -238,7 +223,7 @@ class SpriteTabCanvas{
 
 
     // Function called by frame class to open a frame at the current index (index in children of parent element for frame list)
-    #openFrameAtIndex(frameCanvas, frameContext, frameIndex){
+    #openFrameAtIndex(frameCanvas, frameIndex){
         if(this.canvas == undefined){
             this.#setupDrawingCanvas();
         }
@@ -248,7 +233,7 @@ class SpriteTabCanvas{
         this.context.drawImage(frameCanvas, 0, 0);
 
         // Store the context of the current frame
-        this.frameContext = frameContext;
+        this.frameContext = frameCanvas.getContext('2d', { alpha: false });
 
         // The index of the current frame (changes when frames are moved or deleted)
         this.frameIndex = frameIndex;
@@ -265,131 +250,238 @@ class SpriteTabCanvas{
 
     // Typically called from a frame object to remove the frame from the dom and the sprite data
     #deleteFrameAtIndex(frameIndex){
-        // Remove the portion of data containing the the frame's data
-        const frameByteLength = this.#getFrameLength();
-        let frameByteOffset = 17 + (frameByteLength * frameIndex);
-        let newSpriteData = new Uint8Array(this.spriteData.length - frameByteLength);               // The sprite data will end up being its length minus one frame
-        newSpriteData.set(this.spriteData.slice(0, frameByteOffset));                               // Copy over portion of sprite data before the frame
-        newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset); // Copy over portion of sprite data after the frame
+        if(this.shown){
+            // Remove the portion of data containing the the frame's data
+            const frameByteLength = this.#getFrameLength();
+            let frameByteOffset = 17 + (frameByteLength * frameIndex);
+            let newSpriteData = new Uint8Array(this.spriteData.length - frameByteLength);               // The sprite data will end up being its length minus one frame
+            newSpriteData.set(this.spriteData.slice(0, frameByteOffset));                               // Copy over portion of sprite data before the frame
+            newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset); // Copy over portion of sprite data after the frame
 
-        this.spriteData = newSpriteData;
+            this.spriteData = newSpriteData;
 
-        // Decrease the sprite data's frame count
-        this.spriteData[14] = this.spriteData[14] - 1;
+            // Decrease the sprite data's frame count
+            this.spriteData[14] = this.spriteData[14] - 1;
 
-        // Save the edits to the sprite data
-        this.saveCallback(this.spriteData);
+            // Save the edits to the sprite data
+            this.saveCallback(this.spriteData);
 
-        // Remove the frame from the dom list
-        this.divFrameListParent.removeChild(this.divFrameListParent.children[frameIndex]);
+            // Remove the frame from the dom list
+            this.divFrameListParent.removeChild(this.divFrameListParent.children[frameIndex]);
 
-        // Only hide the canvas if the last opened/edited frame is the same as this one being deleted
-        if(this.frameIndex == frameIndex){
-            this.canvas.classList.add("invisible");
+            // Only hide the canvas if the last opened/edited frame is the same as this one being deleted
+            if(this.frameIndex == frameIndex){
+                this.canvas.classList.add("invisible");
+            }
+
+            // Update the frame index and save it so updateFrameList selects the correct frame
+            this.frameIndex = this.frameIndex - 1;
+            localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+
+            // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+            this.#updateFrameList();
         }
-
-        // Update the frame index and save it so updateFrameList selects the correct frame
-        this.frameIndex = this.frameIndex - 1;
-        localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
-
-        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
-        this.#updateFrameList();
     }
 
 
     // Copies the frame at frameIndex and places it in front of the current frameIndex
     #duplicateFrameAtIndex(frameIndex){
-        const frameByteLength = this.#getFrameLength();
-        let frameByteOffset = 17 + (frameByteLength * frameIndex);
-        let newSpriteData = new Uint8Array(this.spriteData.length + frameByteLength);                                                   // The sprite data will end up being its length plus one frame
-        newSpriteData.set(this.spriteData.slice(0, frameByteOffset+frameByteLength));                                                   // Copy over portion of sprite data before the duplicated frame
-        newSpriteData.set(this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength), frameByteOffset+frameByteLength);    // Duplicate frame
-        newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset+(frameByteLength*2));                 // Copy over portion of sprite data after duplicated frame
-    
-        this.spriteData = newSpriteData;
+        if(this.shown){
+            const frameByteLength = this.#getFrameLength();
+            let frameByteOffset = 17 + (frameByteLength * frameIndex);
+            let newSpriteData = new Uint8Array(this.spriteData.length + frameByteLength);                                                   // The sprite data will end up being its length plus one frame
+            newSpriteData.set(this.spriteData.slice(0, frameByteOffset+frameByteLength));                                                   // Copy over portion of sprite data before the duplicated frame
+            newSpriteData.set(this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength), frameByteOffset+frameByteLength);    // Duplicate frame
+            newSpriteData.set(this.spriteData.slice(frameByteOffset+frameByteLength), frameByteOffset+(frameByteLength*2));                 // Copy over portion of sprite data after duplicated frame
+        
+            this.spriteData = newSpriteData;
 
-        // Increase the sprite data's frame count
-        this.spriteData[14] = this.spriteData[14] + 1;
+            // Increase the sprite data's frame count
+            this.spriteData[14] = this.spriteData[14] + 1;
 
-        // Save the edits to the sprite data
-        this.saveCallback(this.spriteData);
+            // Save the edits to the sprite data
+            this.saveCallback(this.spriteData);
 
-        if(frameIndex < this.frameIndex){
-            // Update the frame index and save it so updateFrameList selects the correct frame
-            this.frameIndex = this.frameIndex + 1;
-            localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+            if(frameIndex < this.frameIndex){
+                // Update the frame index and save it so updateFrameList selects the correct frame
+                this.frameIndex = this.frameIndex + 1;
+                localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+            }
+
+            // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+            this.#updateFrameList();
         }
-
-        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
-        this.#updateFrameList();
     }
 
 
     // Moves the frame up or down depending on if moveUp is true or false
     #moveFrame(frameIndex, moveUp){
-        const frameCount = this.spriteData[14];
+        if(this.shown){
+            const frameCount = this.spriteData[14];
 
-        // Get number of bytes in a frame and it's byte offset from the start of the data
-        const frameByteLength = this.#getFrameLength();
-        let frameByteOffset = 17 + (frameByteLength * frameIndex);
+            // Get number of bytes in a frame and it's byte offset from the start of the data
+            const frameByteLength = this.#getFrameLength();
+            let frameByteOffset = 17 + (frameByteLength * frameIndex);
 
-        // Get the frame that is moving to a new location
-        let frameDataToMove = this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength);
+            // Get the frame that is moving to a new location
+            let frameDataToMove = this.spriteData.slice(frameByteOffset, frameByteOffset+frameByteLength);
 
-        let toMoveToOffsetStart = undefined;
-        let toMoveToOffsetEnd = undefined;
+            let toMoveToOffsetStart = undefined;
+            let toMoveToOffsetEnd = undefined;
 
-        // Figure out which way to move the frame
-        if(moveUp == true && frameIndex > 0){         // Up
-            toMoveToOffsetStart = frameByteOffset-frameByteLength;
-            toMoveToOffsetEnd = frameByteOffset;
+            // Figure out which way to move the frame
+            if(moveUp == true && frameIndex > 0){         // Up
+                toMoveToOffsetStart = frameByteOffset-frameByteLength;
+                toMoveToOffsetEnd = frameByteOffset;
 
-            // Follow the moving frame if it is selected
-            if(this.frameIndex == frameIndex){
-                this.frameIndex = this.frameIndex - 1;
+                // Follow the moving frame if it is selected
+                if(this.frameIndex == frameIndex){
+                    this.frameIndex = this.frameIndex - 1;
+                }
+            }else if(moveUp == false && frameIndex < frameCount-1){  // Down
+                toMoveToOffsetStart = frameByteOffset+frameByteLength;
+                toMoveToOffsetEnd = frameByteOffset+(frameByteLength*2);
+
+                // Follow the moving frame if it is selected
+                if(this.frameIndex == frameIndex){
+                    this.frameIndex = this.frameIndex + 1;
+                }
+            }else{
+                window.showError("Moving the sprite frame this way would make it go out of bounds");
+                return;
             }
-        }else if(moveUp == false && frameIndex < frameCount-1){  // Down
-            toMoveToOffsetStart = frameByteOffset+frameByteLength;
-            toMoveToOffsetEnd = frameByteOffset+(frameByteLength*2);
 
-            // Follow the moving frame if it is selected
-            if(this.frameIndex == frameIndex){
-                this.frameIndex = this.frameIndex + 1;
-            }
-        }else{
-            window.showError("Moving the sprite frame this way would make it go out of bounds");
-            return;
+            // Grab the frame data the position the frameIndex frame is swapping places with
+            let frameDataToMoveTo = this.spriteData.slice(toMoveToOffsetStart, toMoveToOffsetEnd);
+
+            // Switch the frames
+            this.spriteData.set(frameDataToMove, toMoveToOffsetStart);
+            this.spriteData.set(frameDataToMoveTo, frameByteOffset);
+
+            this.saveCallback(this.spriteData);
+
+            // Save the frame index since it may have moved to follow the moved frame if selected
+            localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
+
+            // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
+            this.#updateFrameList();
         }
-
-        // Grab the frame data the position the frameIndex frame is swapping places with
-        let frameDataToMoveTo = this.spriteData.slice(toMoveToOffsetStart, toMoveToOffsetEnd);
-
-        // Switch the frames
-        this.spriteData.set(frameDataToMove, toMoveToOffsetStart);
-        this.spriteData.set(frameDataToMoveTo, frameByteOffset);
-
-        this.saveCallback(this.spriteData);
-
-        // Save the frame index since it may have moved to follow the moved frame if selected
-        localStorage.setItem("SpriteEditorSelectedFrame" + this.filePath, this.frameIndex);
-
-        // Re-add all frames back into list to make them re-index themselves (maybe too much for just re-indexing)
-        this.#updateFrameList();
     }
 
 
     // Add frame behind the leading element (typically the add frame button)
-    #addFrameToList(frameIndex){
+    #addFrameToList(frameIndex, selectedFrameIndex){
         const [ frameWidth, frameHeight ] = this.#getFrameWidthHeight();
         const frameByteLength = this.#getFrameLength();
 
         let frameByteOffset = 17 + (frameByteLength * frameIndex);
         let frameData = this.spriteData.slice(frameByteOffset, frameByteOffset + frameByteLength);
 
-        let newFrame = new Frame(this.btnAddFrame, frameWidth, frameHeight, this.#openFrameAtIndex.bind(this), this.#deleteFrameAtIndex.bind(this), this.#duplicateFrameAtIndex.bind(this), this.#moveFrame.bind(this));
-        newFrame.update(frameData);
+        let select = (frameDiv) => {
+            // Remove selected outline from all other frame elements
+            for(let icx=0; icx<this.btnAddFrame.parentElement.children.length; icx++){
+                this.btnAddFrame.parentElement.children[icx].classList.remove("outline");
+                this.btnAddFrame.parentElement.children[icx].classList.remove("outline-2");
+                this.btnAddFrame.parentElement.children[icx].classList.remove("outline-gray-400");
+            }
 
-        return newFrame;
+            // Add selected outline to this frame element
+            frameDiv.classList.add("outline");
+            frameDiv.classList.add("outline-2");
+            frameDiv.classList.add("outline-gray-400");
+
+            let frameIndex = Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, frameDiv);
+
+            this.#openFrameAtIndex(frameDiv.children[0], frameIndex);
+        }
+
+        // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
+        let divFrameContainer = document.createElement("div");
+        divFrameContainer.classList = "border border-gray-400 min-w-full max-w-full mt-3 relative aspect-square flex justify-center items-center bg-base-200";
+        divFrameContainer.onclick = (event) => {
+            // Make sure clicking the options (three dots) doesn't select the frame (annoying)
+            if(event.target.toString() != "[object SVGSVGElement]" && event.target.toString() != "[object SVGPathElement]"){
+                if(event.target.toString() == "[object HTMLCanvasElement]"){
+                    select(event.target.parentElement);
+                }else{
+                    select(event.target);
+                }
+            }
+        }
+
+        this.btnAddFrame.parentElement.insertBefore(divFrameContainer, this.btnAddFrame);
+
+
+        // The canvas all the drawing is done on
+        let canvas = document.createElement("canvas");
+        canvas.classList = "crisp-canvas";
+
+        // When the frame is recreated on list update, figure out with size to use
+        if(frameWidth >= frameHeight){
+            canvas.classList.add("min-w-full");
+        }else if(frameWidth < frameHeight){
+            canvas.classList.add("min-h-full");
+        }
+
+        canvas.width = frameWidth;
+        canvas.height = frameHeight;
+
+        // Get the context for drawing and disable any smoothing
+        let context = canvas.getContext('2d', { alpha: false });
+        context.imageSmoothingEnabled = false;
+        context.mozImageSmoothingEnabled = false;
+        context.oImageSmoothingEnabled = false;
+        context.webkitImageSmoothingEnabled = false;
+        context.msImageSmoothingEnabled = false;
+
+        // Add the canvas to the canvas parent div
+        divFrameContainer.appendChild(canvas);
+
+        // Div for frame count
+        let divFrameIndexIndicator = document.createElement("div");
+        divFrameIndexIndicator.classList = "absolute bg-transparent top-0 left-0 w-fit h-fit px-1 opacity-0 transition-all ease-linear duration-100 rounded-br-md select-none"
+        divFrameIndexIndicator.innerHTML = frameIndex;
+        divFrameContainer.appendChild(divFrameIndexIndicator);
+
+
+        // Options div is always same and exists to indicate to the user that they can click it
+        let optionsDiv = document.createElement("div");
+        optionsDiv.title = "Frame options";
+        optionsDiv.classList = "w-6 h-6 absolute opacity-0 right-0 top-0 mt-0.5 rounded-full hover:stroke-accent";
+        optionsDiv.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-accent" viewBox="0 0 20 20">
+                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+        `;
+        optionsDiv.onclick = (event) => {
+            // let rect = this.optionsDiv.getBoundingClientRect();
+            // this.divOptionsDropdown.style.left = rect.x + "px";
+            // this.divOptionsDropdown.style.top = rect.y + "px";
+            // this.divOptionsDropdown.classList.remove("invisible");
+        }
+        divFrameContainer.appendChild(optionsDiv);
+
+
+
+        // Show/hide frame index and options div on mouse hover over frame
+        divFrameContainer.onmouseenter = (event) => {
+            event.currentTarget.children[1].classList.add("opacity-100");
+            event.currentTarget.children[1].classList.remove("opacity-0");
+            event.currentTarget.children[2].classList.add("opacity-100");
+            event.currentTarget.children[2].classList.remove("opacity-0");
+        }
+        divFrameContainer.onmouseleave = (event) => {
+            event.currentTarget.children[1].classList.remove("opacity-100");
+            event.currentTarget.children[1].classList.add("opacity-0");
+            event.currentTarget.children[2].classList.remove("opacity-100");
+            event.currentTarget.children[2].classList.add("opacity-0");
+        }
+
+        context.putImageData(this.#VLSBToImageData(frameWidth, frameHeight, frameData), 0, 0);
+
+        if(frameIndex == selectedFrameIndex){
+            select(divFrameContainer);
+        }
     }
 
 
@@ -406,14 +498,9 @@ class SpriteTabCanvas{
         let selectedFrameIndex = localStorage.getItem("SpriteEditorSelectedFrame" + this.filePath);
         if(selectedFrameIndex == null) selectedFrameIndex = 0;
 
-        // For through frame count and call method to add frames from file sprite data
+        // Go through frame count and call method to add frames from file sprite data
         for(let ifx=0; ifx<frameCount; ifx++){
-            let frame = this.#addFrameToList(ifx);
-
-            // Does the index match the one that was retrieved from localStorage? If so, select it
-            if(ifx == selectedFrameIndex){
-                frame.select();
-            }
+            let frame = this.#addFrameToList(ifx, selectedFrameIndex);
         }
     }
 
@@ -542,6 +629,31 @@ class SpriteTabCanvas{
     }
 
 
+    #VLSBToImageData(frameWidth, frameHeight, vlsbFrameData){
+        let displayPixelBuffer = new Uint8ClampedArray(new ArrayBuffer(frameWidth * frameHeight * 4));
+
+        let ib = 0;
+        for(let row=0; row < frameHeight; row+=8){
+            for(let col=0; col < frameWidth; col++){
+                for(let i=0; i<8; i++){
+                    const x = col;
+                    const y = row + i;
+                    const bit = ((vlsbFrameData[ib] & (1 << i)) === 0 ? 0 : 255);
+                    const p = (y * frameWidth + x) * 4;
+                    displayPixelBuffer[p] = bit;
+                    displayPixelBuffer[p+1] = bit;
+                    displayPixelBuffer[p+2] = bit;
+                    displayPixelBuffer[p+3] = 255;
+                }
+        
+                ib += 1;
+            }
+        }
+
+        return new ImageData(displayPixelBuffer, frameWidth, frameHeight);
+    }
+
+
     #updateSpriteFrame(){
         // Quickly show the edits
         this.frameContext.drawImage(this.canvas, 0, 0);
@@ -579,6 +691,8 @@ class SpriteTabCanvas{
         // Only track mouse events if left-click
         if(event.buttons == 1){
             if(event.type == "mousedown"){
+                this.#addUndoInstance();
+
                 // On mouse down, save the coordinates for reference in end, and save the frame to restore from as previews are drawn
                 this.drawingStartX = x;
                 this.drawingStartY = y;
@@ -599,6 +713,7 @@ class SpriteTabCanvas{
                     let baseColor = getPixelColor(x, y);
                     let fillColor = this.context.fillStyle == '#000000' ? 0 : 255;
 
+                    // Only fill if the selected color is not the same as current fill color
                     if(baseColor != fillColor){
                         let setPixelToFill = (newX, newY) => {
                             let xyi = (frameWidth * newY + newX)*4;
@@ -606,23 +721,17 @@ class SpriteTabCanvas{
                             newImageData.data[xyi+1] = fillColor;
                             newImageData.data[xyi+2] = fillColor;
                         }
-                        let spreadPixels = (newX, newY) => {
-                            // Set this pixel to the fill or stroke color
-                            setPixelToFill(newX, newY);
-                            if(newX+1 < frameWidth && getPixelColor(newX+1, newY) == baseColor){
-                                spreadPixels(newX+1, newY);
-                            }
-                            if(newY+1 < frameHeight && getPixelColor(newX, newY+1) == baseColor){
-                                spreadPixels(newX, newY+1);
-                            }
-                            if(newX-1 >= 0 && getPixelColor(newX-1, newY) == baseColor){
-                                spreadPixels(newX-1, newY);
-                            }
-                            if(newY-1 >= 0 && getPixelColor(newX, newY-1) == baseColor){
-                                spreadPixels(newX, newY-1);
+
+                        // Fill using stack instead of recusion: https://stackoverflow.com/questions/53144746/how-do-i-fill-an-area-using-a-non-recursive-algorithm
+                        const stack = [[x, y]];
+                        while(stack.length){
+                            const [xp, yp] = stack.pop();
+                            if(getPixelColor(xp, yp) == baseColor){
+                                setPixelToFill(xp, yp);
+                                stack.push([xp + 1, yp], [xp - 1, yp], [xp, yp + 1], [xp, yp - 1]);
                             }
                         }
-                        spreadPixels(x, y);
+
                         this.context.putImageData(newImageData, 0, 0);
                     }
                 }
@@ -953,22 +1062,20 @@ class SpriteTabCanvas{
         // Remove the stored selected frame index for this file so a new file with teh same name doesn't restore from it
         localStorage.removeItem("SpriteEditorSelectedFrame" + this.filePath);
 
-        // REmove the canvas dimensions and position for later restoration
+        // Remove the canvas dimensions and position
         localStorage.removeItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
 
         // Remove any listeners
         document.getElementById("btnSpriteEditorZoomIn").removeEventListener("click", this.listenerZoomIn);
         document.getElementById("btnSpriteEditorZoomOut").removeEventListener("click", this.listenerZoomOut);
         document.getElementById("btnSpriteEditorFitCanvas").removeEventListener("click", this.listenerFitCanvas);
-        this.btnSpriteEditorBrushTool.removeEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorRectangle.removeEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorOval.removeEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorLine.removeEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorBucket.removeEventListener("click", this.#updateToolState.bind(this));
-        this.btnSpriteEditorBlack.removeEventListener("click", this.#updateColorStates.bind(this));
-        this.btnSpriteEditorWhite.removeEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorUndo.removeEventListener("click", this.#undo.bind(this));
+        this.btnSpriteEditorRedo.removeEventListener("click", this.#redo.bind(this));
         this.btnSpriteEditorResize.removeEventListener("click", this.#fillResizePrompt.bind(this));
         this.btnSpriteEditorResizeConfirm.removeEventListener("click", this.#resizeFrames.bind(this));
+
+        // Delete the undo database from the page when the tab is closed
+        this.undoDB.delete();
     }
 }
 

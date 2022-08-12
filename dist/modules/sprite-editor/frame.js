@@ -90,7 +90,7 @@ class Frame{
             <label><li><a>Move up</a></li></label>
             <label><li><a>Move down</a></li></label>
             <div class="divider mt-0 mb-0"></div>
-            <label><li><a>Delete</a></li></label>
+            <label class="text-warning"><li><a>Delete</a></li></label>
             
         </ul>
         `

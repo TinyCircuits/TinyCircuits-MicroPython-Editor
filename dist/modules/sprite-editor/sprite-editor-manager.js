@@ -40,6 +40,77 @@ class SpriteEditorManager{
         document.getElementById("checkboxSpriteEditorFilled").onclick = (event) => {
             localStorage.setItem("SpriteEditorFilled", event.currentTarget.checked);
         }
+
+
+        this.btnSpriteEditorBrushTool = document.getElementById("btnSpriteEditorBrushTool");
+        this.btnSpriteEditorRectangle = document.getElementById("btnSpriteEditorRectangle");
+        this.btnSpriteEditorOval = document.getElementById("btnSpriteEditorOval");
+        this.btnSpriteEditorLine = document.getElementById("btnSpriteEditorLine");
+        this.btnSpriteEditorBucket = document.getElementById("btnSpriteEditorBucket");
+        this.btnSpriteEditorBlack = document.getElementById("btnSpriteEditorBlack");
+        this.btnSpriteEditorWhite = document.getElementById("btnSpriteEditorWhite");
+        
+
+        this.btnSpriteEditorBrushTool.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorRectangle.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorOval.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorLine.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBucket.addEventListener("click", this.#updateToolState.bind(this));
+        this.btnSpriteEditorBlack.addEventListener("click", this.#updateColorStates.bind(this));
+        this.btnSpriteEditorWhite.addEventListener("click", this.#updateColorStates.bind(this));
+    }
+
+
+    #toolFocusReplace(element){
+        element.classList.replace("btn-primary-focus", "btn-primary");
+        element.classList.remove("border");
+        element.classList.remove("border-primary-focus");
+    }
+
+    #toolFocusToggle(element){
+        element.classList.toggle("btn-primary-focus");
+        element.classList.toggle("btn-primary");
+        element.classList.toggle("border");
+        element.classList.toggle("border-primary-focus");
+    }
+
+    // Keep track of which tool is toggle for this drawing canvas in relation to global element button presses
+    #updateToolState(event){
+        this.#toolFocusReplace(this.btnSpriteEditorBrushTool);
+        this.#toolFocusReplace(this.btnSpriteEditorRectangle);
+        this.#toolFocusReplace(this.btnSpriteEditorOval);
+        this.#toolFocusReplace(this.btnSpriteEditorLine);
+        this.#toolFocusReplace(this.btnSpriteEditorBucket);
+
+        if(event.currentTarget.id == "btnSpriteEditorBrushTool"){
+            this.#toolFocusToggle(this.btnSpriteEditorBrushTool);
+            if(this.btnSpriteEditorBrushTool.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBrushTool");
+        }else if(event.currentTarget.id == "btnSpriteEditorRectangle"){
+            this.#toolFocusToggle(this.btnSpriteEditorRectangle);
+            if(this.btnSpriteEditorRectangle.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorRectangle");
+        }else if(event.currentTarget.id == "btnSpriteEditorOval"){
+            this.#toolFocusToggle(this.btnSpriteEditorOval);
+            if(this.btnSpriteEditorOval.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorOval");
+        }else if(event.currentTarget.id == "btnSpriteEditorLine"){
+            this.#toolFocusToggle(this.btnSpriteEditorLine);
+            if(this.btnSpriteEditorLine.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorLine");
+        }else if(event.currentTarget.id == "btnSpriteEditorBucket"){
+            this.#toolFocusToggle(this.btnSpriteEditorBucket);
+            if(this.btnSpriteEditorBucket.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledTool", "btnSpriteEditorBucket");
+        }
+    }
+
+    #updateColorStates(event){
+        this.#toolFocusReplace(this.btnSpriteEditorBlack);
+        this.#toolFocusReplace(this.btnSpriteEditorWhite);
+
+        if(event.currentTarget.id == "btnSpriteEditorBlack"){
+            this.#toolFocusToggle(this.btnSpriteEditorBlack);
+            if(this.btnSpriteEditorBlack.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorBlack");
+        }else if(event.currentTarget.id == "btnSpriteEditorWhite"){
+            this.#toolFocusToggle(this.btnSpriteEditorWhite);
+            if(this.btnSpriteEditorWhite.classList.contains("btn-primary-focus")) localStorage.setItem("SpriteEditorLastEnabledColor", "btnSpriteEditorWhite");
+        }
     }
 
 

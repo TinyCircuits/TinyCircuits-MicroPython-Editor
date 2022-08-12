@@ -183,6 +183,11 @@ class DB{
         this.#deleteDBFile(this.STORE_ID, this.STORE_INDEX, name);
     }
 
+    // Removes the database from the page
+    delete(){
+        indexedDB.deleteDatabase(this.DB_ID);
+    }
+
     // Rename database by return new version under new name with all old content and then deleting old data base
     async rename(newName){
         let newDB = new DB(newName);

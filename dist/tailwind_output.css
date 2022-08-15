@@ -3418,6 +3418,10 @@ body[dir="rtl"] .checkbox:checked,
   visibility: hidden;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }

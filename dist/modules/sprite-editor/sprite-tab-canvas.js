@@ -397,10 +397,11 @@ class SpriteTabCanvas{
 
         // Parent of the frame canvas that is inserted into the list and contains other useful info/graphics
         let divFrameContainer = document.createElement("div");
+        divFrameContainer.title = "Sprite frame";
         divFrameContainer.classList = "border border-gray-400 min-w-full max-w-full mt-3 relative aspect-square flex justify-center items-center bg-base-200";
         divFrameContainer.onclick = (event) => {
             // Make sure clicking the options (three dots) doesn't select the frame (annoying)
-            if(event.target.toString() != "[object SVGSVGElement]" && event.target.toString() != "[object SVGPathElement]"){
+            if(event.target.title == "Sprite frame" && event.target.toString() != "[object SVGSVGElement]" && event.target.toString() != "[object SVGPathElement]"){
                 if(event.target.toString() == "[object HTMLCanvasElement]"){
                     select(event.target.parentElement);
                 }else{
@@ -415,6 +416,9 @@ class SpriteTabCanvas{
         // The canvas all the drawing is done on
         let canvas = document.createElement("canvas");
         canvas.classList = "crisp-canvas";
+        canvas.onclick = (event) => {
+            event.target.parentElement.click();
+        }
 
         // When the frame is recreated on list update, figure out with size to use
         if(frameWidth >= frameHeight){
@@ -454,12 +458,62 @@ class SpriteTabCanvas{
             </svg>
         `;
         optionsDiv.onclick = (event) => {
-            // let rect = this.optionsDiv.getBoundingClientRect();
-            // this.divOptionsDropdown.style.left = rect.x + "px";
-            // this.divOptionsDropdown.style.top = rect.y + "px";
-            // this.divOptionsDropdown.classList.remove("invisible");
+            let optionsDiv = undefined;
+            let dropdown = undefined;
+            if(event.target.toString() == "[object SVGPathElement]"){
+                optionsDiv = event.target.parentElement.parentElement.parentElement.children[2];
+                dropdown = event.target.parentElement.parentElement.parentElement.children[3];
+            }else{
+                optionsDiv = event.target.parentElement.parentElement.children[2];
+                dropdown = event.target.parentElement.parentElement.children[3];
+            }
+            let rect = optionsDiv.getBoundingClientRect();
+            dropdown.style.left = rect.x + "px";
+            dropdown.style.top = rect.y + "px";
+            dropdown.classList.remove("invisible");
         }
         divFrameContainer.appendChild(optionsDiv);
+
+
+
+        let divOptionsDropdown = document.createElement("div");
+        divOptionsDropdown.classList = "fixed z-[1000] invisible";
+        divOptionsDropdown.innerHTML = `
+        <ul tabindex="0" class="menu p-1 shadow bg-base-300 rounded-box w-fit whitespace-nowrap flex flex-col items-center">
+            <label><li><a>Duplicate</a></li></label>
+            <label><li><a>Move up</a></li></label>
+            <label><li><a>Move down</a></li></label>
+            <div class="divider mt-0 mb-0"></div>
+            <label class="text-warning"><li><a>Delete</a></li></label>
+        </ul>
+        `
+        divFrameContainer.appendChild(divOptionsDropdown);
+
+        divOptionsDropdown.onmouseleave = (event) => {
+            event.target.classList.add("invisible");
+        }
+
+        // Handle the duplicate button
+        divOptionsDropdown.children[0].children[0].onclick = (event) => {
+            event.currentTarget.parentElement.parentElement.classList.add("invisible");
+            this.#duplicateFrameAtIndex(Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, event.currentTarget.parentElement.parentElement.parentElement));
+        }
+
+        // Handle the move up button
+        divOptionsDropdown.children[0].children[1].onclick = (event) => {
+            event.currentTarget.parentElement.parentElement.classList.add("invisible");
+            this.#moveFrame(Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, event.currentTarget.parentElement.parentElement.parentElement), true);
+        }
+
+        // Handle the move down button
+        divOptionsDropdown.children[0].children[2].onclick = (event) => {
+            this.#moveFrame(Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, event.currentTarget.parentElement.parentElement.parentElement), false);
+        }
+
+        // Handle the delete button
+        divOptionsDropdown.children[0].children[4].onclick = (event) => {
+            this.#deleteFrameAtIndex(Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, event.currentTarget.parentElement.parentElement.parentElement));
+        }
 
 
 
@@ -722,7 +776,7 @@ class SpriteTabCanvas{
                             newImageData.data[xyi+2] = fillColor;
                         }
 
-                        // Fill using stack instead of recusion: https://stackoverflow.com/questions/53144746/how-do-i-fill-an-area-using-a-non-recursive-algorithm
+                        // Fill using stack instead of recursion: https://stackoverflow.com/questions/53144746/how-do-i-fill-an-area-using-a-non-recursive-algorithm
                         const stack = [[x, y]];
                         while(stack.length){
                             const [xp, yp] = stack.pop();

@@ -56,40 +56,103 @@ class SpriteTabCanvas{
 
     #undo(event){
         if(this.shown){
-            console.warn(this.filePath);
+            console.warn("UNDO: " + this.filePath);
+
+            // Handle getting undoIndex and count
+            let undoCount = localStorage.getItem("undoCount" + this.filePath);
+            let undoIndex = localStorage.getItem("undoIndex" + this.filePath);
+
+            if(undoCount != null && undoIndex != null){
+                undoCount = parseInt(undoCount);
+                undoIndex = parseInt(undoIndex);
+
+                if(undoIndex >= 0){
+                    this.undoDB.getFile(undoIndex, (data) => {
+                        if(data != undefined){
+                            this.spriteData = data;
+
+                            this.#updateFrameList();
+                            this.saveCallback(this.spriteData);
+                        }
+                    });
+
+                    undoIndex--;
+                    localStorage.setItem("undoIndex" + this.filePath, undoIndex);
+                }
+            }
         }
     }
 
 
     #redo(event){
         if(this.shown){
-            console.warn(this.filePath);
+            console.warn("REDO: " + this.filePath);
+
+            // Handle getting undoIndex and count
+            let undoCount = localStorage.getItem("undoCount" + this.filePath);
+            let undoIndex = localStorage.getItem("undoIndex" + this.filePath);
+
+            if(undoCount != null && undoIndex != null){
+                undoCount = parseInt(undoCount);
+                undoIndex = parseInt(undoIndex);
+
+                if(undoIndex < undoCount){
+                    undoIndex++;
+                    this.undoDB.getFile(undoIndex, (data) => {
+                        if(data != undefined){
+                            this.spriteData = data;
+    
+                            this.#updateFrameList();
+                            this.saveCallback(this.spriteData);
+                        }
+                    });
+                    localStorage.setItem("undoIndex" + this.filePath, undoIndex);
+                }
+            }
         }
     }
 
 
     #addUndoInstance(){
-        // // First, get the undo count and increase it
-        // this.undoDB.getFile("undoCount", (data) => {
-        //     let undoIndex = data;
+        // Copy data quickly because it takes the database
+        // time to save teh data that may be edited by then
+        let copy = new Uint8Array(this.spriteData.byteLength);
+        copy.set(this.spriteData);
 
-        //     if(undoIndex == undefined){
-        //         undoIndex = 1;
-        //     }else{
-        //         undoIndex = undoIndex + 1;
-        //     }
-        //     this.undoDB.addFile(undoIndex, "undoCount");
-            
-        //     // Second, make another undo instance with this new undo count/index
-        //     let instance = {index: undoIndex, spriteData: this.spriteData};
+        // Handle getting undoCount and setting if not saved before
+        let undoCount = localStorage.getItem("undoCount" + this.filePath);
+        undoCount = undoCount == null ? 0 : parseInt(undoCount);
+        undoCount++;
+        localStorage.setItem("undoCount" + this.filePath, undoCount);
 
-        //     this.undoDB.addFile(JSON.stringify(instance), undoIndex);
-        // });
+        // Handle getting undoIndex and setting if not saved before 
+        let undoIndex = localStorage.getItem("undoIndex" + this.filePath);
+        undoIndex = undoIndex == null ? -1 : parseInt(undoIndex);
+        undoIndex++;
+        localStorage.setItem("undoIndex" + this.filePath, undoIndex);
+
+        // Save the undo instance using this sprite undo database
+        this.undoDB.addFile(copy, undoIndex);
+
+        // If the undo index is not at its max (undoCount-1), then
+        // a new instance is being added where a redo is, erase all
+        // redos from here to end
+        let deleteIndex = undoIndex+1;
+        while(undoIndex < undoCount-2){
+            this.undoDB.deleteFile(deleteIndex);
+            deleteIndex++;
+            undoCount--;
+        }
+
+        localStorage.setItem("undoCount" + this.filePath, undoCount);
     }
 
 
     #resizeFrames(newWidth, newHeight){
         if(this.shown){
+            // Before resizing everything, save for undo
+            this.#addUndoInstance();
+
             // If the width or height are undefined, must have been called
             // from resize confirm, grab those values instead (see code.html)
             if(newWidth == undefined || newHeight == undefined){
@@ -99,7 +162,6 @@ class SpriteTabCanvas{
             
             // Grab the old frame width and height
             const [ oldWidth, oldHeight ] = this.#getFrameWidthHeight();
-            const oldFrameByteLength = this.#getFrameLength();
 
             // Set the new width and height in what is now the old data
             this.spriteData[15] = newWidth;
@@ -514,7 +576,6 @@ class SpriteTabCanvas{
         divOptionsDropdown.children[0].children[4].onclick = (event) => {
             this.#deleteFrameAtIndex(Array.prototype.indexOf.call(this.btnAddFrame.parentElement.children, event.currentTarget.parentElement.parentElement.parentElement));
         }
-
 
 
         // Show/hide frame index and options div on mouse hover over frame
@@ -1118,6 +1179,10 @@ class SpriteTabCanvas{
 
         // Remove the canvas dimensions and position
         localStorage.removeItem("SpriteEditorCanvasDimensionsPosition" + this.filePath);
+
+        // Remove undo trackers
+        localStorage.removeItem("undoCount" + this.filePath);
+        localStorage.removeItem("undoIndex" + this.filePath);
 
         // Remove any listeners
         document.getElementById("btnSpriteEditorZoomIn").removeEventListener("click", this.listenerZoomIn);

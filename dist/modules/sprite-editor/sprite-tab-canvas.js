@@ -41,123 +41,193 @@ class SpriteTabCanvas{
         this.btnSpriteEditorResize = document.getElementById("btnSpriteEditorResize");
         this.btnSpriteEditorResizeConfirm = document.getElementById("btnSpriteEditorResizeConfirm");
 
-        this.btnSpriteEditorUndo.addEventListener("click", this.#undo.bind(this));
-        this.btnSpriteEditorRedo.addEventListener("click", this.#redo.bind(this));
-        this.btnSpriteEditorResize.addEventListener("click", this.#fillResizePrompt.bind(this));
-        this.btnSpriteEditorResizeConfirm.addEventListener("click", this.#resizeFrames.bind(this));
+        this.undoFuncRef = this.#undo.bind(this);
+        this.redoFuncRef = this.#redo.bind(this)
+        this.fillResizePromptFuncRef = this.#fillResizePrompt.bind(this)
+        this.resizeFramesFuncRef = this.#resizeFrames.bind(this);
+
+        this.btnSpriteEditorUndo.addEventListener("click", this.undoFuncRef);
+        this.btnSpriteEditorRedo.addEventListener("click", this.redoFuncRef);
+        this.btnSpriteEditorResize.addEventListener("click", this.fillResizePromptFuncRef);
+        this.btnSpriteEditorResizeConfirm.addEventListener("click", this.resizeFramesFuncRef);
 
         // Setup frame list and drawing canvas (frame list dictates what is shown on the drawing canvas)
         this.#setupFrameList();
 
         // Undo list is stored in a database since raw frames are often stored (remove forward slashes and periods for keypath)
         this.undoDB = new DB("spriteUndoList" + this.filePath.replaceAll("/", "").replaceAll(".", ""));
+        this.undoList = [];
+        this.undoIndex = -1;
+        this.undoLastTime = true;
 
         // Restore/get the undo max index and the current undo index, set to default otherwise
-        this.undoCount = localStorage.getItem("undoCount" + this.filePath);
-        this.undoIndex = localStorage.getItem("undoIndex" + this.filePath);
-        this.addedLastTime = localStorage.getItem("addedLastTime" + this.filePath);
-        this.undoLastTime = localStorage.getItem("undoLastTime" + this.filePath);
+        // this.undoCount = localStorage.getItem("undoCount" + this.filePath);
+        // this.undoIndex = localStorage.getItem("undoIndex" + this.filePath);
+        // this.addedLastTime = localStorage.getItem("addedLastTime" + this.filePath);
+        // this.undoLastTime = localStorage.getItem("undoLastTime" + this.filePath);
 
-        this.undoCount = this.undoCount == null ? 0 : parseInt(this.undoCount);
-        this.undoIndex = this.undoIndex == null ? 0 : parseInt(this.undoIndex);
-        this.addedLastTime = this.addedLastTime == null ? undefined  :  this.addedLastTime == "true" ? true : false;
-        this.undoLastTime = this.undoLastTime == null ? undefined  :  this.undoLastTime == "true" ? true : false;
+        // this.undoCount = this.undoCount == null ? 0 : parseInt(this.undoCount);
+        // this.undoIndex = this.undoIndex == null ? 0 : parseInt(this.undoIndex);
+        // this.addedLastTime = this.addedLastTime == null ? undefined  :  this.addedLastTime == "true" ? true : false;
+        // this.undoLastTime = this.undoLastTime == null ? undefined  :  this.undoLastTime == "true" ? true : false;
     }
 
 
     #undo(event){
         if(this.shown){
-            console.warn("UNDO: " + this.filePath);
+            if(this.undoIndex > 0 && !this.undoLastTime){
+                this.undoIndex--;
+            }
+
+            this.spriteData = this.undoList[this.undoIndex];
+            this.#updateFrameList();
+            this.saveCallback(this.spriteData);
 
             if(this.undoIndex > 0){
-                // If undo index is at its max and we're trying to go back, save this frame incase of redo
-                if(this.undoIndex == this.undoCount && this.addedLastTime){
-                    this.#addUndoInstance();
-                    this.addedLastTime = false;
-                    localStorage.setItem("addedLastTime" + this.filePath, this.addedLastTime);
-                    this.undoIndex -= 1
-                }
-
-                if(this.undoLastTime == false){
-                    this.undoIndex -= 1;
-                }
-
-                this.undoDB.getFile(this.undoIndex, (data) => {
-                    if(data != undefined){
-                        this.spriteData = data;
-
-                        this.#updateFrameList();
-                        this.saveCallback(this.spriteData);
-                    }
-                });
-
                 this.undoIndex--;
-                localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
             }
+
             this.undoLastTime = true;
-            localStorage.setItem("undoLastTime" + this.filePath, this.undoLastTime);
         }
     }
 
 
     #redo(event){
         if(this.shown){
-            console.warn("REDO: " + this.filePath);
-
-            if(this.undoIndex < this.undoCount){
-                this.addedLastTime = false;
-                localStorage.setItem("addedLastTime" + this.filePath, this.addedLastTime);
-
-                if(this.undoLastTime == true){
-                    this.undoIndex += 2;
-                }else{
-                    this.undoIndex++;
-                }
-                
-                this.undoDB.getFile(this.undoIndex, (data) => {
-                    if(data != undefined){
-                        this.spriteData = data;
-
-                        this.#updateFrameList();
-                        this.saveCallback(this.spriteData);
-                    }
-                });
-                localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
+            if(this.undoIndex < this.undoList.length-1){
+                this.undoIndex++;
             }
+            
+            this.spriteData = this.undoList[this.undoIndex];
+            this.#updateFrameList();
+            this.saveCallback(this.spriteData);
+
             this.undoLastTime = false;
-            localStorage.setItem("undoLastTime" + this.filePath, this.undoLastTime);
         }
     }
 
 
-    #addUndoInstance(){
-        this.addedLastTime = true;
+    #addUndoInstance(isExtra = false){
+        if(this.shown){
+            let copy = new Uint8Array(this.spriteData.byteLength);
+            copy.set(this.spriteData);
 
-        // Copy data quickly because it takes the database
-        // time to save teh data that may be edited by then
-        let copy = new Uint8Array(this.spriteData.byteLength);
-        copy.set(this.spriteData);
-
-        // Increase and store max undo index
-        this.undoCount++;
-        localStorage.setItem("undoCount" + this.filePath, this.undoCount);
-
-        // Increase the current undo index
-        this.undoIndex++;
-        localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
-
-        let index = this.undoIndex;
-
-        // Save the undo instance using this sprite undo database
-        this.undoDB.addFile(copy, index);
-
-        if(this.undoIndex < this.undoCount){
-            this.undoCount = this.undoIndex;
+            if(isExtra){
+                this.undoList.push(copy);
+            }else{
+                if(this.undoList.length > 0){
+                    this.undoList[this.undoList.length-1] = copy;
+                    this.undoIndex = this.undoList.length-1;
+                }else{
+                    this.undoList.push(copy);
+                    this.undoIndex = 0;
+                }
+            }
         }
-
-        // Deleted some undo instances, update storage
-        localStorage.setItem("undoCount" + this.filePath, this.undoCount);
     }
+
+
+    // #undo(event){
+    //     if(this.shown){
+    //         console.warn("UNDO: " + this.filePath);
+
+    //         if(this.undoIndex >= 0){
+    //             // If undo index is at its max and we're trying to go back, save this frame incase of redo
+    //             if(this.undoIndex == this.undoCount && this.addedLastTime){
+    //                 this.#addUndoInstance();
+    //                 this.addedLastTime = false;
+    //                 localStorage.setItem("addedLastTime" + this.filePath, this.addedLastTime);
+    //                 this.undoIndex -= 2;
+    //             }
+
+    //             if(this.undoLastTime == false){
+    //                 this.undoIndex -= 1;
+    //             }
+
+    //             this.undoDB.getFile(this.undoIndex, (data) => {
+    //                 if(data != undefined){
+    //                     this.spriteData = data;
+
+    //                     this.#updateFrameList();
+    //                     this.saveCallback(this.spriteData);
+    //                 }
+    //             });
+
+    //             this.undoIndex--;
+    //             localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
+    //         }
+    //         this.undoLastTime = true;
+    //         localStorage.setItem("undoLastTime" + this.filePath, this.undoLastTime);
+    //     }
+    // }
+
+
+    // #redo(event){
+    //     if(this.shown){
+    //         console.warn("REDO: " + this.filePath);
+
+    //         if(this.undoIndex < this.undoCount-1){
+    //             this.addedLastTime = false;
+    //             localStorage.setItem("addedLastTime" + this.filePath, this.addedLastTime);
+
+    //             if(this.undoLastTime == true){
+    //                 this.undoIndex += 2;
+    //             }else{
+    //                 this.undoIndex++;
+    //             }
+                
+    //             this.undoDB.getFile(this.undoIndex, (data) => {
+    //                 if(data != undefined){
+    //                     this.spriteData = data;
+
+    //                     this.#updateFrameList();
+    //                     this.saveCallback(this.spriteData);
+    //                 }
+    //             });
+    //             localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
+    //         }
+    //         this.undoLastTime = false;
+    //         localStorage.setItem("undoLastTime" + this.filePath, this.undoLastTime);
+    //     }
+    // }
+
+
+    // #addUndoInstance(){
+    //     if(this.shown){
+    //         this.addedLastTime = true;
+    //         let index = this.undoIndex;
+    //         Object.assign(index, this.undoIndex);
+
+    //         // Copy data quickly because it takes the database
+    //         // time to save teh data that may be edited by then
+    //         let copy = new Uint8Array(this.spriteData.byteLength);
+    //         copy.set(this.spriteData);
+
+    //         // Increase and store max undo index
+    //         this.undoCount++;
+    //         localStorage.setItem("undoCount" + this.filePath, this.undoCount);
+
+    //         // Increase the current undo index
+    //         this.undoIndex++;
+    //         localStorage.setItem("undoIndex" + this.filePath, this.undoIndex);
+
+    //         // Save the undo instance using this sprite undo database
+    //         this.undoDB.addFile(copy, index);
+
+    //         if(this.undoIndex < this.undoCount){
+    //             this.undoCount = this.undoIndex;
+
+    //             this.addedLastTime = true;
+    //             localStorage.setItem("addedLastTime" + this.filePath, this.addedLastTime);
+
+    //             this.undoLastTime = true;
+    //             localStorage.setItem("undoLastTime" + this.filePath, this.undoLastTime);
+    //         }
+
+    //         // Deleted some undo instances, update storage
+    //         localStorage.setItem("undoCount" + this.filePath, this.undoCount);
+    //     }
+    // }
 
 
     #resizeFrames(newWidth, newHeight){
@@ -818,7 +888,7 @@ class SpriteTabCanvas{
         // Only track mouse events if left-click
         if(event.buttons == 1){
             if(event.type == "mousedown"){
-                this.#addUndoInstance();
+                this.#addUndoInstance(false);
 
                 // On mouse down, save the coordinates for reference in end, and save the frame to restore from as previews are drawn
                 this.drawingStartX = x;
@@ -947,9 +1017,9 @@ class SpriteTabCanvas{
                         }
                     }
                 }
-            }else if(event.type == "mouseup"){
-
             }
+        }else if(event.buttons == 0 && event.type == "mouseup"){
+            this.#addUndoInstance(true);
         }
 
         // End this drawing operation
@@ -1200,10 +1270,10 @@ class SpriteTabCanvas{
         document.getElementById("btnSpriteEditorZoomIn").removeEventListener("click", this.listenerZoomIn);
         document.getElementById("btnSpriteEditorZoomOut").removeEventListener("click", this.listenerZoomOut);
         document.getElementById("btnSpriteEditorFitCanvas").removeEventListener("click", this.listenerFitCanvas);
-        this.btnSpriteEditorUndo.removeEventListener("click", this.#undo.bind(this));
-        this.btnSpriteEditorRedo.removeEventListener("click", this.#redo.bind(this));
-        this.btnSpriteEditorResize.removeEventListener("click", this.#fillResizePrompt.bind(this));
-        this.btnSpriteEditorResizeConfirm.removeEventListener("click", this.#resizeFrames.bind(this));
+        this.btnSpriteEditorUndo.removeEventListener("click", this.undoFuncRef);
+        this.btnSpriteEditorRedo.removeEventListener("click", this.redoFuncRef);
+        this.btnSpriteEditorResize.removeEventListener("click", this.fillResizePromptFuncRef);
+        this.btnSpriteEditorResizeConfirm.removeEventListener("click", this.resizeFramesFuncRef);
 
         // Delete the undo database from the page when the tab is closed
         this.undoDB.delete();

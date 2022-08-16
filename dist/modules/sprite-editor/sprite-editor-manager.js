@@ -129,6 +129,7 @@ class SpriteEditorManager{
     #tabClosed(filePath){
         for(let itx=0; itx<this.tabs.length; itx++){
             if(filePath == this.tabs[itx].filePath){
+                this.tabs[itx] = undefined;
                 this.tabs.remove(itx);
                 break;
             }

@@ -205,6 +205,7 @@ class Row{
                     this.tab.onClose = () => {
                         this.isOpened = false;
                         this.project.saveProjectStructure();
+                        this.tab = undefined;
                     }
 
                     if(select){

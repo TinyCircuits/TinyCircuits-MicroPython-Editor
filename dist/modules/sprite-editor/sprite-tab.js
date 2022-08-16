@@ -57,14 +57,14 @@ class SpriteTab{
         this.divTab.title = this.filePath;
 
         this.divSpriteTabHeader.insertBefore(this.divTab, this.divSpriteTabHeader.lastElementChild);
-        
-        // this.divSpriteTabHeader.appendChild(this.divTab);
 
         this.#initTabText();
         this.#initTabCloseBtn();
 
         this.divTab.onclick = (event) => {
-            this.select();
+            if(event.target == this.divTab){
+                this.select();
+            }
         }
     }
 
@@ -149,6 +149,7 @@ class SpriteTab{
 
             // Close the underlying canvas class object
             this.spriteTabCanvas.close();
+            this.spriteTabCanvas = undefined;
 
             this.tabClosedCallback(this.filePath);
         }

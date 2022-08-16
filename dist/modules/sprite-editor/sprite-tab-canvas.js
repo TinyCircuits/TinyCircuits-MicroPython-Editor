@@ -74,7 +74,7 @@ class SpriteTabCanvas{
 
 
     #undo(event){
-        if(this.shown){
+        if(this.shown && this.undoList.length > 0 && this.undoIndex >= 0){
             if(this.undoIndex > 0 && !this.undoLastTime){
                 this.undoIndex--;
             }
@@ -83,7 +83,7 @@ class SpriteTabCanvas{
             this.#updateFrameList();
             this.saveCallback(this.spriteData);
 
-            if(this.undoIndex > 0){
+            if(this.undoIndex >= 0){
                 this.undoIndex--;
             }
 
@@ -93,10 +93,16 @@ class SpriteTabCanvas{
 
 
     #redo(event){
-        if(this.shown){
-            if(this.undoIndex < this.undoList.length-1){
-                this.undoIndex++;
+        if(this.shown && this.undoList.length > 0){
+            if(this.undoLastTime){
+                console.warn(this.undoIndex);
+                this.undoIndex += 2;
+            }else{
+                if(this.undoIndex < this.undoList.length-1){
+                    this.undoIndex++;
+                }
             }
+            
             
             this.spriteData = this.undoList[this.undoIndex];
             this.#updateFrameList();

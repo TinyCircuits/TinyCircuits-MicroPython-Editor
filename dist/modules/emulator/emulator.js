@@ -52,7 +52,7 @@ class Emulator{
         this.mainFilePath = undefined;
 
         // Stop emulator if started, clear canvas, stop audio
-        this.btnStopBrowser.onclick = () => {
+        if(this.btnStopBrowser) this.btnStopBrowser.onclick = () => {
             if(this.mcu != undefined){
                 this.mcu.stop();
                 this.mcu.reset();
@@ -64,7 +64,7 @@ class Emulator{
             }
         }
 
-        this.btnZoomInEmulator.onclick = () => {
+        if(this.btnZoomInEmulator) this.btnZoomInEmulator.onclick = () => {
             let w = parseInt(this.canvasEmulator.style.width);
             let h = parseInt(this.canvasEmulator.style.height);
             if(w*2 < 4608){
@@ -72,7 +72,7 @@ class Emulator{
                 this.canvasEmulator.style.height = (h*2) + "px";
             }
         }
-        this.btnZoomOutEmulator.onclick = () => {
+        if(this.btnZoomOutEmulator) this.btnZoomOutEmulator.onclick = () => {
             let w = parseInt(this.canvasEmulator.style.width);
             let h = parseInt(this.canvasEmulator.style.height);
             if(h/2 >= 40){
@@ -81,7 +81,7 @@ class Emulator{
             }
         }
 
-        this.btnRotateEmulator.onclick = () => {
+        if(this.btnRotateEmulator) this.btnRotateEmulator.onclick = () => {
             let rotation = this.canvasEmulator.style.transform;
 
             if(rotation == ""){
@@ -96,7 +96,7 @@ class Emulator{
         }
 
 
-        this.btnEmulatorAudio.onclick = () => {
+        if(this.btnEmulatorAudio) this.btnEmulatorAudio.onclick = () => {
             if(this.muted){
                 this.muted = false;
                 this.btnEmulatorAudio.innerHTML = `

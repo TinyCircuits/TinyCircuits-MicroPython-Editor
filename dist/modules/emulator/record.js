@@ -36,7 +36,7 @@ class Record{
         }
 
 
-        this.btnEmulatorVideo.onclick = (event) => {
+        if(this.btnEmulatorVideo) this.btnEmulatorVideo.onclick = (event) => {
             if(this.recording == false){
                 // Start recording based on state using background color of button
                 this.recording = true;
@@ -51,7 +51,7 @@ class Record{
             }
         }
 
-        this.btnEmulatorScreenshot.onclick = (event) => {
+        if(this.btnEmulatorScreenshot) this.btnEmulatorScreenshot.onclick = (event) => {
             this.takeScreenshot();
         }
     }

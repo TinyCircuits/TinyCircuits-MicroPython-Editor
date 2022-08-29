@@ -47,7 +47,7 @@ fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/
             }
         }
 
-        const gameLinkPack = gameLinkPacks[2];
+        const gameLinkPack = gameLinkPacks[19];
         let fileList = [];
         let projectName = gameLinkPack[0].slice(5);
 

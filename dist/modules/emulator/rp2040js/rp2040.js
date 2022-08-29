@@ -1516,7 +1516,7 @@ export class RP2040 {
         this.clock.resume();
         this.executeTimer = null;
         this.stopped = false;
-        for (let i = 0; i < 100000 && !this.stopped && !this.waiting; i++) {
+        for (let i = 0; i < 500000 && !this.stopped && !this.waiting; i++) {
             this.executeInstruction();
         }
         if (!this.stopped) {

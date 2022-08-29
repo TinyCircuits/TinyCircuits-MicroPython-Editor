@@ -4323,6 +4323,14 @@ input[type="number"]::-webkit-inner-spin-button,
 
 /* Remove arrows on number inputs https://stackoverflow.com/questions/71296535/how-to-remove-arrow-on-input-type-number-with-tailwind-css */
 
+.crisp-canvas{
+  image-rendering: optimizeQuality;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
 .hover\:cursor-n-resize:hover {
   cursor: n-resize;
 }

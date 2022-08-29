@@ -124,17 +124,17 @@ class Emulator{
 
 
     #setupAudio(){
-        this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+        // this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
 
-        this.audioVolumeNode = this.audioContext.createGain();
-        this.audioVolumeNode.connect(this.audioContext.destination);
-        this.audioVolumeNode.gain.value = 0.25;
+        // this.audioVolumeNode = this.audioContext.createGain();
+        // this.audioVolumeNode.connect(this.audioContext.destination);
+        // this.audioVolumeNode.gain.value = 0.25;
 
-        this.audioBuzzerNode = this.audioContext.createOscillator();
-        this.audioBuzzerNode.frequency.value = 0;
-        this.audioBuzzerNode.type = "triangle";
-        this.audioBuzzerNode.start();
-        this.audioBuzzerNode.connect(this.audioVolumeNode);
+        // this.audioBuzzerNode = this.audioContext.createOscillator();
+        // this.audioBuzzerNode.frequency.value = 0;
+        // this.audioBuzzerNode.type = "triangle";
+        // this.audioBuzzerNode.start();
+        // this.audioBuzzerNode.connect(this.audioVolumeNode);
     }
 
 
@@ -203,7 +203,7 @@ class Emulator{
         this.mcu.onBrightness = (brightness) => {this.displayBrightness = Math.floor((brightness / 127) * 255)};
         this.mcu.onAudioFreq = (freq) => {
             if(this.muted == false){
-                this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.audioContext.currentTime + 0.03);
+                // this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.audioContext.currentTime + 0.03);
             }
         };
         this.mcu.onUpdate = () => {this.#updateDisplay()};

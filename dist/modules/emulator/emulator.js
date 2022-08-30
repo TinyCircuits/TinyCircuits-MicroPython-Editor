@@ -51,6 +51,14 @@ class Emulator{
 
         this.mainFilePath = undefined;
 
+        let state = localStorage.getItem("emulatorState");
+        if(state != null){
+            state = JSON.parse(state);
+            this.canvasEmulator.style.width = state.width;
+            this.canvasEmulator.style.height = state.height;
+            this.canvasEmulator.style.transform = state.rotation;
+        }
+
         // Stop emulator if started, clear canvas, stop audio
         if(this.btnStopBrowser) this.btnStopBrowser.onclick = () => {
             if(this.mcu != undefined){
@@ -71,6 +79,7 @@ class Emulator{
                 this.canvasEmulator.style.width = (w*2) + "px";
                 this.canvasEmulator.style.height = (h*2) + "px";
             }
+            this.#saveZoomRotation();
         }
         if(this.btnZoomOutEmulator) this.btnZoomOutEmulator.onclick = () => {
             let w = parseInt(this.canvasEmulator.style.width);
@@ -79,6 +88,7 @@ class Emulator{
                 this.canvasEmulator.style.width = (w/2) + "px";
                 this.canvasEmulator.style.height = (h/2) + "px";
             }
+            this.#saveZoomRotation();
         }
 
         if(this.btnRotateEmulator) this.btnRotateEmulator.onclick = () => {
@@ -93,6 +103,8 @@ class Emulator{
                 }
                 this.canvasEmulator.style.transform = "rotate(" + rotation + "deg)";
             }
+
+            this.#saveZoomRotation();
         }
 
 
@@ -117,6 +129,15 @@ class Emulator{
     }
 
 
+    #saveZoomRotation(){
+        let state = {};
+        state.width = this.canvasEmulator.style.width;
+        state.height = this.canvasEmulator.style.height;
+        state.rotation = this.canvasEmulator.style.transform;
+        localStorage.setItem("emulatorState", JSON.stringify(state));
+    }
+
+
     resetLayoutSize(){
         this.canvasEmulator.style.width = "144px";
         this.canvasEmulator.style.height = "80px";
@@ -124,17 +145,17 @@ class Emulator{
 
 
     #setupAudio(){
-        // this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+        this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
 
-        // this.audioVolumeNode = this.audioContext.createGain();
-        // this.audioVolumeNode.connect(this.audioContext.destination);
-        // this.audioVolumeNode.gain.value = 0.25;
+        this.audioVolumeNode = this.audioContext.createGain();
+        this.audioVolumeNode.connect(this.audioContext.destination);
+        this.audioVolumeNode.gain.value = 0.25;
 
-        // this.audioBuzzerNode = this.audioContext.createOscillator();
-        // this.audioBuzzerNode.frequency.value = 0;
-        // this.audioBuzzerNode.type = "triangle";
-        // this.audioBuzzerNode.start();
-        // this.audioBuzzerNode.connect(this.audioVolumeNode);
+        this.audioBuzzerNode = this.audioContext.createOscillator();
+        this.audioBuzzerNode.frequency.value = 0;
+        this.audioBuzzerNode.type = "triangle";
+        this.audioBuzzerNode.start();
+        this.audioBuzzerNode.connect(this.audioVolumeNode);
     }
 
 
@@ -203,7 +224,7 @@ class Emulator{
         this.mcu.onBrightness = (brightness) => {this.displayBrightness = Math.floor((brightness / 127) * 255)};
         this.mcu.onAudioFreq = (freq) => {
             if(this.muted == false){
-                // this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.audioContext.currentTime + 0.03);
+                this.audioBuzzerNode.frequency.exponentialRampToValueAtTime(freq + 0.0001, this.audioContext.currentTime + 0.03);
             }
         };
         this.mcu.onUpdate = () => {this.#updateDisplay()};

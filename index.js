@@ -25,7 +25,3 @@ app.get('/', function (req, res) {
 app.get('/code', function (req, res) {
     res.sendFile(path.join(__dirname, '/dist/html/pages/code/code.html'));
 });
-
-app.get('/account', function (req, res) {
-    res.sendFile(path.join(__dirname, '/dist/html/pages/account.html'));
-});

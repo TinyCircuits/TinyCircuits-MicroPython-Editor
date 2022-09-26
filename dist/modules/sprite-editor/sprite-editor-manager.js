@@ -2,11 +2,13 @@
 
 import { SpriteTab } from "./sprite-tab.js";
 import { SpriteAnimationPreview } from "./sprite-animation-preview.js";
+import { ImageImporter } from "./sprite-editor-image-importer.js";
 
 class SpriteEditorManager{
     constructor(){
         this.divSpriteTabHeader = document.getElementById("divSpriteTabHeader");
         this.spriteAnimationPreview = new SpriteAnimationPreview();
+        this.imageImporter = new ImageImporter();
 
         this.tabs = [];
 

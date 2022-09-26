@@ -67,10 +67,10 @@
         <div class="modal-box relative min-h-[500px] min-w-[800px] border border-primary-focus">
             <label for="modelImportImage" id="divModelAddToFolderExit" class="btn btn-sm btn-circle absolute right-1 top-1">✕</label>
             <label class="font-bold whitespace-nowrap h-fit w-fit absolute left-2 top-2 select-none">Image Importer</label>
-            <div class="absolute left-10 top-10 bottom-10 right-10 bg-lime-600 flex flex-row">
-                <div class="w-[75%] h-full bg-pink-600 flex flex-col">
-                    <div class="h-full w-full bg-pink-600 flex flex-col">
-
+            <div class="absolute left-10 top-10 bottom-10 right-10 flex flex-row">
+                <div class="w-[75%] h-full flex flex-col">
+                    <div id="spriteEditorImageDrop" class="h-full w-full flex flex-col justify-center items-center border border-dashed select-none">
+                        <strong>Drag and drop</strong> or click to pick file
                     </div>
                     <div class="h-14 w-full bg-green-600">
     
@@ -392,7 +392,7 @@
         </div>
 
 
-        <!-- Import image -->
+        <!-- Import image (the modal it opens is likely defined in code.html) -->
         <div class="flex flex-row items-center justify-evenly w-full my-2">
             <label for="modelImportImage" class="btn btn-sm btn-primary min-h-0 p-0 w-[84%] rounded-md">
                 Import Image

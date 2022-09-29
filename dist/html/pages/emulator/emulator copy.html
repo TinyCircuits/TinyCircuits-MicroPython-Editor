@@ -1,0 +1,23 @@
+<!doctype html>
+
+<html data-theme="dark">
+    <head>
+        <title>Thumby Emulator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="/dist/tailwind_output.css" rel="stylesheet">
+    </head>
+
+
+    <body class="overflow-hidden">
+        
+        <div id="canvasEmulatorParent" class="absolute left-0 right-0 top-0 bottom-0 flex justify-center items-center">
+            <canvas id="canvasEmulator" width="72" height="40" style="width:72px; height:40px;" class="border border-gray-600 border-dashed crisp-canvas"></canvas>
+        </div>
+
+        <script src="/dist/js/common/prototypes.js"></script>
+        <script src="/dist/js/common/window.js"></script>
+        <script src="/dist/modules/emulator/littlefs/littlefs.js"></script>
+        <script type="module" src="/dist/js/pages/emulator/emulatorPage.js"></script>
+    </body>
+</html>

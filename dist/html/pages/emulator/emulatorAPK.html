@@ -1,4 +1,4 @@
-<html lang="en-us">
+<html data-theme="dark" lang="en-us">
 <script src="../../../../dist/js/pages/emulator/emulatorPageAPK.js"></script>
 <script src="https://pygame-web.github.io/archives/0.2.0/pythons.js" type=module id="main" data-src="fs,snd,gui" async defer>#<!--
 
@@ -38,42 +38,21 @@ def uy(*argv):
         acc += u(HEIGHT, REFY, v)
     return acc
 
-print("""
-Loading building from building.apk
-    Pygbag Version : 0.2.0
-    Template Version : 0.2.0
-    CDN URL : https://pygame-web.github.io/archives/0.2.0/
-    Screen  : {{cookiecutter.width}}x{{cookiecutter.height}}
-    Title   : building
-    Folder  : building
-    Authors : pgw
-    SPDX-License-Identifier: cookiecutter.spdx
-
-""")
-
 # don't rename
 async def sitecustomize():
     import embed
-
-    platform.document.body.style.background = "#7f7f7f"
 
     import pygame
 
     def compose():
         pygame.display.update()
-        window.chromakey(None, *screen.get_colorkey(), 40)
 
     pygame.init()
     pygame.font.init()
 
     screen = pygame.display.set_mode([ux(.100),uy(.100)], pygame.SRCALPHA, 32)
-    screen.set_colorkey( (0,0,0,0), pygame.RLEACCEL )
-    screen.fill( (0,0,0,0) )
 
     compose()
-
-    platform.window.transfer.hidden = true
-    platform.window.canvas.style.visibility = "visible"
 
 
 
@@ -100,18 +79,8 @@ async def sitecustomize():
 
     track = platform.window.MM.prepare(apk, json.dumps(cfg))
 
-    marginx = ux(.020) # 20%
-    marginy = uy(.045) # 45%
-
-
     def pg_bar(pos):
-        nonlocal marginx, marginy
-        # resolution of progress bar, recalculate since it may not be know yet.
-        total = track.len or 10  # avoid div0
-        slot = ux(.060)/ total # 60%
-
-        pygame.draw.rect(screen,(10,10,10),( marginx-ux(10), marginy-uy(10), (total*slot)+ux(20), uy(110) ) )
-        pygame.draw.rect(screen,(0,255,0), ( marginx, marginy, track.pos*slot, uy(90)) )
+        pass
 
     # wait until zip mount + overlayfs is complete
     while not track.ready:
@@ -196,56 +165,29 @@ asyncio.run( sitecustomize() )
 
 
 // this dict is available under PyConfig.config from __main__
-
-config = {
-    xtermjs : "1" ,
-    _sdl2 : "canvas",
-    user_canvas : 1,
-    ume_block : 0,
-    archive : "building",
-    gui_debug : 3,
-    cdn : "https://pygame-web.github.io/archives/0.2.0/",
-    autorun : 0,
-    PYBUILD : "3.11"
-}
-
 </script>
 
-    <title>building</title>
+    <title>Thumby Arcade</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
 
 
+    <link href="/dist/tailwind_output.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
 
     <style>
-        #status {
-            display: inline-block;
-            vertical-align: top;
-            margin-top: 20px;
-            margin-left: 30px;
-            font-weight: bold;
-            color: rgb(120, 120, 120);
-        }
+        /* Hide "Downloading" and "Running" elements added by pygbag and pythons.js */
+        /* .emscripten{
+            visibility: hidden;
+        } */
 
-        #progress {
-            height: 20px;
-            width: 300px;
-        }
-
-        div.emscripten { text-align: center; }
-        div.emscripten_border { border: 1px solid black; }
-        div.thick_border { border: 4px solid black; }
-
-        /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-        /* average size of droid screen 470dp x 320dp  */
-        canvas.emscripten {
+        .canvas {
             border: 0px none;
             background-color: transparent;
             width: 100%;
-            height=100%;
+            height: 100%;
             z-index: 5;
 
             padding: 0;
@@ -256,44 +198,8 @@ config = {
             bottom: 0;
             left: 0;
             right: 0;
-        }
 
-        body {
-            font-family: arial;
-            margin: 0;
-            padding: none;
-            background-color:powderblue;
-        }
-
-        .topright{
-            position:absolute;
-            top:0px;
-            right:0px;
-        }
-
-        .bottomright {
-            position:absolute;
-            top: 40%;
-            right: 0px;
-        }
-
-        .center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .trinfo{
-            position:relative;
-            right:0px;
-            border: 1px solid black;
-        }
-
-        .framed{
-            position:relative;
-            top:150px;
-            right:10px;
-            border: 1px solid black;
+            visibility: hidden;
         }
     </style>
 
@@ -302,115 +208,68 @@ config = {
 </head>
 
 <body>
-
-    <div id="transfer" align=center>
-        <div class="emscripten" id="status">Downloading...</div>
-        <div class="emscripten">
-            <progress value="0" max="100" id="progress"></progress>
-        </div>
-    </div>
+    <canvas class="canvas" id="canvas" width="1px" height="1px" oncontextmenu="event.preventDefault()" tabindex=1> </canvas>
 
 
+    <svg id="thumbyIcon" viewBox="0 0 723.19 1182.1" xmlns="http://www.w3.org/2000/svg" class="absolute left-0 right-0 top-0 bottom-0 m-auto w-1/12">
+        <g id="Page" transform="translate(-1123.6 -458.95)" fill="none" fill-rule="evenodd" stroke="#fff" stroke-linejoin="bevel">
+            <g transform="translate(1485,1050)" stroke-linecap="round" stroke-width="10.0">
+                <path d="m48.437 409.26-10.16 2.722m-101.6-2.722-10.16 2.722m25.035-58.238 10.16-2.722m101.6 2.722 10.16-2.722m-282.27-940.64h137.16m-147.32-.177c3.3867.059 6.7733.118 10.16.177m137.16 0c3.2011-.0557 6.4022-.11133 9.6033-.167m-9.6033.167v.515m10.16-.692h382.02m39.618 39.618c.45875-21.274-18.336-40.076-39.618-39.618m39.618 39.618v1020.1m-119.87 119.89h-.018m119.89-119.89v.018m-680.73-1059.7c-21.274-.46005-40.076 18.336-39.618 39.618m39.618-39.618h101.61v.101m155.63 998.95-10.16 2.722m25.035-58.238 10.16-2.722m86.725 58.238-10.16 2.722m25.035-58.238 10.16-2.722m-45.355 23.042c11.732-6.7733 23.464-13.547 35.195-20.32m20.32 35.196c-11.732 6.7733-23.464 13.547-35.195 20.32m-132.08-35.196c11.732-6.7733 23.464-13.547 35.195-20.32m20.32 35.196c-11.732 6.7733-23.464 13.547-35.195 20.32m-136.83-845.64v289.56h400.3v-289.56h-400.3m-20.32 386.08h401.32m-440.94-39.624c-.48384 21.27 18.347 40.106 39.624 39.624m-39.624-400.3v360.68m39.624-400.3c-21.27-.48389-40.106 18.347-39.624 39.624m480.57-39.624h-440.94m480.57 39.624c.48389-21.27-18.347-40.106-39.624-39.624m39.624 360.68v-321.06m-79.248 400.3c42.607.9072 80.151-36.611 79.248-79.248m-322.07-460.25c-.90584.18082-3.2169.64216-3.4666.692m305.22 639.39c-51.334-2.7991-80.649 68.016-42.387 102.33 11.071 11.169 26.654 17.644 42.387 17.557m-119.89-40.64c-51.334-2.7992-80.649 68.016-42.387 102.33 11.071 11.169 26.654 17.644 42.387 17.557m-331.22-139.19h-69.596c-5.4418-.1369-10.297 4.7182-10.16 10.16v83.312c-.1369 5.4418 4.7182 10.297 10.16 10.16h69.596v69.596c-.1369 5.4418 4.7182 10.297 10.16 10.16h83.312c5.4418.1369 10.297-4.7182 10.16-10.16v-69.596h69.596c5.4418.13696 10.297-4.7182 10.16-10.16v-83.312c.13694-5.4418-4.7182-10.297-10.16-10.16h-69.596m0-69.596c.13696-5.4418-4.7182-10.297-10.16-10.16m-83.312 0c-5.4418-.13694-10.297 4.7182-10.16 10.16m93.472-10.16h-83.312m-18.288-620.27h-101.1m-39.618 39.618c-.46005-21.274 18.336-40.076 39.618-39.618m-39.618 39.618v1100.3m39.618 39.618c-21.274.45875-40.076-18.336-39.618-39.618m720.34-80.252c1.2853 64.496-55.321 121.15-119.87 119.87m119.87-119.87v-1020.1m-39.618-39.618c21.275-.46012 40.075 18.336 39.618 39.618m-39.618-39.618h-382.53m163.65 1178.7c7.1842.00058 14.369.0387 21.552.156m-21.552-.156h-203.35m-21.552.156c7.1834-.11728 14.368-.15541 21.552-.156m-21.552.156c-14.635.25533-29.27.51067-43.905.766m-153.42 0h153.42m334.26 0h73.17m-73.17 0c-14.635-.25533-29.27-.51067-43.905-.766m-230.92-478.79v-69.596m-103.63 0v69.596m284.81 240.79c20.301-.66025 28.074 28.307 10.16 37.918m-45.355 23.042c-20.301.66037-28.075-28.307-10.16-37.918m-66.405-23.042c20.301-.66025 28.074 28.307 10.16 37.918m-45.355 23.042c-20.301.66037-28.075-28.307-10.16-37.918m323.41-203.89c51.334 2.799 80.649-68.016 42.387-102.33-11.071-11.169-26.654-17.644-42.387-17.557m-119.89 199.14c51.334 2.799 80.649-68.016 42.387-102.33-11.071-11.169-26.654-17.644-42.387-17.557m120.38 380.59c52.663.0567 52.922-80.318 0-80.5-52.663-.0578-52.921 80.318 0 80.5"/>
+            </g>
+        </g>
+    </svg>
 
-    <canvas class="emscripten" id="canvas" width="1px" height="1px" oncontextmenu="event.preventDefault()" tabindex=1> </canvas>
 
-    <div id=html></div>
+    <!-- The button to open modal -->
+    <label id="btnOpenArcade" for="my-modal" class="btn modal-button invisible">open arcade</label>
 
-    <div id=crt  class=bottomright >
+    <!-- Put this part before </body> tag -->
+    <input type="checkbox" id="my-modal" class="modal-toggle" />
+        <div class="modal">
+            <div class="modal-box p-0  tiny:min-w-[320px]  sm:min-w-[640px] absolute top-0 bottom-0 m-[auto_0]">
+                <div class="absolute left-0 top-0 bottom-0 right-0">
+                    <div class="min-w-full min-h-[6.25%] flex justify-center items-center">
+                        <h3 class="font-bold text-lg select-none">Thumby Arcade</h3>
+                    </div>
+                    <div class="bg-base-200 min-w-full min-h-[81.25%] max-h-[81.25%] flex overflow-hidden relative">
+                        <div id="divGameScrollContainer" class="min-w-full min-h-full flex overflow-y-hidden overflow-x-scroll snap-x snap-mandatory">
 
-        <div id="system" hidden>
-            <div class="button-container">
-                <button id="aiostop" disabled>AIO ⏏︎</button>
-                <button id="aiopaused_true" disabled>AIO ■</button>
-                <button id="aiopaused_false" disabled>AIO ▶</button>
-                <button id="pygame_mixer_music_pause" disabled>Music ■</button>
+                            <div id="divGameList" class="min-w-fit min-h-full flex pr-32 items-center justify-left">
+                            </div>
+
+                        </div>
+
+                        <label id="gameCount" class="absolute right-1 top-1 select-none">0/0</label> 
+
+                        <div id="btnScrollLeft" class="absolute top-0 bottom-0 left-0 min-w-fit flex items-center justify-center">
+                            <button class="mb-[24px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                </svg>                              
+                            </button>
+                        </div>
+                        <div id="btnScrollRight" class="absolute top-0 bottom-0 right-0 min-w-fit flex items-center justify-center">
+                            <button class="mb-[24px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>                             
+                            </button>
+                        </div>
+                        <div class="absolute h-20 bottom-8 left-0 right-0 flex items-center justify-evenly">
+                            <button class="btn btn-lg">Info</button>
+                            <button id="btnPlay" class="btn btn-lg btn-primary">Play</button>
+                        </div>
+                    </div>
+                    <div class="min-w-full min-h-[12.5%] flex justify-center items-center">
+                        <label id="btnBackToGame" for="my-modal" class="tiny:btn tiny:btn-sm  sm:btn sm:btn-lg">Exit</label> 
+                    </div>
+                </div>
             </div>
-
-            <div class="button-container">
-                <div id=load_min>min</div>
-                <div id=load_avg>avg</div>
-                <div id=load_max>max</div>
-                <button id="load_rst" disabled>RESET</button>
-            </div>
-
-            <div id="level">(battery level unknown)</div>
-            <div id="stateBattery">(charging state unknown)</div>
-
         </div>
-
-        <div id=box class="emscripten_border" hidden=true>
-
-            <div id="info" class="trinfo"></div>
-        </div>
-
     </div>
 
-
-    <div id="dlg" hidden>
-        <input type="file" id="dlg_multifile" multiple accept="image/*">
-        <label for="dlg_multifile">Select files</label>
-    </div>
-
-    <div id="pyconsole">
-        <div id="terminal" tabIndex=1 align="left"></div>
-    </div>
 
     <script type="application/javascript">
-
-    function custom_postRun(VM) {
-        
-    }
-
-    async function custom_onload(debug_hidden) {
-        // this is called before anythinh python is loaded
-        // make your js customization here
-        console.log(__FILE__, "custom_onload")
-
-        pyconsole.hidden = debug_hidden
-        system.hidden = debug_hidden
-        transfer.hidden = debug_hidden
-        info.hidden = debug_hidden
-        box.hidden =  debug_hidden
-    }
-
-    function custom_prerun(){
-        // no python main and no (MEMFS + VFS) yet.
-        console.log(__FILE__, "custom_prerun")
-
-    }
-
-    function custom_postrun(){
-        // python main and no VFS filesystem yet.
-        console.log(__FILE__, "custom_postrun")
-
-    }
-
-    function debug() {
-        // allow to gain access to dev tools from js console
-        // but only on desktop. difficult to reach when in iframe
-        python.config.debug = true
-        custom_onload(false)
-        Module.PyRun_SimpleString("shell.uptime()")
-        window_resize()
-    }
-
-    function info_inline(data){
-        document.getElementById("info").innerHTML = data
-    }
-
-    function info_online(url) {
-        // display info about current APK
-        fetch( url /*, options */)
-            .then((response) => response.text())
-            .then((html) => {
-                info_inline(html);
-        })
-        .catch((error) => {
-            console.warn(error);
-        });
-    }
-
     </script>
-
 </body>
 </html>

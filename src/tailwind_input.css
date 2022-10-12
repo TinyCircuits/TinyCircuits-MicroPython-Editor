@@ -12,6 +12,31 @@
 }
 
 
+
+/* Scrollbar style */
+::-webkit-scrollbar{
+    height: 15px;
+    width: 15px;
+}
+::-webkit-scrollbar-thumb:horizontal{
+    background: black;
+    border-radius: 9999px;
+    height: 15px;
+    width: 15px;
+}
+::-webkit-scrollbar-thumb:vertical{
+    background: black;
+    border-radius: 9999px;
+    height: 15px;
+    width: 15px;
+}
+::-webkit-scrollbar-track {
+    background: hsl(var(--b3, var(--b1)) / var(--tw-bg-opacity));
+    border-radius: 9999px;
+}
+
+
+
 .crisp-canvas{
     image-rendering: optimizeQuality;
     image-rendering: -moz-crisp-edges;

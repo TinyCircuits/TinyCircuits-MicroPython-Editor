@@ -3813,6 +3813,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 37px;
 }
 
+.h-24 {
+  height: 6rem;
+}
+
 .h-20 {
   height: 5rem;
 }
@@ -4042,6 +4046,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .cursor-default {
   cursor: default;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
 }
 
 .select-none {
@@ -4743,6 +4751,11 @@ input[type="number"]::-webkit-inner-spin-button,
     border-bottom-right-radius: var(--rounded-btn, 0.5rem);
   }
 
+  .tiny\:mx-2 {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
   .tiny\:min-w-\[320px\] {
     min-width: 320px;
   }
@@ -4968,6 +4981,11 @@ input[type="number"]::-webkit-inner-spin-button,
     border-top-right-radius: 0;
     border-bottom-left-radius: var(--rounded-btn, 0.5rem);
     border-bottom-right-radius: var(--rounded-btn, 0.5rem);
+  }
+
+  .sm\:mx-4 {
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 
   .sm\:min-w-\[640px\] {

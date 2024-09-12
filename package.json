@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@uiw/react-tabs-draggable": "^1.0.1",
     "daisyui": "^4.12.10",
     "react": "^18.3.1",
+    "react-complex-tree": "^2.4.5",
     "react-daisyui": "^5.0.4",
     "react-dom": "^18.3.1",
     "react-resizable-panels": "^2.1.2",

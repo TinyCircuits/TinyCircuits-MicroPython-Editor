@@ -4,7 +4,9 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 
 # Libraries
 * Framework: [ReactJS](https://react.dev/)
-* Editor: [monaco-editor](https://github.com/microsoft/monaco-editor)
+* Editor: [monaco-editor](https://github.com/microsoft/monaco-editor) + [ReactJS](https://react.dev/) = [monaco-react](https://github.com/suren-atoyan/monaco-react)
+* Tabs: [react-tabs-draggable](https://github.com/uiwjs/react-tabs-draggable)
+* File Tree: [react-complex-tree](https://github.com/lukasbach/react-complex-tree)
 * Terminal: [xterm.js](https://github.com/xtermjs/xterm.js)
 * Layout: [Resizable.js](https://github.com/TinyCircuits/Resizable.js)
 * Simulator: [MicroPython](https://github.com/micropython/micropython)

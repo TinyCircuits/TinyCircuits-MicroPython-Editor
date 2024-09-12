@@ -127,7 +127,7 @@ function CodePanel(props){
                 }
             </Tabs>
 
-            <div className="w-full h-full flex flex-col bg-base-300">
+            <div className="w-full h-full flex flex-col bg-base-200">
                 {getActiveComponent()}
             </div>
 

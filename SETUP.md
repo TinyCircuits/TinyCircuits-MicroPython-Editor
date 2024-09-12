@@ -11,3 +11,5 @@ These are the steps taken to set this project up the first time. This is for ref
 8. `npm install react-resizable-panels`
 9. `npm install react-complex-tree`
 10. `npm install @uiw/react-tabs-draggable`
+11. `@pablo-lion/xterm-react`
+12. `npm install @xterm/addon-fit`

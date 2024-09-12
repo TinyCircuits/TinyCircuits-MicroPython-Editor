@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -11,6 +11,7 @@ import PanelHeader from './PanelHeader.jsx'
 import FilesConnection from './files_connection.js'
 import FilesPanel from './FilesPanel.jsx'
 import CodePanel from './CodePanel.jsx'
+import TerminalPanel from './TerminalPanel.jsx'
 
 import {
   getPanelElement,
@@ -24,6 +25,10 @@ import {
 function App(props){
   // Create instance of class that handles files opened on computer
   const files_connection = new FilesConnection();
+
+  const test = () => {
+    console.log("TEST");
+  }
 
   return(
     <div className="w-full h-full bg-base-300 flex flex-col">
@@ -49,8 +54,9 @@ function App(props){
 
             <PanelResizeHandle className="h-1 bg-base-300"/>
 
-            <Panel className="bg-base-100" defaultSize={25} minSize={2} maxSize={98}>
+            <Panel className="bg-base-100" defaultSize={26} minSize={2} maxSize={98} onResize={test}>
               <PanelHeader title="Terminal"/>
+              <TerminalPanel />
             </Panel>
           </PanelGroup>
         </Panel>

@@ -13,35 +13,23 @@ function TerminalPanel(props){
     // https://github.com/PabloLION/xterm-react/blob/main/docs.md#calling-xterm-functions
     const xterm = useRef(null);
 
-    const process = () => {
+    const handleFit = () => {
         // https://github.com/xtermjs/xterm.js/issues/1283#issuecomment-938246315
-        fitAddon._terminal.element.parentElement.style.boxSizing = "content-box"
-        fitAddon._terminal.element.parentElement.style.display = "grid"
-        fitAddon.fit();
+        if(fitAddon._terminal != undefined){
+            fitAddon._terminal.element.parentElement.style.boxSizing = "content-box"
+            fitAddon._terminal.element.parentElement.style.display = "grid"
+            fitAddon.fit();
+        }
     }
 
     // This is called once
     useEffect(() => {
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminal");
-        xterm.current.writeln("##### TinyCircuits Programming Terminalaaaaaaaa");
-        xterm.current.writeln("##### TinyCircuits Programming Terminalaaaaaaaabbbbbbbbbbbbb");
-        xterm.current.writeln("##### TinyCircuits Programming Terminalaaaaaaaabbbbbbbbbbbbb");
-        xterm.current.writeln("##### TinyCircuits Programming Terminalaaaaaaaabbbbbbbbbbbbb");
+        document.addEventListener("terminal-panel-resized", handleFit);
     }, []);
 
     return (
         <div className="w-full h-full bg-accent">
-            <XTerm ref={xterm} addons={[fitAddon]} onData={process} onResize={process} onRender={process} onWriteParsed={process} className="w-full h-full bg-accent"/>
+            <XTerm ref={xterm} addons={[fitAddon]} onRender={handleFit} className="w-full h-full bg-accent"/>
         </div>
     )
 }

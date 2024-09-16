@@ -13,3 +13,4 @@ These are the steps taken to set this project up the first time. This is for ref
 10. `npm install @uiw/react-tabs-draggable`
 11. `@pablo-lion/xterm-react`
 12. `npm install @xterm/addon-fit`
+13. Added `"ViperIDE" : "https://github.com/vshymanskyy/ViperIDE"` to `package.json`

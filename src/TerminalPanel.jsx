@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect} from 'react'
 import './tailwind_output.css'
 import { Theme, Button, Tabs as DaisyTabs} from 'react-daisyui'
 import { XTerm } from "@pablo-lion/xterm-react";
@@ -26,6 +26,7 @@ function TerminalPanel(props){
     useEffect(() => {
         document.addEventListener("terminal-panel-resized", handleFit);
     }, []);
+
 
     return (
         <div className="w-full h-full bg-accent">

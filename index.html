@@ -8,7 +8,37 @@
     <title>TinyCircuits Programming</title>
   </head>
   <body>
+
+    <script>
+      // Due to ViperIDE classes importing other classes that register
+      // global event listeners (https://github.com/vshymanskyy/ViperIDE/blob/63dcf15154e0f6322c86cad6eaa2601f6e0a8bc1/src/utils.js#L268-L279)
+      // override the addEventListeners and do not allow adding listeners
+      // for those events:
+      // https://stackoverflow.com/a/57437878
+      var placeToReplace;
+      if (window.EventTarget && EventTarget.prototype.addEventListener) {
+        placeToReplace = EventTarget;
+      } else {
+        placeToReplace = Element;
+      }
+
+      placeToReplace.prototype.oldaddEventListener = placeToReplace.prototype.addEventListener;
+      placeToReplace.prototype.addEventListener = function(event, handler, placeholder) {
+
+        if(event == "error" || event == "unhandledrejection"){
+          return;
+        }
+
+        if (arguments.length < 3) {
+          this.oldaddEventListener(event, handler, false);
+        } else {
+          this.oldaddEventListener(event, handler, placeholder);
+        }
+      }
+    </script>
+
     <div id="root" class="bg-accent absolute w-full h-full"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -9051,6 +9051,10 @@ html:has(.drawer-open.drawer-open) {
   line-height: 1rem;
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
 .uppercase {
   text-transform: uppercase;
 }

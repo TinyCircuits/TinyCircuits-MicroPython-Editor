@@ -8,7 +8,7 @@ function PanelHeader(props){
 
     return(
         <div className="w-full h-6 bg-base-200 flex items-center text-nowrap">
-            <p>{title}</p>
+            <p className='text'>{title}</p>
         </div>
     )
 }

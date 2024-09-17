@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect, forwardRef} from 'react'
 import './tailwind_output.css'
 import { Theme, Button, Tabs as DaisyTabs} from 'react-daisyui'
 import { XTerm } from "@pablo-lion/xterm-react";
@@ -6,12 +6,13 @@ import { FitAddon } from "@xterm/addon-fit"
 
 
 
-function TerminalPanel(props){
+const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     // Instantiate the addon
-    const fitAddon = new FitAddon()
+    const fitAddon = new FitAddon();
+    const serial = props.serial;
 
     // https://github.com/PabloLION/xterm-react/blob/main/docs.md#calling-xterm-functions
-    const xterm = useRef(null);
+    // const xterm = useRef(null);
 
     const handleFit = () => {
         // https://github.com/xtermjs/xterm.js/issues/1283#issuecomment-938246315
@@ -22,18 +23,25 @@ function TerminalPanel(props){
         }
     }
 
+    // https://github.com/PabloLION/xterm-react/blob/main/docs.md#calling-xterm-functions:~:text=the%20cursor%20moves.-,onData,-%3F%3A%20IEventListener%3Cstring%3E
+    const onData = (data) => {
+        serial.write(data);
+    }
+
     // This is called once
     useEffect(() => {
         document.addEventListener("terminal-panel-resized", handleFit);
+        xtermRef.current.writeln("TinyCircuits MicroPython Editor Terminal");
+        xtermRef.current.writeln("----------------------------------------");
     }, []);
 
 
     return (
         <div className="w-full h-full bg-accent">
-            <XTerm ref={xterm} addons={[fitAddon]} onRender={handleFit} className="w-full h-full bg-accent"/>
+            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className="w-full h-full bg-accent"/>
         </div>
     )
-}
+});
 
 
 export default TerminalPanel;

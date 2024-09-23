@@ -43,7 +43,7 @@ function TabPanel(props){
     const [tabsData, setTabsData] = useState(tabs);
 
     // The active tab key
-    const [activeKey, setActiveKey] = useState(-1);
+    const [activeKey, setActiveKey] = useState(0);
 
     // When a tab is clicked, set the active key which
     // will index into editor component array and render
@@ -105,27 +105,38 @@ function TabPanel(props){
     }
 
     return (
-        <div className="">
+        <div className="w-full h-full flex flex-col">
             
-            <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
-                {
-                    tabsData.map(
-                        (m, idx) => {
-                            return (
-                                <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
-                                    <div className='flex'>
-                                        {m.children.title}
-                                        {addCloseButton(m)}
-                                    </div>
-                                </Tab>
-                            );
-                        }
-                    )
-                }
-            </Tabs>
+            <div className="w-full bg-error relative">
+                <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
+                    {
+                        tabsData.map(
+                            (m, idx) => {
+                                return (
+                                    <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
+                                        <div className='flex'>
+                                            {m.children.title}
+                                            {addCloseButton(m)}
+                                        </div>
+                                    </Tab>
+                                );
+                            }
+                        )
+                    }
+                </Tabs>
+            </div>
 
-            <div className="w-full h-full flex flex-col">
-                {getActiveComponent()}
+            <div className="w-full h-full bg-success min-h-0 overflow-hidden">
+                {/* {getActiveComponent()} */}
+                {
+                    tabsData.map((item, index) => {
+                        return (
+                            <div key={index} className={item.id==activeKey ? "w-full h-full bg-success min-h-0 overflow-hidden" : "invisible fixed"}>
+                                {item.children.component};
+                            </div>
+                        );
+                    })
+                }
             </div>
 
         </div>

@@ -11,6 +11,10 @@ import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
 import { XTerm } from "@pablo-lion/xterm-react";
 
+import React from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { python } from '@codemirror/lang-python';
+
 import FilesConnection from './files_connection.js'
 // import Serial from './serial.js'
 
@@ -37,23 +41,24 @@ const files_connection = new FilesConnection();
 
 function App(props){
     const [tabsData, setTabsData] = useState([
-        { id: 0, children: {title:'main.py', component:<>main.py</>} },
-        { id: 1, children: {title:'test.py', component:<>test.py</>}},
+        { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },
+        { id: 1, children: {title:'test.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} }
     ]);
 
     const [errorMsg, setErrorMsg] = useState("No error, you shouldn't see this...");
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
 
     const errorModalRef = useRef(null);
-    const xtermRef = useRef(null);
+    const xtermRefDevice = useRef(null);
+    const xtermRefSimulator = useRef(null);
 
     let serial  = undefined;
 
     const [terminalTabsData, setTerminalTabsData] = useState([
         // { id: 0, children: {title:'Device Terminal', component:<>test 0</>} },
         // { id: 1, children: {title:'Simulator Terminal', component:<>test 1</>}},
-        { id: 0, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRef} serial={serial} startMessage="Device Terminal"/>} },
-        { id: 1, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRef} serial={serial} startMessage="Simulator Terminal"/>}},
+        { id: 0, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
+        { id: 1, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
     ]);
 
     try{
@@ -200,7 +205,7 @@ function App(props){
                                                     </svg>
                                                     Connect
                                                 </Button>
-                                                <Button className="flex-1 h-full" size="sm" disabled={false} style={{borderRadius: "0px"}} onClick={connectSerial} title="Upload and the opened project files on the device. Only uploads files from opened project if files differ.">
+                                                <Button className="flex-1 h-full" size="sm" disabled={false} style={{borderRadius: "0px"}} onClick={connectSerial} title="If files are opened from a computer, this button will upload files from the source location to the run location">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-upload" viewBox="0 0 16 16">
                                                         <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
                                                         <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
@@ -317,7 +322,7 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            <TabPanel tabs={tabsData} draggable={false} closeable={true}/>
+                            <TabPanel tabs={tabsData} draggable={true} closeable={true}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300" />

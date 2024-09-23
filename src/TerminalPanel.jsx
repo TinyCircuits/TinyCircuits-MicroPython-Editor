@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, forwardRef} from 'react'
 import './tailwind_output.css'
-import { Theme, Button, Tabs as DaisyTabs} from 'react-daisyui'
+import { Theme, Button, Tabs} from 'react-daisyui'
 import { XTerm } from "@pablo-lion/xterm-react";
 import { FitAddon } from "@xterm/addon-fit"
+import TabPanel from './TabPanel';
 
 
 
@@ -31,14 +32,16 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     // This is called once
     useEffect(() => {
         document.addEventListener("terminal-panel-resized", handleFit);
-        xtermRef.current.writeln("TinyCircuits MicroPython Editor Terminal");
+        xtermRef.current.writeln(props.startMessage);
         xtermRef.current.writeln("----------------------------------------");
     }, []);
 
 
     return (
-        <div className="w-full h-full bg-accent">
-            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className="w-full h-full bg-accent"/>
+        <div className="">
+
+            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className=""/>
+
         </div>
     )
 });

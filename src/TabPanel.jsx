@@ -36,19 +36,11 @@ function insertAndShift(arr, from, to) {
 
 
 
-function CodePanel(props){
-    // The tabs data that gives each tab a name
-    const [tabsData, setTabsData] = useState([
-        { id: 0, children: {title:'Google', component:<>Google Component</>} },
-        { id: 1, children: {title:'MicroSoft', component:<>MicroSoft Component</>}},
-        { id: 2, children: {title:'Baidu', component:<>Baidu Component</>}},
-        { id: 3, children: {title:'Taobao', component:<>Taobao Component</>}},
-        { id: 4, children: {title:'JD', component:<>JD Component</>}},
-        { id: 5, children: {title:'Apple', component:<>Apple Component</>}},
-        { id: 6, children: {title:'Bing', component:<>Bing Component</>}},
-        { id: 7, children: {title:'Gmail', component:<>Gmail Component</>}},
-        { id: 8, children: {title:'Gitter', component:<>Gitter Component</>}},
-    ]);
+function TabPanel(props){
+
+    const {tabs, draggable, closeable, ...other_props} = props;
+
+    const [tabsData, setTabsData] = useState(tabs);
 
     // The active tab key
     const [activeKey, setActiveKey] = useState(-1);
@@ -106,19 +98,24 @@ function CodePanel(props){
         return tabData.children.component;
     }
 
+    const addCloseButton = (m) => {
+        if(closeable){
+            return <button style={{all:'unset', width:18}} onClick={(evn) => whenTabClosed(m, evn)} className='btn'>x</button>
+        }
+    }
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="">
             
-            <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
+            <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
                 {
                     tabsData.map(
                         (m, idx) => {
                             return (
-                                <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")}>
+                                <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
                                     <div className='flex'>
                                         {m.children.title}
-                                        <button style={{all:'unset', width:18}} onClick={(evn) => whenTabClosed(m, evn)} className='btn'>x</button>
+                                        {addCloseButton(m)}
                                     </div>
                                 </Tab>
                             );
@@ -127,7 +124,7 @@ function CodePanel(props){
                 }
             </Tabs>
 
-            <div className="w-full h-full flex flex-col bg-base-200">
+            <div className="w-full h-full flex flex-col">
                 {getActiveComponent()}
             </div>
 
@@ -136,4 +133,4 @@ function CodePanel(props){
 }
 
 
-export default CodePanel;
+export default TabPanel;

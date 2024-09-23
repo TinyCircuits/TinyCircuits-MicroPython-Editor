@@ -7,7 +7,7 @@ function PanelHeader(props){
     const title = props.title;
 
     return(
-        <div className="w-full h-6 bg-base-200 flex items-center text-nowrap">
+        <div className="ml-1 w-full h-7 bg-base-200 flex items-center font-bold text-nowrap select-none">
             <p className='text'>{title}</p>
         </div>
     )

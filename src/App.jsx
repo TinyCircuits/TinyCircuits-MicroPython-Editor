@@ -319,7 +319,7 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            <TabPanel tabs={tabsData} draggable={true} closeable={true}/>
+                            <TabPanel tabs={tabsData} draggable={false} closeable={true}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300" />

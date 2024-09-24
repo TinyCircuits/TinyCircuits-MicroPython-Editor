@@ -12,9 +12,6 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     const fitAddon = new FitAddon();
     const serial = props.serial;
 
-    // https://github.com/PabloLION/xterm-react/blob/main/docs.md#calling-xterm-functions
-    // const xterm = useRef(null);
-
     const handleFit = () => {
         // https://github.com/xtermjs/xterm.js/issues/1283#issuecomment-938246315
         if(fitAddon._terminal != undefined){
@@ -32,15 +29,22 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     // This is called once
     useEffect(() => {
         document.addEventListener("terminal-panel-resized", handleFit);
+
+        // Print start message
         xtermRef.current.writeln(props.startMessage);
-        xtermRef.current.writeln("----------------------------------------");
+
+        // Print underline
+        for(let i=0; i<props.startMessage.length; i++){
+            xtermRef.current.write("-");
+        }
+        xtermRef.current.writeln("");
     }, []);
 
 
     return (
-        <div className="">
+        <div className="flex flex-col w-full h-full bg-error">
 
-            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className=""/>
+            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className="w-full h-full"/>
 
         </div>
     )

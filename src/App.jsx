@@ -52,14 +52,20 @@ function App(props){
     const xtermRefDevice = useRef(null);
     const xtermRefSimulator = useRef(null);
 
-    let serial  = undefined;
+    function onSerialData(value){
+        xtermRefDevice.current.write(value);
+    }
 
-    const [terminalTabsData, setTerminalTabsData] = useState([
-        // { id: 0, children: {title:'Device Terminal', component:<>test 0</>} },
-        // { id: 1, children: {title:'Simulator Terminal', component:<>test 1</>}},
-        { id: 0, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
-        { id: 1, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
-    ]);
+    function onSerialActivity(){
+        console.log("Hi");
+    }
+
+    function onSerialDisconnect(){
+        console.log("Serial disconnect")
+        // serial.disconnect();
+    }
+
+    let serial  = undefined;
 
     try{
         serial = new WebSerialOverride();
@@ -69,6 +75,11 @@ function App(props){
     }catch(error){
         console.error(error);
     }
+
+    const [terminalTabsData, setTerminalTabsData] = useState([
+        { id: 0, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
+        { id: 1, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
+    ]);
 
     const connectSerial = async () => {
         if(serial == undefined){
@@ -104,20 +115,6 @@ function App(props){
         }
     }
 
-    // document.onkeydown = (event) => {console.log(event)};
-
-    function onSerialData(value){
-        xtermRef.current.write(value);
-    }
-
-    function onSerialActivity(){
-        console.log("Hi");
-    }
-
-    function onSerialDisconnect(){
-        console.log("Serial disconnect")
-        // serial.disconnect();
-    }
 
     const handleShowErrorMsg = useCallback(() => {
         errorModalRef.current?.showModal();

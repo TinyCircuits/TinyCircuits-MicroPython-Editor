@@ -8599,12 +8599,36 @@ html:has(.drawer-open.drawer-open) {
   top: 50%;
 }
 
+.left-0 {
+  left: 0px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.right-0 {
+  right: 0px;
+}
+
+.bottom-0 {
+  bottom: 0px;
+}
+
 .isolate {
   isolation: isolate;
 }
 
 .isolation-auto {
   isolation: auto;
+}
+
+.z-0 {
+  z-index: 0;
+}
+
+.z-10 {
+  z-index: 10;
 }
 
 .mb-8 {
@@ -8755,42 +8779,13 @@ html:has(.drawer-open.drawer-open) {
   height: 1.75rem;
 }
 
-.h-9 {
-  height: 2.25rem;
-}
-
 .h-full {
   height: 100%;
 }
 
-.h-8 {
-  height: 2rem;
-}
-
-.h-0 {
-  height: 0px;
-}
-
-.max-h-40 {
-  max-height: 10rem;
-}
-
-.max-h-full {
-  max-height: 100%;
-}
-
-.max-h-min {
-  max-height: -moz-min-content;
-  max-height: min-content;
-}
-
-.max-h-fit {
-  max-height: -moz-fit-content;
-  max-height: fit-content;
-}
-
-.max-h-80 {
-  max-height: 20rem;
+.h-min {
+  height: -moz-min-content;
+  height: min-content;
 }
 
 .min-h-0 {
@@ -8833,10 +8828,6 @@ html:has(.drawer-open.drawer-open) {
   width: 100%;
 }
 
-.w-0 {
-  width: 0px;
-}
-
 .max-w-10 {
   max-width: 2.5rem;
 }
@@ -8855,10 +8846,6 @@ html:has(.drawer-open.drawer-open) {
 
 .grow {
   flex-grow: 1;
-}
-
-.basis-full {
-  flex-basis: 100%;
 }
 
 .border-collapse {

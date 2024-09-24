@@ -126,12 +126,11 @@ function TabPanel(props){
                 </Tabs>
             </div>
 
-            <div className="w-full h-full bg-success min-h-0 overflow-hidden">
-                {/* {getActiveComponent()} */}
+            <div className="w-full h-full min-h-0 overflow-hidden relative">
                 {
                     tabsData.map((item, index) => {
                         return (
-                            <div key={index} className={item.id==activeKey ? "w-full h-full bg-success min-h-0 overflow-hidden" : "invisible fixed"}>
+                            <div key={index} className={"top-0 left-0 right-0 bottom-0 min-h-0 absolute" + " " + (item.id==activeKey ? "z-10" : "invisible z-0")}>
                                 {item.children.component};
                             </div>
                         );

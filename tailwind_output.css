@@ -8587,32 +8587,32 @@ html:has(.drawer-open.drawer-open) {
   inset: -0.25rem;
 }
 
-.left-5 {
-  left: 1.25rem;
-}
-
-.right-5 {
-  right: 1.25rem;
-}
-
-.top-1\/2 {
-  top: 50%;
+.bottom-0 {
+  bottom: 0px;
 }
 
 .left-0 {
   left: 0px;
 }
 
-.top-0 {
-  top: 0px;
+.left-5 {
+  left: 1.25rem;
 }
 
 .right-0 {
   right: 0px;
 }
 
-.bottom-0 {
-  bottom: 0px;
+.right-5 {
+  right: 1.25rem;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.top-1\/2 {
+  top: 50%;
 }
 
 .isolate {
@@ -8629,6 +8629,11 @@ html:has(.drawer-open.drawer-open) {
 
 .z-10 {
   z-index: 10;
+}
+
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 .mb-8 {
@@ -8779,13 +8784,12 @@ html:has(.drawer-open.drawer-open) {
   height: 1.75rem;
 }
 
-.h-full {
-  height: 100%;
+.h-8 {
+  height: 2rem;
 }
 
-.h-min {
-  height: -moz-min-content;
-  height: min-content;
+.h-full {
+  height: 100%;
 }
 
 .min-h-0 {
@@ -8897,6 +8901,10 @@ html:has(.drawer-open.drawer-open) {
   flex-wrap: wrap;
 }
 
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
 .items-center {
   align-items: center;
 }
@@ -8907,6 +8915,10 @@ html:has(.drawer-open.drawer-open) {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-evenly {
+  justify-content: space-evenly;
 }
 
 .gap-2 {

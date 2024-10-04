@@ -30,22 +30,20 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     useEffect(() => {
         document.addEventListener("terminal-panel-resized", handleFit);
 
-        // Print start message
-        xtermRef.current.writeln(props.startMessage);
+        // // Print start message
+        // xtermRef.current.writeln(props.startMessage);
 
-        // Print underline
-        for(let i=0; i<props.startMessage.length; i++){
-            xtermRef.current.write("-");
-        }
-        xtermRef.current.writeln("");
+        // // Print underline
+        // for(let i=0; i<props.startMessage.length; i++){
+        //     xtermRef.current.write("-");
+        // }
+        // xtermRef.current.writeln("");
     }, []);
 
 
     return (
         <div className="flex flex-col w-full h-full bg-error">
-
             <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className="w-full h-full"/>
-
         </div>
     )
 });

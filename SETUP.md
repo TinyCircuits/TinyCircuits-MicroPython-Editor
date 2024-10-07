@@ -9,9 +9,10 @@ These are the steps taken to set this project up the first time. This is for ref
 6. Run this whenever editing themes/daisyUI config: `npx tailwindcss -i ./src/tailwind_input.css -o ./src/tailwind_output.css --watch`
 7. `npm run dev` to start local server
 8. `npm install react-resizable-panels`
-9. `npm install react-complex-tree`
 10. `npm install @uiw/react-tabs-draggable`
 11. `@pablo-lion/xterm-react`
 12. `npm install @xterm/addon-fit`
 13. Added `"ViperIDE" : "https://github.com/vshymanskyy/ViperIDE"` to `package.json`
 14. `npm install @uiw/react-codemirror`
+15. `npm install react-arborist`
+16. `npm install use-resize-observer`

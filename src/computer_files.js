@@ -1,7 +1,8 @@
 class ComputerFiles{
-    constructor(){
+    constructor(setTree){
         this.dir_handle = undefined;
         this.tree = undefined;
+        this.setTree = setTree;
     }
 
     get_tree = () => {
@@ -34,7 +35,7 @@ class ComputerFiles{
             }else if(handle.kind == "directory"){
                 let content = [];
                 list.push({name:handle.name, path:full_path, content:content})
-                this.build_tree(handle, content, full_path, false)
+                await this.build_tree(handle, content, full_path, false);
             }
 
             // Go to the next iterator handle
@@ -49,8 +50,9 @@ class ComputerFiles{
             this.dir_handle = result;
 
             this.tree = [];
-            this.build_tree(this.dir_handle, this.tree, "");
-            console.log(this.tree);
+            this.build_tree(this.dir_handle, this.tree, "").then(() => {
+                this.setTree(this.tree);
+            });
         }
 
         // Define what to do when the user does not choose a directory

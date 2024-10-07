@@ -1,10 +1,11 @@
 import { MpRawMode } from 'ViperIDE/src/rawmode';
 
 class DeviceFiles{
-    constructor(serial){
+    constructor(serial, setTree){
         this.dir_handle = undefined;
         this.serial = serial;
         this.tree = undefined;
+        this.setTree = setTree;
     }
 
     // Call this to open file directory chooser on computer
@@ -18,7 +19,7 @@ class DeviceFiles{
             console.log(await raw_mode.getDeviceInfo());
 
             this.tree = await raw_mode.walkFs();
-            console.log(this.tree);
+            this.setTree(this.tree);
         });
     }
 }

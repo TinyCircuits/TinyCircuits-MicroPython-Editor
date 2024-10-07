@@ -8631,11 +8631,6 @@ html:has(.drawer-open.drawer-open) {
   z-index: 10;
 }
 
-.mx-1 {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
-}
-
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -8784,12 +8779,16 @@ html:has(.drawer-open.drawer-open) {
   height: 1.75rem;
 }
 
-.h-8 {
-  height: 2rem;
-}
-
 .h-full {
   height: 100%;
+}
+
+.h-12 {
+  height: 3rem;
+}
+
+.h-20 {
+  height: 5rem;
 }
 
 .min-h-0 {
@@ -9250,6 +9249,10 @@ html:has(.drawer-open.drawer-open) {
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+.pl-1 {
+  padding-left: 0.25rem;
 }
 
 .text-3xl {
@@ -10097,6 +10100,16 @@ html:has(.drawer-open.drawer-open) {
     padding-left: 0.688rem;
     padding-right: 0.688rem;
   }
+}
+
+.hover\:bg-error:hover {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
+}
+
+.hover\:bg-base-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity)));
 }
 
 .focus\:outline-offset-0:focus {

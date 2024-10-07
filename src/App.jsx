@@ -38,7 +38,16 @@ import{
 
 function App(props){
 
+    const [tree, setTree] = useState([]);
     let files = undefined;
+
+    // const get_file_tree = () => {
+    //     if(files == undefined){
+    //         return [];
+    //     }else{
+    //         return files.get_tree();
+    //     }
+    // }
     
     const [tabsData, setTabsData] = useState([
         { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },
@@ -123,13 +132,13 @@ function App(props){
     }
 
     const openComputerFiles = () => {
-        files = new ComputerFiles();
+        files = new ComputerFiles(setTree);
         files.open_files();
         choosePLatformModalRef.current?.close();
     }
 
     const openDeviceFiles = () => {
-        files = new DeviceFiles(serial);
+        files = new DeviceFiles(serial, setTree);
         files.open_files();
         choosePLatformModalRef.current?.close();
     }
@@ -220,10 +229,10 @@ function App(props){
                     <PanelGroup direction="vertical">
 
                         {/* ### File panel ### */}
-                        <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
+                        <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}>
                             <PanelHeader title="Files"/>
                             
-                            <FilesPanel />
+                            <FilesPanel tree={tree} />
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300"/>

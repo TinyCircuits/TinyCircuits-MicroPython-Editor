@@ -1,4 +1,4 @@
-# TinyCircuits-Web-Programming-Platform
+# TinyCircuits-MicroPython-Editor
 Web IDE focused on editing, running, and uploading MicroPython code on and to TinyCircuits' devices.
 
 TODO: Add popup on run and hide run location and source location. Source location only matters for opening files from computer and running on simulator

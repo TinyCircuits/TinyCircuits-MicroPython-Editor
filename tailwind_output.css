@@ -8783,14 +8783,6 @@ html:has(.drawer-open.drawer-open) {
   height: 100%;
 }
 
-.h-12 {
-  height: 3rem;
-}
-
-.h-20 {
-  height: 5rem;
-}
-
 .min-h-0 {
   min-height: 0px;
 }
@@ -10100,11 +10092,6 @@ html:has(.drawer-open.drawer-open) {
     padding-left: 0.688rem;
     padding-right: 0.688rem;
   }
-}
-
-.hover\:bg-error:hover {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
 }
 
 .hover\:bg-base-200:hover {

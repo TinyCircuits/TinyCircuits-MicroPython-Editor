@@ -37,10 +37,25 @@ function App(props){
     let files = undefined;
 
     
+    // const [tabsData, setTabsData] = useState([
+    //     { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },
+    //     { id: 1, children: {title:'test.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} }
+    // ]);
+
     const [tabsData, setTabsData] = useState([
-        { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },
-        { id: 1, children: {title:'test.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} }
+        
     ]);
+
+    // When a file in the files panel is opened, this gets called to add
+    // a new code editor to `tabsData`. The code editor tab will need
+    // access to `fileDataGetter` and `fileDataSetter` for getting and
+    // setting data from/to the file on a computer or device
+    const addCodeEditor = (path, name, fileDataGetter, fileDataSetter) => {
+        tabsData.push({ id:path, children: {title:name, component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} })
+        setTabsData([...tabsData]);
+
+        console.log(tabsData);
+    }
 
     const [errorMsg, setErrorMsg] = useState("No error, you shouldn't see this...");
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
@@ -116,7 +131,6 @@ function App(props){
 
     const chooseFilesPlatform = () => {
         choosePLatformModalRef.current?.showModal();
-        // files_connection.open_files();
     }
 
     const openComputerFiles = () => {
@@ -220,7 +234,7 @@ function App(props){
                         <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}>
                             <PanelHeader title="Files"/>
                             
-                            <FilesPanel tree={tree} />
+                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300"/>
@@ -366,7 +380,8 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            <TabPanel tabs={tabsData} draggable={false} closeable={true}/>
+                            {console.log("TEST1", tabsData)}
+                            <TabPanel tabsData={tabsData} setTabsData={setTabsData} draggable={false} closeable={true}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300" />
@@ -374,7 +389,7 @@ function App(props){
                         <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
                             {/* <PanelHeader title="Terminal" /> */}
                             {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
-                            <TabPanel tabs={terminalTabsData} draggable={false} closeable={false}/>
+                            <TabPanel tabsData={terminalTabsData} setTabsData={setTabsData} draggable={false} closeable={false}/>
                         </Panel>
                     </PanelGroup>
                 </Panel>

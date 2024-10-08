@@ -90,7 +90,10 @@ function FilesPanel(props){
     }
 
     const onSelected = (node) => {
-        console.log(node);
+        // Only open a code editor if actually selected something and is not a folder
+        if(node.length != 0 && node[0].isLeaf){
+            props.addCodeEditor(node[0].id, node[0].data.name);
+        }
     }
     
     return (

@@ -38,9 +38,9 @@ function insertAndShift(arr, from, to) {
 
 function TabPanel(props){
 
-    const {tabs, draggable, closeable, ...other_props} = props;
+    const {tabsData, setTabsData, draggable, closeable, ...other_props} = props;
 
-    const [tabsData, setTabsData] = useState(tabs);
+    // const [tabsData, setTabsData] = useState(tabs);
 
     // The active tab key
     const [activeKey, setActiveKey] = useState(0);
@@ -59,37 +59,26 @@ function TabPanel(props){
     // adn close the editor
     const whenTabClosed = (item, evn) => {
         evn.stopPropagation();
-        const idx = tabsData.findIndex((m) => m.id === item.id);
+        const idx = props.tabsData.findIndex((m) => m.id === item.id);
 
         let active = -1;
         if(idx > -1 && activeKey){
-            active = tabsData[idx - 1] ? tabsData[idx - 1].id : tabsData[idx].id;
+            active = props.tabsData[idx - 1] ? props.tabsData[idx - 1].id : props.tabsData[idx].id;
             setActiveKey(active || -1);
         }
 
-        setTabsData(tabsData.filter((m) => m.id !== item.id));
-
-        // TODO: close code editor and maybe remove it from an array!
-    };
-
-    // Copy tab data and add one more tab item and then
-    // set the tabs data for persistance and to re-render
-    // component using a `useState` set function
-    const whenTabAdded = () => {
-        // const newData = [...tabsData, { id: tabsData.length+1}`, children: `New Tab ${tabsData.length+1}` }];
-        // setTabsData(newData);
+        setTabsData(props.tabsData.filter((m) => m.id !== item.id));
     };
 
     // When a tab is dropped, reorganize all the tabs
     const whenTabDropped = (id, index) => {
-        const oldIndex = [...tabsData].findIndex((m) => m.id === id);
-        const newData = insertAndShift([...tabsData], oldIndex, index);
+        const oldIndex = [...props.tabsData].findIndex((m) => m.id === id);
+        const newData = insertAndShift([...props.tabsData], oldIndex, index);
         setTabsData(newData);
     };
 
-
     const getActiveComponent = () => {
-        let tabData = tabsData.find((entry) => entry.id == activeKey);
+        let tabData = props.tabsData.find((entry) => entry.id == activeKey);
 
         if(tabData == undefined){
             return <></>;
@@ -106,11 +95,11 @@ function TabPanel(props){
 
     return (
         <div className="w-full h-full flex flex-col">
-            
+            {console.log("Test2", props.tabsData)}
             <div className="w-full bg-error relative">
                 <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
                     {
-                        tabsData.map(
+                        props.tabsData.map(
                             (m, idx) => {
                                 return (
                                     <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
@@ -128,7 +117,7 @@ function TabPanel(props){
 
             <div className="w-full h-full min-h-0 overflow-hidden relative">
                 {
-                    tabsData.map((item, index) => {
+                    props.tabsData.map((item, index) => {
                         return (
                             <div key={index} className={"top-0 left-0 right-0 bottom-0 min-h-0 absolute" + " " + (item.id==activeKey ? "z-10" : "invisible z-0")}>
                                 {item.children.component};

@@ -1,13 +1,12 @@
 # TinyCircuits-MicroPython-Editor
 Web IDE focused on editing, running, and uploading MicroPython code on and to TinyCircuits' devices.
 
-TODO: Add popup on run and hide run location and source location. Source location only matters for opening files from computer and running on simulator
 
 # Libraries
 * Framework: [ReactJS](https://react.dev/)
 * Editor: [CodeMirror](https://codemirror.net/) + [ReactJS](https://react.dev/) = [React CodeMirror](https://uiwjs.github.io/react-codemirror/)
 * Tabs: [react-tabs-draggable](https://github.com/uiwjs/react-tabs-draggable)
-* File Tree: [react-complex-tree](https://github.com/lukasbach/react-complex-tree)
+* File Tree: [react-arborist](https://github.com/brimdata/react-arborist)
 * Terminal: [xterm.js](https://github.com/xtermjs/xterm.js) + [ReactJS](https://react.dev/) = [xterm-react](https://github.com/PabloLION/xterm-react)
 * Communication: [ViperIDE](https://github.com/vshymanskyy/ViperIDE/blob/main/src/transports.js)
 * Simulator: [MicroPython](https://github.com/micropython/micropython)

@@ -22,7 +22,8 @@
     "react-resizable-panels": "^2.1.2",
     "tailwindcss": "^3.4.10",
     "use-resize-observer": "^9.1.0",
-    "ViperIDE": "https://github.com/vshymanskyy/ViperIDE"
+    "ViperIDE": "https://github.com/vshymanskyy/ViperIDE",
+    "vite-plugin-singlefile": "^2.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

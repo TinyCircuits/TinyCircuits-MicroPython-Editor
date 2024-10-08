@@ -5,50 +5,28 @@ import { python } from '@codemirror/lang-python';
 
 
 function CodePanel(props){
-    const [value, setValue] = useState("");
+    const handleOnChange = (value, viewUpdate) => {
+        props.editorValues[props.path] = value;
+        props.onCodeEditorChanged(props.path);
+    }
 
-    useEffect(() => {
-        props.openFile(props.path).then((file_contents) => {
-            setValue(file_contents);
-            console.log("Editor value set!");
-        })
-    });
+    const getEditorValue = () => {
+        return props.editorValues[props.path];
+    }
+
+    const handleLookForSaveKeyPress = (event) => {
+        if(event.ctrlKey && event.key == "s"){
+            event.preventDefault();
+            props.onCodeEditorSaved(props.path, props.editorValues[props.path]);
+        }
+    }
 
     return(
-        <div className='h-full w-full'>
-            <CodeMirror value={value} className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />
+        <div className='h-full w-full' onKeyDown={handleLookForSaveKeyPress}>
+            <CodeMirror onChange={handleOnChange} value={getEditorValue()} className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />
         </div>
     );
 }
 
-
-// // https://github.com/uiwjs/react-codemirror?tab=readme-ov-file#support-hook
-// const extensions = [python({ })];
-
-
-// function CodePanel(props){
-//     const editor = useRef();
-
-//     const { setContainer } = useCodeMirror({
-//         container: editor.current,
-//         extensions,
-//         value: "import os",
-//         theme: "dark",
-//     });
-
-//     useEffect(() => {
-//         if (editor.current){
-//             setContainer(editor.current);
-//             console.log(editor.current.children);
-//             // editor.current.children[0].className += " w-full h-full"
-//         }
-//     }, [editor.current]);
-
-//     return(
-//         <div ref={editor} className='w-full h-full'>
-
-//         </div>
-//     );
-// }
 
 export default CodePanel;

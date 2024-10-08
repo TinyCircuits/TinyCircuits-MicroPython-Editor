@@ -104,6 +104,7 @@ function TabPanel(props){
                                     <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
                                         <div className='flex'>
                                             {m.children.title}
+                                            {m.saved ? "" : "*"}
                                             {addCloseButton(m)}
                                         </div>
                                     </Tab>

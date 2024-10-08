@@ -36,32 +36,9 @@ function App(props){
 
     const [tree, setTree] = useState([]);
     let [files, setFiles] = useState(undefined);
-
-    
-    // const [tabsData, setTabsData] = useState([
-    //     { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },
-    //     { id: 1, children: {title:'test.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} }
-    // ]);
-
-    const [tabsData, setTabsData] = useState([
-        
-    ]);
-
-    // When a file in the files panel is opened, this gets called to add
-    // a new code editor to `tabsData`. The code editor tab will need
-    // access to `fileDataGetter` and `fileDataSetter` for getting and
-    // setting data from/to the file on a computer or device
-    const addCodeEditor = (path, name, fileDataGetter, fileDataSetter) => {
-        // First, see if an editor tab has an `id` with the same path, if so, do not add it
-        for(let i=0; i<tabsData.length; i++){
-            if(tabsData[i].id == path){
-                return;
-            }
-        }
-
-        tabsData.push({ id:path, children: {title:name, component:<CodePanel openFile={files.openFile} path={path}/>} })
-        setTabsData([...tabsData]);
-    }
+    const [editorTabsData, setEditorTabsData] = useState([]);
+    const [choseComputer, setChoseComputer] = useState(undefined);
+    let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
 
     const [errorMsg, setErrorMsg] = useState("No error, you shouldn't see this...");
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
@@ -70,19 +47,6 @@ function App(props){
     const choosePLatformModalRef = useRef(null);
     const xtermRefDevice = useRef(null);
     const xtermRefSimulator = useRef(null);
-
-    function onSerialData(value){
-        xtermRefDevice.current.write(value);
-    }
-
-    function onSerialActivity(){
-        
-    }
-
-    function onSerialDisconnect(){
-        console.log("Serial disconnect")
-        // serial.disconnect();
-    }
 
     let serial  = undefined;
 
@@ -96,9 +60,73 @@ function App(props){
     }
 
     const [terminalTabsData, setTerminalTabsData] = useState([
-        { id: 0, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
-        { id: 1, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
+        { id: 0, saved:true, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
+        { id: 1, saved:true, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
     ]);
+
+    const onCodeEditorChanged = (path) => {
+        // When an editor has its content changed, loop through all editor tabs
+        // and add/set a `saved` attribute to `false` to show indicate that the
+        // tab is not saved. Will be rendered with a `*`
+        for(let i=0; i<editorTabsData.length; i++){
+            if(editorTabsData[i].id == path){
+                editorTabsData[i].saved = false;
+                setEditorTabsData([...editorTabsData]);
+                break;
+            }
+        }
+    }
+
+    const onCodeEditorSaved = (path, valueToSave) => {
+        files.saveFile(path, valueToSave).then(() => {
+            // Go through and find the editor tab being saved based on `path` and tab `id`.
+            // Set tab `saved` flag to `true` so that the `*` is removed 
+            for(let i=0; i<editorTabsData.length; i++){
+                if(editorTabsData[i].id == path){
+                    editorTabsData[i].saved = true;
+                    setEditorTabsData([...editorTabsData]);
+                    break;
+                }
+            }
+        });
+    }
+
+    // When a file in the files panel is opened, this gets called to add
+    // a new code editor to `editorTabsData`. The code editor tab will need
+    // access to `fileDataGetter` and `fileDataSetter` for getting and
+    // setting data from/to the file on a computer or device
+    const addCodeEditor = (path, name, fileDataGetter, fileDataSetter) => {
+        // First, see if an editor tab has an `id` with the same path, if so, do not add it
+        for(let i=0; i<editorTabsData.length; i++){
+            if(editorTabsData[i].id == path){
+                return;
+            }
+        }
+
+        // Open file from whatever the current file handler class is,
+        // then add it to all the current editor values for persistance
+        // without rerender, then add the editor to the tabs and rerender
+        // the tabs
+        files.openFile(path).then((content) => {
+            editorValues.current[path] = content;
+            editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
+            setEditorTabsData([...editorTabsData]);
+        })
+    }
+
+
+    function onSerialData(value){
+        xtermRefDevice.current.write(value);
+    }
+
+    function onSerialActivity(){
+        
+    }
+
+    function onSerialDisconnect(){
+        console.log("Serial disconnect")
+        // serial.disconnect();
+    }
 
     const connectSerial = async () => {
         if(serial == undefined){
@@ -143,16 +171,34 @@ function App(props){
         files = new ComputerFiles(setTree);
         setFiles(files);
 
-        files.openFiles();
-        choosePLatformModalRef.current?.close();
+        files.openFiles().then(() => {
+            choosePLatformModalRef.current?.close();
+
+            // Set this so that the files panel header renders with the correct platform
+            setChoseComputer(true);
+        });
     }
 
     const openDeviceFiles = () => {
         files = new DeviceFiles(serial, setTree);
         setFiles(files);
 
-        files.openFiles();
-        choosePLatformModalRef.current?.close();
+        files.openFiles().then(() => {
+            choosePLatformModalRef.current?.close();
+
+            // Set this so that the files panel header renders with the correct platform
+            setChoseComputer(false);
+        })
+    }
+
+    const getFilesPanelTitle = () => {
+        if(choseComputer == undefined){
+            return "Files";
+        }else if(choseComputer){
+            return "Files: Computer";
+        }else{
+            return "Files: Device";
+        }
     }
 
 
@@ -242,7 +288,7 @@ function App(props){
 
                         {/* ### File panel ### */}
                         <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}>
-                            <PanelHeader title="Files"/>
+                            <PanelHeader title={getFilesPanelTitle()}/>
                             
                             <FilesPanel tree={tree} addCodeEditor={addCodeEditor}/>
                         </Panel>
@@ -390,7 +436,7 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            <TabPanel tabsData={tabsData} setTabsData={setTabsData} draggable={false} closeable={true}/>
+                            <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300" />
@@ -398,7 +444,7 @@ function App(props){
                         <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
                             {/* <PanelHeader title="Terminal" /> */}
                             {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
-                            <TabPanel tabsData={terminalTabsData} setTabsData={setTabsData} draggable={false} closeable={false}/>
+                            <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false}/>
                         </Panel>
                     </PanelGroup>
                 </Panel>
@@ -406,7 +452,7 @@ function App(props){
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: V09.23.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: V10.08.2024.0</p>
                 </div>
             </div>
 

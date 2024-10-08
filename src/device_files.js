@@ -9,13 +9,19 @@ class DeviceFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = () => {
-        MpRawMode.begin(this.serial).then(async (raw_mode) => {
-            console.log(raw_mode);
-
-            this.tree = await raw_mode.walkFs();
-            this.setTree(this.tree);
-            raw_mode.end();
+    openFiles = async () => {
+        return new Promise((resolve, reject) => {
+            MpRawMode.begin(this.serial).then(async (raw_mode) => {
+                raw_mode.walkFs().then((tree) => {
+                    this.tree = tree;
+                    this.setTree(this.tree);
+                    raw_mode.end();
+                    resolve();
+                }).catch((error) => {
+                    console.error(error);
+                    reject();
+                })
+            });
         });
     }
 
@@ -28,7 +34,17 @@ class DeviceFiles{
 
                 resolve(new TextDecoder().decode(file_data))
             });
-        })
+        });
+    }
+
+    saveFile = (path, valueToSave) => {
+        return new Promise((resolve, reject) => {
+            MpRawMode.begin(this.serial).then(async (raw_mode) => {
+                await raw_mode.writeFile(path, valueToSave);
+                raw_mode.end();
+                resolve();
+            });
+        });
     }
 }
 

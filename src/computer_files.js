@@ -36,7 +36,7 @@ class ComputerFiles{
 
                 // For opening files, need a dictionary with full paths as keys
                 // and file handles as values
-                this.full_path_files[full_path] = file;
+                this.full_path_files[full_path] = handle;
             }else if(handle.kind == "directory"){
                 let content = [];
                 list.push({name:handle.name, path:full_path, content:content})
@@ -49,32 +49,43 @@ class ComputerFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = () => {
-        // Define what to do when the user does choose a directory
-        let chose_directory_success = async (result) => {
-            this.dir_handle = result;
+    openFiles = async () => {
+        return new Promise((resolve, reject) => {
+            // Define what to do when the user does choose a directory
+            let chose_directory_success = async (result) => {
+                this.dir_handle = result;
 
-            this.tree = [];
-            this.full_path_files = {};
-            this.build_tree(this.dir_handle, this.tree, "").then(() => {
-                this.setTree(this.tree);
-            });
-        }
+                this.tree = [];
+                this.full_path_files = {};
+                this.build_tree(this.dir_handle, this.tree, "").then(() => {
+                    this.setTree(this.tree);
+                    resolve();
+                }).catch((error) => {
+                    console.error(error);
+                    reject();
+                });
+            }
 
-        // Define what to do when the user does not choose a directory
-        let chose_directory_fail = (result) => {
-            console.error(result);
-        }
+            // Define what to do when the user does not choose a directory
+            let chose_directory_fail = (result) => {
+                console.error(result);
+                reject();
+            }
 
-        // Show the user the OS directory picker
-        showDirectoryPicker().then(chose_directory_success, chose_directory_fail);
+            // Show the user the OS directory picker
+            showDirectoryPicker().then(chose_directory_success, chose_directory_fail);
+        });
     }
 
     openFile = async (path) => {
-        return await this.full_path_files[path].text();
-        // console.log(path);
-        // console.log(this.full_path_files);
-        // return "import os"
+        let file = await this.full_path_files[path].getFile();
+        return await file.text();
+    }
+
+    saveFile = async (path, valueToSave) => {
+        const writable = await this.full_path_files[path].createWritable();
+        await writable.write(valueToSave);
+        await writable.close();
     }
 }
 

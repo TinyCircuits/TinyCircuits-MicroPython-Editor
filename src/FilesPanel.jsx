@@ -1,29 +1,8 @@
 import { useState, useMemo } from 'react'
 import './tailwind_output.css'
 import { Theme, Button } from 'react-daisyui'
-// import { UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider } from 'react-complex-tree';
-
 import { Tree } from 'react-arborist'
 import useResizeObserver from 'use-resize-observer'
-
-
-
-// class CustomDataProviderImplementation {
-//     constructor(data){
-//         this.data = data;
-//     }
-
-//     getTreeItem = (itemId) => {
-//         return this.data[itemId];
-//     }
-
-//     setData = (data) => {
-//         this.data = data;
-//         console.log("Data set!");
-//     }
-// }
-
-
 
 
 function FilesPanel(props){

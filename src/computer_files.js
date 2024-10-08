@@ -2,6 +2,7 @@ class ComputerFiles{
     constructor(setTree){
         this.dir_handle = undefined;
         this.tree = undefined;
+        this.full_path_files = undefined;   // A dictionary where full file paths are keys and file handles are values
         this.setTree = setTree;
     }
 
@@ -32,6 +33,10 @@ class ComputerFiles{
                 let size = file.size;
 
                 list.push({name:handle.name, path:full_path, size:size})
+
+                // For opening files, need a dictionary with full paths as keys
+                // and file handles as values
+                this.full_path_files[full_path] = file;
             }else if(handle.kind == "directory"){
                 let content = [];
                 list.push({name:handle.name, path:full_path, content:content})
@@ -44,12 +49,13 @@ class ComputerFiles{
     }
 
     // Call this to open file directory chooser on computer
-    open_files = () => {
+    openFiles = () => {
         // Define what to do when the user does choose a directory
         let chose_directory_success = async (result) => {
             this.dir_handle = result;
 
             this.tree = [];
+            this.full_path_files = {};
             this.build_tree(this.dir_handle, this.tree, "").then(() => {
                 this.setTree(this.tree);
             });
@@ -62,6 +68,13 @@ class ComputerFiles{
 
         // Show the user the OS directory picker
         showDirectoryPicker().then(chose_directory_success, chose_directory_fail);
+    }
+
+    openFile = async (path) => {
+        return await this.full_path_files[path].text();
+        // console.log(path);
+        // console.log(this.full_path_files);
+        // return "import os"
     }
 }
 

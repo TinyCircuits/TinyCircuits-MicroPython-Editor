@@ -9,18 +9,26 @@ class DeviceFiles{
     }
 
     // Call this to open file directory chooser on computer
-    open_files = () => {
-        // console.log(this.serial);
-
-        // console.log(this.mp_raw_mode);
-
+    openFiles = () => {
         MpRawMode.begin(this.serial).then(async (raw_mode) => {
             console.log(raw_mode);
-            console.log(await raw_mode.getDeviceInfo());
 
             this.tree = await raw_mode.walkFs();
             this.setTree(this.tree);
+            raw_mode.end();
         });
+    }
+
+    openFile = async (path) => {
+        return new Promise((resolve, reject) => {
+            MpRawMode.begin(this.serial).then(async (raw_mode) => {
+    
+                let file_data = await raw_mode.readFile(path);
+                raw_mode.end();
+
+                resolve(new TextDecoder().decode(file_data))
+            });
+        })
     }
 }
 

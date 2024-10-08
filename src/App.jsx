@@ -8,6 +8,7 @@ import FilesPanel from './FilesPanel.jsx'
 import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
 import { XTerm } from "@pablo-lion/xterm-react";
+import CodePanel from './CodePanel.jsx'
 
 import React from 'react';
 import CodeMirror from '@uiw/react-codemirror';
@@ -34,7 +35,7 @@ import{
 function App(props){
 
     const [tree, setTree] = useState([]);
-    let files = undefined;
+    let [files, setFiles] = useState(undefined);
 
     
     // const [tabsData, setTabsData] = useState([
@@ -51,10 +52,15 @@ function App(props){
     // access to `fileDataGetter` and `fileDataSetter` for getting and
     // setting data from/to the file on a computer or device
     const addCodeEditor = (path, name, fileDataGetter, fileDataSetter) => {
-        tabsData.push({ id:path, children: {title:name, component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} })
-        setTabsData([...tabsData]);
+        // First, see if an editor tab has an `id` with the same path, if so, do not add it
+        for(let i=0; i<tabsData.length; i++){
+            if(tabsData[i].id == path){
+                return;
+            }
+        }
 
-        console.log(tabsData);
+        tabsData.push({ id:path, children: {title:name, component:<CodePanel openFile={files.openFile} path={path}/>} })
+        setTabsData([...tabsData]);
     }
 
     const [errorMsg, setErrorMsg] = useState("No error, you shouldn't see this...");
@@ -135,13 +141,17 @@ function App(props){
 
     const openComputerFiles = () => {
         files = new ComputerFiles(setTree);
-        files.open_files();
+        setFiles(files);
+
+        files.openFiles();
         choosePLatformModalRef.current?.close();
     }
 
     const openDeviceFiles = () => {
         files = new DeviceFiles(serial, setTree);
-        files.open_files();
+        setFiles(files);
+
+        files.openFiles();
         choosePLatformModalRef.current?.close();
     }
 
@@ -380,7 +390,6 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            {console.log("TEST1", tabsData)}
                             <TabPanel tabsData={tabsData} setTabsData={setTabsData} draggable={false} closeable={true}/>
                         </Panel>
 

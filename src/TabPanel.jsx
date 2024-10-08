@@ -95,7 +95,6 @@ function TabPanel(props){
 
     return (
         <div className="w-full h-full flex flex-col">
-            {console.log("Test2", props.tabsData)}
             <div className="w-full bg-error relative">
                 <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
                     {

@@ -1,6 +1,7 @@
 # TinyCircuits-MicroPython-Editor
 Web IDE focused on editing, running, and uploading MicroPython code on and to TinyCircuits' devices.
 
+**NOTICE: Still in early development, most features do not work! Even the basics! (10/08/2024)**
 
 # Libraries
 * Framework: [ReactJS](https://react.dev/)

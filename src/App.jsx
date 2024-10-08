@@ -15,12 +15,7 @@ import { python } from '@codemirror/lang-python';
 
 import ComputerFiles from './computer_files.js'
 import DeviceFiles from './device_files.js'
-// import Serial from './serial.js'
-
-
-
 import WebSerialOverride from './WebSerialOverride.js'
-// EventTarget.prototype.addEventListener = defaultAddEventListener;
 
 
 import{
@@ -41,13 +36,6 @@ function App(props){
     const [tree, setTree] = useState([]);
     let files = undefined;
 
-    // const get_file_tree = () => {
-    //     if(files == undefined){
-    //         return [];
-    //     }else{
-    //         return files.get_tree();
-    //     }
-    // }
     
     const [tabsData, setTabsData] = useState([
         { id: 0, children: {title:'main.py', component:<CodeMirror className='h-full w-full' height='100%' theme="dark" extensions={[python({ })]} />} },

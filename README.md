@@ -13,8 +13,7 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 * Simulator: [MicroPython](https://github.com/micropython/micropython)
 * Style: [tailwindcss](https://github.com/tailwindlabs/tailwindcss) + [daisyUI](https://github.com/saadeghi/daisyui) + [ReactJS](https://react.dev/) = [ReactJS daisyUI](https://react.daisyui.com/?path=/docs/welcome--docs)
 * Layout: [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
-* Backend: [pocketbase](https://pocketbase.io/)
-* Server: [BuyVM](https://buyvm.net/)
+* Backend: [pocketbase](https://pocketbase.io/) (maybe)
 
 
 # Resources

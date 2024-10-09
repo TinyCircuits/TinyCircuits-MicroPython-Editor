@@ -59,10 +59,12 @@ function App(props){
         setIsSerialConnected(value);
 
         // Reset all of these so that the editor is reset
-        editorValues.current = {};
-        setTree([]);
-        setEditorTabsData([]);
-        setChoseComputer(undefined);
+        if(value == false && choseComputer == false){
+            editorValues.current = {};
+            setTree([]);
+            setEditorTabsData([]);
+            setChoseComputer(undefined);
+        }
     }
 
     // let serial = undefined;

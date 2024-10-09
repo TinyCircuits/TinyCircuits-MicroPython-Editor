@@ -197,6 +197,9 @@ function App(props){
             // Get rid of any editor tabs that existed before
             setEditorTabsData([]);
             editorValues.current = {};
+
+            // Get rid of any path that was set to run
+            setPathCheckedToRun("");
         });
     }
 
@@ -213,6 +216,9 @@ function App(props){
             // Get rid of any editor tabs that existed before
             setEditorTabsData([]);
             editorValues.current = {};
+
+            // Get rid of any path that was set to run
+            setPathCheckedToRun("");
         })
     }
 
@@ -312,17 +318,17 @@ function App(props){
                     <PanelGroup direction="vertical">
 
                         {/* ### File panel ### */}
-                        <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}>
-                        {/* <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}> */}
+                        {/* <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}> */}
+                        <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
                             <PanelHeader title={getFilesPanelTitle()}/>
                             
                             <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRun}/>
                         </Panel>
 
-                        <PanelResizeHandle className="h-1 bg-base-300"/>
+                        {/* <PanelResizeHandle className="h-1 bg-base-300"/> */}
 
                         {/* ### Device and simulator configuration panels ### */}
-                        <Panel className="bg-base-100 flex" defaultSize={28.2} minSize={2} maxSize={98}>
+                        {/* <Panel className="bg-base-100 flex" defaultSize={28.2} minSize={2} maxSize={98}>
                             <Join className="w-full" vertical={true}>
                                 <Accordion icon="arrow" defaultChecked>
                                     <Accordion.Title className="font-bold bg-base-200 flex flex-row items-center">
@@ -450,7 +456,7 @@ function App(props){
                                     </Accordion.Content>
                                 </Accordion>
                             </Join>
-                        </Panel>
+                        </Panel> */}
                     </PanelGroup>
 
                 </Panel>
@@ -462,7 +468,13 @@ function App(props){
                     <PanelGroup direction="vertical">
                         <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
                             {/* <PanelHeader title="Code"/> */}
-                            <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true}/>
+                            <div className="w-full h-full relative">
+                                <div className="left-0 right-0 top-0 bottom-0 z-00 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
+                                </div>
+                                <div className="left-0 right-0 top-0 bottom-0 z-50 absolute">
+                                    <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true}/>
+                                </div>
+                            </div>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300" />

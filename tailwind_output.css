@@ -8631,6 +8631,11 @@ html:has(.drawer-open.drawer-open) {
   z-index: 10;
 }
 
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -8797,6 +8802,10 @@ html:has(.drawer-open.drawer-open) {
 
 .w-10 {
   width: 2.5rem;
+}
+
+.w-12 {
+  width: 3rem;
 }
 
 .w-14 {

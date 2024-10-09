@@ -35,6 +35,8 @@ import{
 function App(props){
 
     const [tree, setTree] = useState([]);
+    const [pathCheckedToRun, setPathCheckedToRun] = useState("");   // The path that was checked to run, can be a folder or file
+
     let [files, setFiles] = useState(undefined);
     const [editorTabsData, setEditorTabsData] = useState([]);
     const [choseComputer, setChoseComputer] = useState(undefined);
@@ -71,7 +73,13 @@ function App(props){
         for(let i=0; i<editorTabsData.length; i++){
             if(editorTabsData[i].id == path){
                 editorTabsData[i].saved = false;
-                setEditorTabsData([...editorTabsData]);
+                
+                // Not sure why need to copy previous for other tabs to not disappear...
+                // https://stackoverflow.com/questions/70948463/react-stale-state-issue-with-callback-passed-to-children
+                // https://legacy.reactjs.org/docs/hooks-reference.html#functional-updates
+                setEditorTabsData((prevEditorTabsData) => {
+                    return [...prevEditorTabsData];
+                });
                 break;
             }
         }
@@ -84,7 +92,13 @@ function App(props){
             for(let i=0; i<editorTabsData.length; i++){
                 if(editorTabsData[i].id == path){
                     editorTabsData[i].saved = true;
-                    setEditorTabsData([...editorTabsData]);
+                    
+                    // Not sure why need to copy previous for other tabs to not disappear...
+                    // https://stackoverflow.com/questions/70948463/react-stale-state-issue-with-callback-passed-to-children
+                    // https://legacy.reactjs.org/docs/hooks-reference.html#functional-updates
+                    setEditorTabsData((prevEditorTabsData) => {
+                        return [...prevEditorTabsData];
+                    });
                     break;
                 }
             }
@@ -95,7 +109,7 @@ function App(props){
     // a new code editor to `editorTabsData`. The code editor tab will need
     // access to `fileDataGetter` and `fileDataSetter` for getting and
     // setting data from/to the file on a computer or device
-    const addCodeEditor = (path, name, fileDataGetter, fileDataSetter) => {
+    const addCodeEditor = (path, name) => {
         // First, see if an editor tab has an `id` with the same path, if so, do not add it
         for(let i=0; i<editorTabsData.length; i++){
             if(editorTabsData[i].id == path){
@@ -111,6 +125,9 @@ function App(props){
             editorValues.current[path] = content;
             editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
             setEditorTabsData([...editorTabsData]);
+            // setEditorTabsData((prev) => {
+            //     return [...prev, ...editorTabsData];
+            // });
         })
     }
 
@@ -176,6 +193,10 @@ function App(props){
 
             // Set this so that the files panel header renders with the correct platform
             setChoseComputer(true);
+
+            // Get rid of any editor tabs that existed before
+            setEditorTabsData([]);
+            editorValues.current = {};
         });
     }
 
@@ -188,6 +209,10 @@ function App(props){
 
             // Set this so that the files panel header renders with the correct platform
             setChoseComputer(false);
+
+            // Get rid of any editor tabs that existed before
+            setEditorTabsData([]);
+            editorValues.current = {};
         })
     }
 
@@ -288,9 +313,10 @@ function App(props){
 
                         {/* ### File panel ### */}
                         <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}>
+                        {/* <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}> */}
                             <PanelHeader title={getFilesPanelTitle()}/>
                             
-                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor}/>
+                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRun}/>
                         </Panel>
 
                         <PanelResizeHandle className="h-1 bg-base-300"/>

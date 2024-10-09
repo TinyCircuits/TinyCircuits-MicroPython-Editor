@@ -42,6 +42,10 @@ function App(props){
     const [choseComputer, setChoseComputer] = useState(undefined);
     let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
 
+    // The active tab key
+    const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
+    const [activeTerminalTabKey, setActiveTerminalTabKey] = useState(0);
+
     const [errorMsg, setErrorMsg] = useState("No error, you shouldn't see this...");
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
 
@@ -110,9 +114,11 @@ function App(props){
     // access to `fileDataGetter` and `fileDataSetter` for getting and
     // setting data from/to the file on a computer or device
     const addCodeEditor = (path, name) => {
-        // First, see if an editor tab has an `id` with the same path, if so, do not add it
+        // First, see if an editor tab has an `id` with the same path,
+        // if so, do not add it but focus it
         for(let i=0; i<editorTabsData.length; i++){
             if(editorTabsData[i].id == path){
+                setActiveEditorTabKey(path); // Focus it
                 return;
             }
         }
@@ -125,9 +131,7 @@ function App(props){
             editorValues.current[path] = content;
             editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
             setEditorTabsData([...editorTabsData]);
-            // setEditorTabsData((prev) => {
-            //     return [...prev, ...editorTabsData];
-            // });
+            setActiveEditorTabKey(path);
         })
     }
 
@@ -223,13 +227,26 @@ function App(props){
     }
 
     const getFilesPanelTitle = () => {
-        if(choseComputer == undefined){
-            return "Files";
-        }else if(choseComputer){
-            return "Files: Computer";
-        }else{
-            return "Files: Device";
+        const getTitle = () => {
+            if(choseComputer == undefined){
+                return "Files";
+            }else if(choseComputer){
+                return "Files: Computer";
+            }else{
+                return "Files: Device";
+            }
         }
+
+        return(
+            <div className="w-full h-full flex">
+                <div className="flex-1">
+                    {getTitle()}
+                </div>
+                <div className="w-10 flex justify-center items-center">
+                    <p>RUN</p>
+                </div>
+            </div>
+        );
     }
 
 
@@ -320,7 +337,9 @@ function App(props){
                         {/* ### File panel ### */}
                         {/* <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}> */}
                         <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
-                            <PanelHeader title={getFilesPanelTitle()}/>
+                            <div className="pl-1 w-full h-7 bg-base-200 flex items-center font-bold text-nowrap select-none">
+                                {getFilesPanelTitle()}
+                            </div>
                             
                             <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRun}/>
                         </Panel>
@@ -472,7 +491,7 @@ function App(props){
                                 <div className="left-0 right-0 top-0 bottom-0 z-00 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
                                 </div>
                                 <div className="left-0 right-0 top-0 bottom-0 z-50 absolute">
-                                    <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true}/>
+                                    <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey}/>
                                 </div>
                             </div>
                         </Panel>
@@ -482,7 +501,7 @@ function App(props){
                         <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
                             {/* <PanelHeader title="Terminal" /> */}
                             {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
-                            <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false}/>
+                            <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
                         </Panel>
                     </PanelGroup>
                 </Panel>

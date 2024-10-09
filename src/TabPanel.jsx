@@ -38,19 +38,14 @@ function insertAndShift(arr, from, to) {
 
 function TabPanel(props){
 
-    const {tabsData, setTabsData, draggable, closeable, ...other_props} = props;
-
-    // const [tabsData, setTabsData] = useState(tabs);
-
-    // The active tab key
-    const [activeKey, setActiveKey] = useState(0);
+    const {tabsData, setTabsData, draggable, closeable, activeTabKey, setActiveTabKey, ...other_props} = props;
 
     // When a tab is clicked, set the active key which
     // will index into editor component array and render
     // a different editor
     const whenTabClicked = (id, evn) => {
         evn.stopPropagation();
-        setActiveKey(id);
+        setActiveTabKey(id);
     };
 
     // When a tab is closed, find the index of the tab
@@ -62,9 +57,9 @@ function TabPanel(props){
         const idx = props.tabsData.findIndex((m) => m.id === item.id);
 
         let active = -1;
-        if(idx > -1 && activeKey){
+        if(idx > -1 && activeTabKey){
             active = props.tabsData[idx - 1] ? props.tabsData[idx - 1].id : props.tabsData[idx].id;
-            setActiveKey(active || -1);
+            setActiveTabKey(active || -1);
         }
 
         setTabsData(props.tabsData.filter((m) => m.id !== item.id));
@@ -96,12 +91,12 @@ function TabPanel(props){
     return (
         <div className="w-full h-full flex flex-col">
             <div className="w-full bg-error relative">
-                <Tabs activeKey={activeKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
+                <Tabs activeKey={activeTabKey} style={{ gap: 1, overflow: 'auto' }} role="tablist" className="tabs tabs-bordered bg-base-200" onTabClick={(id, evn) => whenTabClicked(id, evn)} onTabDrop={(id, index) => whenTabDropped(id, index)}>
                     {
                         props.tabsData.map(
                             (m, idx) => {
                                 return (
-                                    <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeKey ? "tab-active" : "")} draggable={draggable}>
+                                    <Tab key={idx} id={m.id} role="tab" className={"tab" + " " + (m.id==activeTabKey ? "tab-active" : "")} draggable={draggable}>
                                         <div className='flex'>
                                             {m.children.title}
                                             {m.saved ? "" : "*"}
@@ -119,7 +114,7 @@ function TabPanel(props){
                 {
                     props.tabsData.map((item, index) => {
                         return (
-                            <div key={index} className={"top-0 left-0 right-0 bottom-0 min-h-0 absolute" + " " + (item.id==activeKey ? "z-10" : "invisible z-0")}>
+                            <div key={index} className={"top-0 left-0 right-0 bottom-0 min-h-0 absolute" + " " + (item.id==activeTabKey ? "z-10" : "invisible z-0")}>
                                 {item.children.component};
                             </div>
                         );

@@ -54,10 +54,12 @@ function App(props){
     const xtermRefDevice = useRef(null);
     const xtermRefSimulator = useRef(null);
 
+    const [isSerialConnected, setIsSerialConnected] = useState(false);
+
     let serial  = undefined;
 
     try{
-        serial = new WebSerialOverride();
+        serial = new WebSerialOverride(setIsSerialConnected);
         serial.receiveCallback = onSerialData;
         serial.activityCallback = onSerialActivity;
         serial.disconnectCallback = onSerialDisconnect;
@@ -115,7 +117,7 @@ function App(props){
     // setting data from/to the file on a computer or device
     const addCodeEditor = (path, name) => {
         // First, see if an editor tab has an `id` with the same path,
-        // if so, do not add it but focus it
+        // if so, do not add it but do focus it
         for(let i=0; i<editorTabsData.length; i++){
             if(editorTabsData[i].id == path){
                 setActiveEditorTabKey(path); // Focus it
@@ -146,7 +148,7 @@ function App(props){
 
     function onSerialDisconnect(){
         console.log("Serial disconnect")
-        // serial.disconnect();
+        this.setIsSerialConnected(false);
     }
 
     const connectSerial = async () => {
@@ -183,6 +185,14 @@ function App(props){
         }
     }
 
+    const handleSerialConnectButton = (event) => {
+        if(isSerialConnected == false){
+            connectSerial();
+        }else{
+            serial.disconnect();
+        }
+    }
+
 
     const chooseFilesPlatform = () => {
         choosePLatformModalRef.current?.showModal();
@@ -208,22 +218,24 @@ function App(props){
     }
 
     const openDeviceFiles = () => {
-        files = new DeviceFiles(serial, setTree);
-        setFiles(files);
+        connectSerial().then(() => {
+            files = new DeviceFiles(serial, setTree);
+            setFiles(files);
 
-        files.openFiles().then(() => {
-            choosePLatformModalRef.current?.close();
+            files.openFiles().then(() => {
+                choosePLatformModalRef.current?.close();
 
-            // Set this so that the files panel header renders with the correct platform
-            setChoseComputer(false);
+                // Set this so that the files panel header renders with the correct platform
+                setChoseComputer(false);
 
-            // Get rid of any editor tabs that existed before
-            setEditorTabsData([]);
-            editorValues.current = {};
+                // Get rid of any editor tabs that existed before
+                setEditorTabsData([]);
+                editorValues.current = {};
 
-            // Get rid of any path that was set to run
-            setPathCheckedToRun("");
-        })
+                // Get rid of any path that was set to run
+                setPathCheckedToRun("");
+            })
+        });
     }
 
     const getFilesPanelTitle = () => {
@@ -242,7 +254,7 @@ function App(props){
                 <div className="flex-1">
                     {getTitle()}
                 </div>
-                <div className="w-10 flex justify-center items-center">
+                <div className="w-14 flex justify-center items-center">
                     <p>RUN</p>
                 </div>
             </div>
@@ -320,9 +332,34 @@ function App(props){
             {/* ### Header and open files button ### */}
             <div className="w-full h-14 bg-base-100 border-b-base-300 border-b-4 flex items-center">
                 <div className="h-full flex-1 flex flex-row items-center">
-                    <Button className="btn-sm ml-2" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
+                    <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
                         Open Location
                     </Button>
+
+                    <div>
+                        <Button onClick={handleSerialConnectButton} disabled={(choseComputer == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                            {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
+                        </Button>
+                        <Button disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            Run on Device
+                        </Button>
+                        <Input disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        </Input>
+                        <Button disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            ...
+                        </Button>
+                    </div>
+
+                    <div>
+                        <Button disabled={choseComputer == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                            Run in Simulator
+                        </Button>
+                        <Input disabled={choseComputer == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        </Input>
+                        <Button disabled={choseComputer == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            ...
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -509,7 +546,7 @@ function App(props){
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: V10.08.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: V10.09.2024.0</p>
                 </div>
             </div>
 

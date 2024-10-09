@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import './tailwind_output.css'
 import { Theme, Button, Checkbox } from 'react-daisyui'
 import { Tree } from 'react-arborist'
@@ -122,6 +122,14 @@ function FilesPanel(props){
             }
         }
     }
+
+
+    // Only once (that's what the empty list is for) style the inner tree
+    // element to have a thin and stable scrollbar
+    useEffect(() => {
+        treeRef.current.list.current._outerRef.style.setProperty("scrollbar-gutter", "stable");
+        treeRef.current.list.current._outerRef.style.setProperty("scrollbar-width", "thin");
+    }, []);
 
     
     return (

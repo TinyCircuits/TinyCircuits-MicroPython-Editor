@@ -8660,10 +8660,6 @@ html:has(.drawer-open.drawer-open) {
   margin-top: 0.25rem;
 }
 
-.mr-0 {
-  margin-right: 0px;
-}
-
 .block {
   display: block;
 }
@@ -9033,16 +9029,6 @@ html:has(.drawer-open.drawer-open) {
 .rounded-t {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
-}
-
-.rounded-r-\[0\] {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.rounded-r-\[0px\] {
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
 }
 
 .rounded-bl {

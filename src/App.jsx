@@ -55,21 +55,22 @@ function App(props){
     const xtermRefSimulator = useRef(null);
 
     const [isSerialConnected, setIsSerialConnected] = useState(false);
+    const setIsSerialConnectedWrapper = (value) => {
+        setIsSerialConnected(value);
 
-    let serial  = undefined;
-
-    try{
-        serial = new WebSerialOverride(setIsSerialConnected);
-        serial.receiveCallback = onSerialData;
-        serial.activityCallback = onSerialActivity;
-        serial.disconnectCallback = onSerialDisconnect;
-    }catch(error){
-        console.error(error);
+        // Reset all of these so that the editor is reset
+        editorValues.current = {};
+        setTree([]);
+        setEditorTabsData([]);
+        setChoseComputer(undefined);
     }
 
+    // let serial = undefined;
+    let serial = useRef(undefined);
+
     const [terminalTabsData, setTerminalTabsData] = useState([
-        { id: 0, saved:true, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial} startMessage="Device Terminal"/>} },
-        { id: 1, saved:true, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial} startMessage="Simulator Terminal"/>}},
+        { id: 0, saved:true, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial.current} startMessage="Device Terminal"/>} },
+        { id: 1, saved:true, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial.current} startMessage="Simulator Terminal"/>}},
     ]);
 
     const onCodeEditorChanged = (path) => {
@@ -148,15 +149,16 @@ function App(props){
 
     function onSerialDisconnect(){
         console.log("Serial disconnect")
-        this.setIsSerialConnected(false);
+        serial.current.disconnect();
+        this.setIsSerialConnectedWrapper(false);
     }
 
     const connectSerial = async () => {
-        if(serial == undefined){
+        if(serial.current == undefined){
             reportError("Serial not defined. You are likely not using a Chromium based browser. Please use a browser like Google Chrome or Microsoft Edge.");
         }else{
             try{
-                await serial.requestAccess(0x2E8A, 0x0005);
+                await serial.current.requestAccess(0x2E8A, 0x0005);
             }catch(error){
                 // https://developer.mozilla.org/en-US/docs/Web/API/Serial/requestPort#exceptions
                 if(error.name == "SecurityError"){
@@ -169,7 +171,7 @@ function App(props){
             }
 
             try{
-                await serial.connect();
+                await serial.current.connect();
             }catch(error){
                 // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort/open#exceptions
                 if(error.name == "InvalidStateError"){
@@ -189,7 +191,7 @@ function App(props){
         if(isSerialConnected == false){
             connectSerial();
         }else{
-            serial.disconnect();
+            serial.current.disconnect();
         }
     }
 
@@ -219,7 +221,7 @@ function App(props){
 
     const openDeviceFiles = () => {
         connectSerial().then(() => {
-            files = new DeviceFiles(serial, setTree);
+            files = new DeviceFiles(serial.current, setTree);
             setFiles(files);
 
             files.openFiles().then(() => {
@@ -273,6 +275,17 @@ function App(props){
             setErrorMsgDetails(event.detail.errorStr);
             handleShowErrorMsg();
         });
+
+        try{
+            if(serial.current == undefined){
+                serial.current = new WebSerialOverride(setIsSerialConnectedWrapper);
+                serial.current.receiveCallback = onSerialData;
+                serial.current.activityCallback = onSerialActivity;
+                serial.current.disconnectCallback = onSerialDisconnect;
+            }
+        }catch(error){
+            console.error(error);
+        }
     }, []);
 
     return (

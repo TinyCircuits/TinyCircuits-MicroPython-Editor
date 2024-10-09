@@ -27,7 +27,7 @@ class WebSerialOverride extends WebSerial{
     }
 
     async disconnect(){
-        await super.disconnect();
+        await super.disconnect();        
         this.setIsSerialConnected(false);
     }
 }

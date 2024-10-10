@@ -13,6 +13,12 @@ function FilesPanel(props){
 
     // Converts file tree to structure that react-arborist can use
     const getData = (tree_parent, data_parent, checked, first=false) => {
+        if(first){
+            while(props.allCheckedPaths.length > 0){
+                props.allCheckedPaths.pop();
+            }
+        }
+
         tree_parent.forEach(tree_child => {
 
             // Get the last part of the path for the name
@@ -36,6 +42,10 @@ function FilesPanel(props){
                 if(tree_child.content != undefined){
                     check_children = true;
                 }
+            }
+
+            if(entry.checked || checked){
+                props.allCheckedPaths.push(path);
             }
 
             // If folder, convert the rest of the elements under it/its children

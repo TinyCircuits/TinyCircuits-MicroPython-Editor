@@ -8,6 +8,10 @@ class DeviceFiles{
         this.setTree = setTree;
     }
 
+    get_tree = () => {
+        return this.tree;
+    }
+
     // Call this to open file directory chooser on computer
     openFiles = async () => {
         return new Promise((resolve, reject) => {

@@ -28,7 +28,7 @@ var readyPromise = new Promise((resolve, reject) => {
   readyPromiseResolve = resolve;
   readyPromiseReject = reject;
 });
-["_free","_malloc","_mp_js_init","_mp_js_repl_init","_mp_js_repl_process_char","_mp_hal_get_interrupt_char","_mp_sched_keyboard_interrupt","_mp_js_do_exec","_mp_js_do_exec_async","_mp_js_do_import","_mp_js_register_js_module","_proxy_c_free_obj","_proxy_c_init","_proxy_c_to_js_call","_proxy_c_to_js_delete_attr","_proxy_c_to_js_dir","_proxy_c_to_js_get_array","_proxy_c_to_js_get_dict","_proxy_c_to_js_get_iter","_proxy_c_to_js_get_type","_proxy_c_to_js_has_attr","_proxy_c_to_js_iternext","_proxy_c_to_js_lookup_attr","_proxy_c_to_js_resume","_proxy_c_to_js_store_attr","_proxy_convert_mp_to_js_obj_cside","_memory","___indirect_function_table","_engine_io_web_pressed_buttons","_engine_display_web_update_screen","_proxy_convert_mp_to_js_then_js_to_mp_obj_jsside","_proxy_convert_mp_to_js_then_js_to_js_then_js_to_mp_obj_jsside","_js_get_proxy_js_ref_info","_has_attr","_lookup_attr","_store_attr","_call0","_call1","_call2","_calln","_call0_kwarg","_call1_kwarg","_js_reflect_construct","_js_get_iter","_js_iter_next","_js_subscr_load","_js_subscr_store","_proxy_js_free_obj","_js_check_existing","_js_get_error_info","_js_then_resolve","_js_then_reject","_js_then_continue","_create_promise","onRuntimeInitialized"].forEach((prop) => {
+["_free","_malloc","_mp_js_init","_mp_js_repl_init","_mp_js_repl_process_char","_mp_hal_get_interrupt_char","_mp_sched_keyboard_interrupt","_mp_js_do_exec","_mp_js_do_exec_async","_mp_js_do_import","_mp_js_register_js_module","_proxy_c_free_obj","_proxy_c_init","_proxy_c_to_js_call","_proxy_c_to_js_delete_attr","_proxy_c_to_js_dir","_proxy_c_to_js_get_array","_proxy_c_to_js_get_dict","_proxy_c_to_js_get_iter","_proxy_c_to_js_get_type","_proxy_c_to_js_has_attr","_proxy_c_to_js_iternext","_proxy_c_to_js_lookup_attr","_proxy_c_to_js_resume","_proxy_c_to_js_store_attr","_proxy_convert_mp_to_js_obj_cside","_memory","___indirect_function_table","_new_hook","_engine_io_web_pressed_buttons","_engine_display_web_update_screen","_proxy_convert_mp_to_js_then_js_to_mp_obj_jsside","_proxy_convert_mp_to_js_then_js_to_js_then_js_to_mp_obj_jsside","_js_get_proxy_js_ref_info","_has_attr","_lookup_attr","_store_attr","_call0","_call1","_call2","_calln","_call0_kwarg","_call1_kwarg","_js_reflect_construct","_js_get_iter","_js_iter_next","_js_subscr_load","_js_subscr_store","_proxy_js_free_obj","_js_check_existing","_js_get_error_info","_js_then_resolve","_js_then_reject","_js_then_continue","_create_promise","onRuntimeInitialized"].forEach((prop) => {
   if (!Object.getOwnPropertyDescriptor(readyPromise, prop)) {
     Object.defineProperty(readyPromise, prop, {
       get: () => abort('You are getting ' + prop + ' on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js'),
@@ -925,6 +925,7 @@ function dbg(...args) {
 // end include: runtime_debug.js
 // === Body ===
 
+function new_hook() { self.get_serial(); }
 function engine_io_web_pressed_buttons() { let pressed = self.get_pressed_buttons(); return pressed; }
 function engine_display_web_update_screen(screen_buffer_to_render) { self.update_display(screen_buffer_to_render); }
 function proxy_convert_mp_to_js_then_js_to_mp_obj_jsside(out) { const ret = proxy_convert_mp_to_js_obj_jsside(out); proxy_convert_js_to_mp_obj_jsside_force_double_proxy(ret, out); }
@@ -4432,40 +4433,6 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   }
   }
 
-  var _mp_js_hook = () => {
-          if (ENVIRONMENT_IS_NODE) {
-              const mp_interrupt_char = Module.ccall(
-                  "mp_hal_get_interrupt_char",
-                  "number",
-                  ["number"],
-                  ["null"],
-              );
-              const fs = require("fs");
-  
-              const buf = Buffer.alloc(1);
-              try {
-                  const n = fs.readSync(process.stdin.fd, buf, 0, 1);
-                  if (n > 0) {
-                      if (buf[0] === mp_interrupt_char) {
-                          Module.ccall(
-                              "mp_sched_keyboard_interrupt",
-                              "null",
-                              ["null"],
-                              ["null"],
-                          );
-                      } else {
-                          process.stdout.write(String.fromCharCode(buf[0]));
-                      }
-                  }
-              } catch (e) {
-                  if (e.code === "EAGAIN") {
-                  } else {
-                      throw e;
-                  }
-              }
-          }
-      };
-
   var _mp_js_random_u32 = () =>
           globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
 
@@ -5036,13 +5003,13 @@ var wasmImports = {
   /** @export */
   lookup_attr,
   /** @export */
-  mp_js_hook: _mp_js_hook,
-  /** @export */
   mp_js_random_u32: _mp_js_random_u32,
   /** @export */
   mp_js_ticks_ms: _mp_js_ticks_ms,
   /** @export */
   mp_js_time_ms: _mp_js_time_ms,
+  /** @export */
+  new_hook,
   /** @export */
   proxy_convert_mp_to_js_then_js_to_js_then_js_to_mp_obj_jsside,
   /** @export */

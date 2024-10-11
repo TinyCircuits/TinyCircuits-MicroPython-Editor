@@ -72,9 +72,17 @@ function App(props){
     // let serial = undefined;
     let serial = useRef(undefined);
 
+    function onDeviceTerminalType(value){
+        serial.current.write(value);
+    }
+
+    function onSimulatorTerminalType(value){
+        simulatorRef.current.addTypedChar(value);
+    }
+
     const [terminalTabsData, setTerminalTabsData] = useState([
-        { id: "Device", saved:true, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} serial={serial.current} startMessage="Device Terminal"/>} },
-        { id: "Simulator", saved:true, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} serial={serial.current} startMessage="Simulator Terminal"/>}},
+        { id: "Device", saved:true, children: {title:'Device Terminal', component:<TerminalPanel ref={xtermRefDevice} onData={onDeviceTerminalType} startMessage="Device Terminal"/>} },
+        { id: "Simulator", saved:true, children: {title:'Simulator Terminal', component:<TerminalPanel ref={xtermRefSimulator} onData={onSimulatorTerminalType} startMessage="Simulator Terminal"/>}},
     ]);
 
     const onCodeEditorChanged = (path) => {
@@ -197,6 +205,11 @@ function App(props){
         }else{
             serial.current.disconnect();
         }
+    }
+
+    function onSimulatorData(value){
+        // MicroPython webassembly is buffered by line
+        xtermRefSimulator.current.write(value + "\r\n");
     }
 
 
@@ -488,7 +501,7 @@ function App(props){
                                 {/* SIMULATOR PANEL */}
                                 <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
                                     <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
-                                        <SimulatorPanel ref={simulatorRef}/>
+                                        <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
                                     </div>
                                 </div>
 

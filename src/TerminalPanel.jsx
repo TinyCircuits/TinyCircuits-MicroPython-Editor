@@ -10,7 +10,6 @@ import TabPanel from './TabPanel';
 const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
     // Instantiate the addon
     const fitAddon = new FitAddon();
-    const serial = props.serial;
 
     const handleFit = () => {
         // https://github.com/xtermjs/xterm.js/issues/1283#issuecomment-938246315
@@ -19,11 +18,6 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
             fitAddon._terminal.element.parentElement.style.display = "grid"
             fitAddon.fit();
         }
-    }
-
-    // https://github.com/PabloLION/xterm-react/blob/main/docs.md#calling-xterm-functions:~:text=the%20cursor%20moves.-,onData,-%3F%3A%20IEventListener%3Cstring%3E
-    const onData = (data) => {
-        serial.write(data);
     }
 
     // This is called once
@@ -43,7 +37,7 @@ const TerminalPanel = forwardRef(function TerminalPanel(props, xtermRef){
 
     return (
         <div className="flex flex-col w-full h-full bg-error">
-            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={onData} className="w-full h-full"/>
+            <XTerm ref={xtermRef} addons={[fitAddon]} onRender={handleFit} onData={props.onData} className="w-full h-full"/>
         </div>
     )
 });

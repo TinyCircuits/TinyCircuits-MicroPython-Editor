@@ -1,21 +1,3 @@
-# import engine_main
-# import engine
-# from engine_nodes import Sprite2DNode, CameraNode, Rectangle2DNode
-# from engine_resources import TextureResource
-
-# texture = TextureResource("system/launcher/assets/launcher-background.bmp")
-# spr = Sprite2DNode(texture=texture)
-# cam = CameraNode()
-# rect = Rectangle2DNode()
-
-# while True:
-#     if engine.tick() == False:
-#         continue
-    
-#     print(engine.get_running_fps())
-
-# engine.start()
-
 # main.py: This is the first file to run when the system boots up
 import engine_main
 import engine

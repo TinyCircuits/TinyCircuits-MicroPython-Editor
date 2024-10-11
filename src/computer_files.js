@@ -79,7 +79,7 @@ class ComputerFiles{
 
     openFile = async (path) => {
         let file = await this.full_path_files[path].getFile();
-        return await file.text();
+        return new Uint8Array(await file.arrayBuffer());
     }
 
     saveFile = async (path, valueToSave) => {

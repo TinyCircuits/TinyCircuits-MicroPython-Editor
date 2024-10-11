@@ -143,7 +143,7 @@ function App(props){
         // without rerender, then add the editor to the tabs and rerender
         // the tabs
         files.openFile(path).then((content) => {
-            editorValues.current[path] = content;
+            editorValues.current[path] = new TextDecoder().decode(content);
             editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
             setEditorTabsData([...editorTabsData]);
             setActiveEditorTabKey(path);
@@ -295,7 +295,7 @@ function App(props){
 
 
     const runOnDevice = () => {
-        console.log("Run on device", allCheckedPaths.current);
+        console.log("Run on device", pathCheckedToRun, allCheckedPaths.current);
 
         // Show error if nothing checked to run
         if(allCheckedPaths.current.length == 0){
@@ -306,18 +306,23 @@ function App(props){
     }
 
 
-    const runInSimulator = () => {
-        console.log("Run in simulator", allCheckedPaths.current);
+    const runInSimulator = async () => {
+        console.log("Run in simulator", pathCheckedToRun, allCheckedPaths.current);
 
         // Show error if nothing checked to run
         if(allCheckedPaths.current.length == 0){
             window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Nothing checked to run"}}));
         }else{
+            // Switch UI
             switchToSimulatorPanel();
             setActiveTerminalTabKey("Simulator");
 
-            console.log(simulatorRef.current);
-            simulatorRef.current.runSimulator();
+            if(pathCheckedToRun.indexOf(".py") != -1){
+                simulatorRef.current.runSimulator([{path:pathCheckedToRun, data:await files.openFile(pathCheckedToRun)}], pathCheckedToRun);
+            }
+
+            // console.log(simulatorRef.current);
+            // simulatorRef.current.runSimulator();
         }
     }
 

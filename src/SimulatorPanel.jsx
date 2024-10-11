@@ -57,9 +57,9 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     }
 
     useImperativeHandle(ref, () => ({
-        runSimulator(){
-            console.log("Run simulator");
-            worker.current.postMessage({message_type:"run"});
+        runSimulator(files, pathToRun){
+            worker.current.postMessage({message_type:"files", value:files});
+            worker.current.postMessage({message_type:"run", value:pathToRun});
         },
 
         addTypedChar(char){

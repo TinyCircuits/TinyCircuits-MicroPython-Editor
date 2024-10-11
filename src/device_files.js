@@ -36,7 +36,7 @@ class DeviceFiles{
                 let file_data = await raw_mode.readFile(path);
                 raw_mode.end();
 
-                resolve(new TextDecoder().decode(file_data))
+                resolve(file_data)
             });
         });
     }

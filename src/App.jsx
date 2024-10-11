@@ -317,8 +317,48 @@ function App(props){
             switchToSimulatorPanel();
             setActiveTerminalTabKey("Simulator");
 
-            if(pathCheckedToRun.indexOf(".py") != -1){
+            // If a Python file is checked to run, run that directly, otherwise,
+            // a folder is checked and we need to run the file that is named
+            // `main.py` or the same as the folder, or open manifest.ini and
+            // see if the file to run is in there
+            if(pathCheckedToRun.indexOf(".py") != -1){  // File
                 simulatorRef.current.runSimulator([{path:pathCheckedToRun, data:await files.openFile(pathCheckedToRun)}], pathCheckedToRun);
+            }else{                                      // Folder
+                // Need to find this
+                let full_path_to_run_file = "";
+
+                // Need to fill this with {path:full_file_path, data:Uint8Array}
+                let file_list = [];
+
+                // Check to see if there's a file directly in the selected
+                // folder called `main.py` to run
+                for(let icx=0; icx<allCheckedPaths.current.length; icx++){
+                    let file_path = allCheckedPaths.current[icx].path;
+                    let path = file_path.substring(0, file_path.lastIndexOf("/"));
+
+                    // Only care about checking files that have the same path as the folder its in
+                    if(path != pathCheckedToRun){
+                        continue;
+                    }
+
+                    // If this is in the selected folder (above) and it is `main.py`, use this and stop looking
+                    if(file_path.indexOf("main.py") != -1){
+                        full_path_to_run_file = file_path;
+                        break;
+                    }
+                }
+
+                // Open all the files to be copied to the simulator
+                for(let icx=0; icx<allCheckedPaths.current.length; icx++){
+                    if(allCheckedPaths.current[icx].isFolder == false){
+                        let full_file_path = allCheckedPaths.current[icx].path;
+                        let data = await files.openFile(full_file_path);
+                        file_list.push({path:full_file_path, data:data});
+                    }
+                }
+
+                console.log(full_path_to_run_file);
+                simulatorRef.current.runSimulator(file_list, full_path_to_run_file);
             }
 
             // console.log(simulatorRef.current);
@@ -532,7 +572,7 @@ function App(props){
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.10.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.11.2024.0</p>
                 </div>
             </div>
 

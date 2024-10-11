@@ -93,8 +93,15 @@ async function test(){
         let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
         mp.FS.mkdirTree(path);
 
-        // Get the file and write it
         mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
+        // console.log(new TextDecoder().decode(mp.FS.readFile(files_list[ifx].path)))
+        // // Get the file and write it
+        // if(files_list[ifx].path.indexOf(".bmp") != -1 || files_list[ifx].path.indexOf(".wav") != -1){
+        //     mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data, {encoding:"binary"});
+        // }else{
+        //     mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data, {encoding:"utf8"});
+        // }
+        
         console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
     }
 
@@ -144,6 +151,14 @@ async function test(){
     // console.log(mp)
     // console.log(mp.FS)
     // console.log(mp.FS.readdir("/"))
+
+    let run_dir_path = path_to_run.substring(0, path_to_run.lastIndexOf("/"));
+
+    // Change to directory of file being executed
+    await mp.runPythonAsync(`
+import os
+os.chdir("` + run_dir_path + `")
+`);
 
     mp.runPythonAsync("execfile(\"" + path_to_run + "\")");
 }

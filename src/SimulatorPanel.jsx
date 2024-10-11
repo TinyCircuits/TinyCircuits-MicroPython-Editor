@@ -201,7 +201,6 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
             worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
             worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
-            // worker.current.postMessage({message_type:"run"});
         }
     }, [])
 

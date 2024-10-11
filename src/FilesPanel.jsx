@@ -38,14 +38,14 @@ function FilesPanel(props){
             if(checked == false && path == props.pathCheckedToRun){
                 entry.checked = true;
 
-                // IF this is a folder, check the rest of the nodes under this
+                // If this is a folder, check the rest of the nodes under this
                 if(tree_child.content != undefined){
                     check_children = true;
                 }
             }
 
             if(entry.checked || checked){
-                props.allCheckedPaths.push(path);
+                props.allCheckedPaths.push({path:path, isFolder:tree_child.content != undefined});
             }
 
             // If folder, convert the rest of the elements under it/its children

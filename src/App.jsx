@@ -331,21 +331,60 @@ function App(props){
                 let file_list = [];
 
                 // Check to see if there's a file directly in the selected
-                // folder called `main.py` to run
+                // folder called `main.py`, folder name + ".py" or if there
+                // is a `manifest.ini` with a main file indicated
                 for(let icx=0; icx<allCheckedPaths.current.length; icx++){
-                    let file_path = allCheckedPaths.current[icx].path;
-                    let path = file_path.substring(0, file_path.lastIndexOf("/"));
+                    // Do not care about doing anything directly with folders
+                    if(allCheckedPaths.current[icx].isFolder){
+                        continue;
+                    }
 
-                    // Only care about checking files that have the same path as the folder its in
+                    let file_path = allCheckedPaths.current[icx].path;
+                    let last_index_of_slash = file_path.lastIndexOf("/");
+                    let second_to_last_index_of_slash = file_path.lastIndexOf("/", last_index_of_slash-1);
+                    let path = file_path.substring(0, last_index_of_slash);
+                    let folder_name = file_path.substring(second_to_last_index_of_slash+1, last_index_of_slash);
+
+                    // Only care about checking files that have the same path
+                    // as the folder its in and not in any sub folders
                     if(path != pathCheckedToRun){
                         continue;
                     }
 
-                    // If this is in the selected folder (above) and it is `main.py`, use this and stop looking
+                    // If this path is in the selected folder (above) and it is `main.py`, use this and stop looking
                     if(file_path.indexOf("main.py") != -1){
                         full_path_to_run_file = file_path;
                         break;
                     }
+
+                    // If this path is in the selected folder (above) and it is a file that's the folder name + ".py",
+                    // use this and stop looking
+                    if(file_path.indexOf(folder_name + ".py") != -1){
+                        full_path_to_run_file = file_path;
+                        break;
+                    }
+
+                    // If this path is in the selected folder (above) and it is a manifest file, open it and check for
+                    // main file and build full path to it
+                    if(file_path.indexOf("manifest.ini") != -1){
+                        let fileData = await files.openFile(file_path);
+                        fileData = new TextDecoder().decode(fileData);
+                        fileData = fileData.split(/\r\n|\r|\n/);         // https://stackoverflow.com/a/52947649
+
+                        fileData.forEach(line => {
+                            if(line.indexOf("main") != -1){
+                                let noSpacesLine = line.replace(/\s+/g, ''); // https://stackoverflow.com/a/5963202
+                                let mainFileName = noSpacesLine.substring(noSpacesLine.indexOf("=")+1);
+                                full_path_to_run_file = path + "/" + mainFileName;
+                            }
+                        });
+                    }
+                }
+
+                // Error if a file to run was not found
+                if(full_path_to_run_file == ""){
+                    window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Did not find a file to run!", errorStr: "Looked for `main.py`, Python file with same name as parent folder, and for a main file in a `manifest.ini` file"}}));
+                    return;
                 }
 
                 // Open all the files to be copied to the simulator
@@ -357,12 +396,9 @@ function App(props){
                     }
                 }
 
-                console.log(full_path_to_run_file);
+                // Run the file
                 simulatorRef.current.runSimulator(file_list, full_path_to_run_file);
             }
-
-            // console.log(simulatorRef.current);
-            // simulatorRef.current.runSimulator();
         }
     }
 

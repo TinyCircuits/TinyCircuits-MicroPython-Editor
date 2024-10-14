@@ -156,7 +156,9 @@ async function test(){
 
     // Change to directory of file being executed
     await mp.runPythonAsync(`
+import sys
 import os
+sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
 `);
 

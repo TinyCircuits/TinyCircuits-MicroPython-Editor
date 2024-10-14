@@ -124,6 +124,20 @@ function App(props){
         });
     }
 
+
+    const switchToCodePanel = () => {
+        setCurrentMainPanel("Code");
+    }
+
+    const switchToSimulatorPanel = () => {
+        setCurrentMainPanel("Simulator");
+    }
+
+    const switchToImagePanel = () => {
+        setCurrentMainPanel("Image");
+    }
+
+
     // When a file in the files panel is opened, this gets called to add
     // a new code editor to `editorTabsData`. The code editor tab will need
     // access to `fileDataGetter` and `fileDataSetter` for getting and
@@ -134,6 +148,7 @@ function App(props){
         for(let i=0; i<editorTabsData.length; i++){
             if(editorTabsData[i].id == path){
                 setActiveEditorTabKey(path); // Focus it
+                switchToCodePanel();
                 return;
             }
         }
@@ -145,6 +160,7 @@ function App(props){
         files.openFile(path).then((content) => {
             editorValues.current[path] = new TextDecoder().decode(content);
             editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
+            switchToCodePanel();
             setEditorTabsData([...editorTabsData]);
             setActiveEditorTabKey(path);
         })
@@ -278,19 +294,6 @@ function App(props){
                 </div>
             </div>
         );
-    }
-
-
-    const switchToCodePanel = () => {
-        setCurrentMainPanel("Code");
-    }
-
-    const switchToSimulatorPanel = () => {
-        setCurrentMainPanel("Simulator");
-    }
-
-    const switchToImagePanel = () => {
-        setCurrentMainPanel("Image");
     }
 
 

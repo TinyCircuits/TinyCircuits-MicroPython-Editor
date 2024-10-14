@@ -82,7 +82,7 @@ async function writeDefaultFilesystem(mp){
 
 // writeFilesystem();
 
-async function test(){
+async function run(){
 
     const mp = await loadMicroPython({stdout:stdoutWriter});
 
@@ -177,6 +177,6 @@ onmessage = (e) => {
         files_list = e.data.value;
     }else if(e.data.message_type == "run"){
         path_to_run = e.data.value;
-        test();
+        run();
     }
 };

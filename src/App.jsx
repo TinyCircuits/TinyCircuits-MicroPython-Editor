@@ -8,6 +8,7 @@ import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
 import SimulatorPanel from './SimulatorPanel.jsx'
 import CodePanel from './CodePanel.jsx'
+import { MpRawMode } from 'ViperIDE/src/rawmode.js'
 
 import React from 'react';
 
@@ -297,42 +298,27 @@ function App(props){
     }
 
 
-    const runOnDevice = () => {
-        console.log("Run on device", pathCheckedToRun, allCheckedPaths.current);
+    // From the checked paths, figure out which file is the one to run and also
+    // get all the data for each checked file as well as their full paths for running
+    const getRunFileAndCheckedData = async () => {
+        // Need to find this
+        let fullPathToRunFile = "";
+
+        // Need to fill this with {path:full_file_path, data:Uint8Array}
+        let file_list = [];
 
         // Show error if nothing checked to run
         if(allCheckedPaths.current.length == 0){
             window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Nothing checked to run"}}));
         }else{
-            setActiveTerminalTabKey("Device");
-        }
-    }
-
-
-    const runInSimulator = async () => {
-        console.log("Run in simulator", pathCheckedToRun, allCheckedPaths.current);
-
-        // Show error if nothing checked to run
-        if(allCheckedPaths.current.length == 0){
-            window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Nothing checked to run"}}));
-        }else{
-            // Switch UI
-            switchToSimulatorPanel();
-            setActiveTerminalTabKey("Simulator");
-
             // If a Python file is checked to run, run that directly, otherwise,
             // a folder is checked and we need to run the file that is named
             // `main.py` or the same as the folder, or open manifest.ini and
             // see if the file to run is in there
             if(pathCheckedToRun.indexOf(".py") != -1){  // File
-                simulatorRef.current.runSimulator([{path:pathCheckedToRun, data:await files.openFile(pathCheckedToRun)}], pathCheckedToRun);
+                fullPathToRunFile = pathCheckedToRun;
+                file_list = [{path:pathCheckedToRun, data:await files.openFile(pathCheckedToRun)}];
             }else{                                      // Folder
-                // Need to find this
-                let full_path_to_run_file = "";
-
-                // Need to fill this with {path:full_file_path, data:Uint8Array}
-                let file_list = [];
-
                 // Check to see if there's a file directly in the selected
                 // folder called `main.py`, folder name + ".py" or if there
                 // is a `manifest.ini` with a main file indicated
@@ -342,11 +328,12 @@ function App(props){
                         continue;
                     }
 
-                    let file_path = allCheckedPaths.current[icx].path;
-                    let last_index_of_slash = file_path.lastIndexOf("/");
-                    let second_to_last_index_of_slash = file_path.lastIndexOf("/", last_index_of_slash-1);
-                    let path = file_path.substring(0, last_index_of_slash);
-                    let folder_name = file_path.substring(second_to_last_index_of_slash+1, last_index_of_slash);
+                    
+                    let filePath = allCheckedPaths.current[icx].path;
+                    let lastIndexOfSlash = filePath.lastIndexOf("/");
+                    let secondToLastIndexOfSlash = filePath.lastIndexOf("/", lastIndexOfSlash-1);
+                    let path = filePath.substring(0, lastIndexOfSlash);
+                    let folder_name = filePath.substring(secondToLastIndexOfSlash+1, lastIndexOfSlash);
 
                     // Only care about checking files that have the same path
                     // as the folder its in and not in any sub folders
@@ -355,37 +342,37 @@ function App(props){
                     }
 
                     // If this path is in the selected folder (above) and it is `main.py`, use this and stop looking
-                    if(file_path.indexOf("main.py") != -1){
-                        full_path_to_run_file = file_path;
+                    if(filePath.indexOf("main.py") != -1){
+                        fullPathToRunFile = filePath;
                         break;
                     }
 
                     // If this path is in the selected folder (above) and it is a file that's the folder name + ".py",
                     // use this and stop looking
-                    if(file_path.indexOf(folder_name + ".py") != -1){
-                        full_path_to_run_file = file_path;
+                    if(filePath.indexOf(folder_name + ".py") != -1){
+                        fullPathToRunFile = filePath;
                         break;
                     }
 
                     // If this path is in the selected folder (above) and it is a manifest file, open it and check for
                     // main file and build full path to it
-                    if(file_path.indexOf("manifest.ini") != -1){
-                        let fileData = await files.openFile(file_path);
+                    if(filePath.indexOf("manifest.ini") != -1){
+                        let fileData = await files.openFile(filePath);
                         fileData = new TextDecoder().decode(fileData);
-                        fileData = fileData.split(/\r\n|\r|\n/);         // https://stackoverflow.com/a/52947649
+                        fileData = fileData.split(/\r\n|\r|\n/);             // https://stackoverflow.com/a/52947649
 
                         fileData.forEach(line => {
                             if(line.indexOf("main") != -1){
                                 let noSpacesLine = line.replace(/\s+/g, ''); // https://stackoverflow.com/a/5963202
                                 let mainFileName = noSpacesLine.substring(noSpacesLine.indexOf("=")+1);
-                                full_path_to_run_file = path + "/" + mainFileName;
+                                fullPathToRunFile = path + "/" + mainFileName;
                             }
                         });
                     }
                 }
 
                 // Error if a file to run was not found
-                if(full_path_to_run_file == ""){
+                if(fullPathToRunFile == ""){
                     window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Did not find a file to run!", errorStr: "Looked for `main.py`, Python file with same name as parent folder, and for a main file in a `manifest.ini` file"}}));
                     return;
                 }
@@ -393,15 +380,71 @@ function App(props){
                 // Open all the files to be copied to the simulator
                 for(let icx=0; icx<allCheckedPaths.current.length; icx++){
                     if(allCheckedPaths.current[icx].isFolder == false){
-                        let full_file_path = allCheckedPaths.current[icx].path;
-                        let data = await files.openFile(full_file_path);
-                        file_list.push({path:full_file_path, data:data});
+                        let fulFilePath = allCheckedPaths.current[icx].path;
+                        let data = await files.openFile(fulFilePath);
+                        file_list.push({path:fulFilePath, data:data});
                     }
                 }
-
-                // Run the file
-                simulatorRef.current.runSimulator(file_list, full_path_to_run_file);
             }
+
+            // Return
+            return [file_list, fullPathToRunFile];
+        }
+    }
+
+
+    const runDevice = (files, filePathToRun) => {
+        MpRawMode.begin(serial.current).then(async (raw_mode) => {
+    
+            // Only if the file system panel has computer files
+            // open do we want to upload the files to the device
+            // before running
+            if(choseComputer == true){
+                files.forEach(file => {
+                    console.log(file);
+                });
+            }
+
+            // console.log("execfile(\"" + filePathToRun + "\")");
+            // await raw_mode.interruptProgram(0);
+            let run_dir_path = filePathToRun.substring(0, filePathToRun.lastIndexOf("/"));
+
+            raw_mode.exec(`
+import sys
+import os
+sys.path.append("` + run_dir_path + `")
+os.chdir("` + run_dir_path + `")
+execfile("` + filePathToRun + `")
+`, 0, true);
+
+            // let file_data = await raw_mode.readFile(path);
+            // raw_mode.end();
+        });
+    }
+
+
+    const runOnDevice = async () => {
+        console.log("Run on device", pathCheckedToRun, allCheckedPaths.current);
+
+        let [files, filePathToRun] = await getRunFileAndCheckedData();
+
+        if(files != undefined){
+            // Switch UI
+            setActiveTerminalTabKey("Device");
+            runDevice(files, filePathToRun);
+        }
+    }
+
+
+    const runInSimulator = async () => {
+        console.log("Run in simulator", pathCheckedToRun, allCheckedPaths.current);
+
+        let [files, filePathToRun] = await getRunFileAndCheckedData();
+        
+        if(files != undefined){
+            switchToSimulatorPanel();
+            setActiveTerminalTabKey("Simulator");
+            simulatorRef.current.runSimulator(files, filePathToRun);
         }
     }
 
@@ -611,7 +654,7 @@ function App(props){
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.11.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.14.2024.0</p>
                 </div>
             </div>
 

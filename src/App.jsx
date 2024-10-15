@@ -9,6 +9,7 @@ import TerminalPanel from './TerminalPanel.jsx'
 import SimulatorPanel from './SimulatorPanel.jsx'
 import CodePanel from './CodePanel.jsx'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
+import SelectLocationModal from './SelectLocationModal.jsx'
 
 import React from 'react';
 
@@ -56,6 +57,11 @@ function App(props){
     const xtermRefSimulator = useRef(null);
 
     let simulatorRef = useRef(undefined);
+
+    const [runPathDevice, setRunPathDevice] = useState(undefined);
+    const [runPathSimulator, setRunPathSimulator] = useState(undefined);
+    const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
+    const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
 
     const [isSerialConnected, setIsSerialConnected] = useState(false);
     const setIsSerialConnectedWrapper = (value) => {
@@ -432,7 +438,7 @@ execfile("` + filePathToRun + `")
     const runOnDevice = async () => {
         console.log("Run on device", pathCheckedToRun, allCheckedPaths.current);
 
-        // SInce we're running on the device, if the files
+        // Since we're running on the device, if the files
         // to run are open on the computer, we need to open
         // and upload them, otherwise we don't (does not make
         // sense to open files on device if we are running
@@ -448,6 +454,18 @@ execfile("` + filePathToRun + `")
         }
     }
 
+    const onRunOnDevice = async () => {
+        // If the user chose files from the computer and the path has not
+        // been set yet, ask the user to select a path on the device to run
+        // the files at
+        if(runPathDevice == undefined && choseComputer){
+            console.log();
+            setRunAfterLocationSelect(() => runOnDevice);
+        }else{
+            runOnDevice();
+        }
+    }
+
 
     const runInSimulator = async () => {
         console.log("Run in simulator", pathCheckedToRun, allCheckedPaths.current);
@@ -458,6 +476,14 @@ execfile("` + filePathToRun + `")
             switchToSimulatorPanel();
             setActiveTerminalTabKey("Simulator");
             simulatorRef.current.runSimulator(files, filePathToRun);
+        }
+    }
+
+    const onRunInSimulator = async () => {
+        if(runPathSimulator == undefined){
+            setRunAfterLocationSelect(() => runInSimulator);
+        }else{
+            runInSimulator();
         }
     }
 
@@ -489,6 +515,7 @@ execfile("` + filePathToRun + `")
     return (
         <Theme dataTheme="dim" className="w-full h-full bg-base-300 flex flex-col">
 
+            <SelectLocationModal runPathDevice={runPathDevice} runPathSimulator={runPathSimulator} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect}/>
 
             {/* ### Error modal ### */}
             <Modal ref={errorModalRef}>
@@ -553,23 +580,23 @@ execfile("` + filePathToRun + `")
                         <Button onClick={handleSerialConnectButton} disabled={(choseComputer == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                             {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
                         </Button>
-                        <Button onClick={runOnDevice} disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={onRunOnDevice} disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             Run
                         </Button>
-                        <Input className='w-24' disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Input value={runPathDevice} className='w-24' disabled={(choseComputer == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                         </Input>
-                        <Button disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             ...
                         </Button>
                     </div>
 
                     <div>
-                        <Button onClick={runInSimulator} disabled={choseComputer == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                        <Button onClick={onRunInSimulator} disabled={choseComputer == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                             Simulate
                         </Button>
-                        <Input className='w-24' disabled={choseComputer == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Input value={runPathSimulator} className='w-24' disabled={choseComputer == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                         </Input>
-                        <Button disabled={choseComputer == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             ...
                         </Button>
                     </div>

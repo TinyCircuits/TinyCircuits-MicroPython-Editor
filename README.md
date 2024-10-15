@@ -17,7 +17,10 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 
 
 # Resources
-* Learning react: https://fullstackopen.com/en/part1/introduction_to_react
+* Learning react:
+    * https://fullstackopen.com/en/part1/introduction_to_react
+    * https://www.joshwcomeau.com/react/why-react-re-renders/
+    * https://www.joshwcomeau.com/react/usememo-and-usecallback/
 
 
 # Running:

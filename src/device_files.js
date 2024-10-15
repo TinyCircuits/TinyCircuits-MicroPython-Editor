@@ -2,7 +2,6 @@ import { MpRawMode } from 'ViperIDE/src/rawmode';
 
 class DeviceFiles{
     constructor(serial, setTree){
-        this.dir_handle = undefined;
         this.serial = serial;
         this.tree = undefined;
         this.setTree = setTree;

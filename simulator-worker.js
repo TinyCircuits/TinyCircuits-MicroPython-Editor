@@ -88,6 +88,7 @@ async function run(){
 
     await writeDefaultFilesystem(mp);
 
+    // Write the actual files to the simulator
     for(let ifx=0; ifx<files_list.length; ifx++){
         // Create the path to the file
         let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));

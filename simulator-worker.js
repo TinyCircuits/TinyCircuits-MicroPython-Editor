@@ -84,7 +84,7 @@ async function writeDefaultFilesystem(mp){
 
 async function run(){
 
-    const mp = await loadMicroPython({stdout:stdoutWriter});
+    const mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
 
     await writeDefaultFilesystem(mp);
 

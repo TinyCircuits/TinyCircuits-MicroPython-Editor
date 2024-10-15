@@ -44,7 +44,7 @@ class DeviceFiles{
     saveFile = (path, valueToSave) => {
         return new Promise((resolve, reject) => {
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
-                await raw_mode.writeFile(path, valueToSave);
+                await raw_mode.writeFile(path, valueToSave, 1024);
                 raw_mode.end();
                 resolve();
             });

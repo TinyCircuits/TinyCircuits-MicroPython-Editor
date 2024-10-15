@@ -94,13 +94,6 @@ async function run(){
         mp.FS.mkdirTree(path);
 
         mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
-        // console.log(new TextDecoder().decode(mp.FS.readFile(files_list[ifx].path)))
-        // // Get the file and write it
-        // if(files_list[ifx].path.indexOf(".bmp") != -1 || files_list[ifx].path.indexOf(".wav") != -1){
-        //     mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data, {encoding:"binary"});
-        // }else{
-        //     mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data, {encoding:"utf8"});
-        // }
         
         console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
     }
@@ -160,9 +153,8 @@ import sys
 import os
 sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
+execfile("` + path_to_run + `")
 `);
-
-    mp.runPythonAsync("execfile(\"" + path_to_run + "\")");
 }
 
 

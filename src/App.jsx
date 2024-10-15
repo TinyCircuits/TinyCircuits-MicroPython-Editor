@@ -300,7 +300,7 @@ function App(props){
 
     // From the checked paths, figure out which file is the one to run and also
     // get all the data for each checked file as well as their full paths for running
-    const getRunFileAndCheckedData = async () => {
+    const getRunFileAndCheckedData = async (openFiles) => {
         // Need to find this
         let fullPathToRunFile = "";
 
@@ -377,12 +377,15 @@ function App(props){
                     return;
                 }
 
-                // Open all the files to be copied to the simulator
-                for(let icx=0; icx<allCheckedPaths.current.length; icx++){
-                    if(allCheckedPaths.current[icx].isFolder == false){
-                        let fulFilePath = allCheckedPaths.current[icx].path;
-                        let data = await files.openFile(fulFilePath);
-                        file_list.push({path:fulFilePath, data:data});
+                // Open all the files to be copied to the runner but only
+                // if the passed flag says to open them
+                if(openFiles){
+                    for(let icx=0; icx<allCheckedPaths.current.length; icx++){
+                        if(allCheckedPaths.current[icx].isFolder == false){
+                            let fulFilePath = allCheckedPaths.current[icx].path;
+                            let data = await files.openFile(fulFilePath);
+                            file_list.push({path:fulFilePath, data:data});
+                        }
                     }
                 }
             }
@@ -400,16 +403,19 @@ function App(props){
             // open do we want to upload the files to the device
             // before running
             if(choseComputer == true){
-                files.forEach(file => {
-                    console.log(file);
-                });
+                for(let ifx=0; ifx<files.length; ifx++){
+                    console.log(files[ifx]);
+                    let fileDirPath = files[ifx].path.substring(0, files[ifx].path.lastIndexOf("/"));
+                    await raw_mode.makePath(fileDirPath);
+                    await raw_mode.writeFile(files[ifx].path, files[ifx].data, 1024);
+                }
             }
 
             // console.log("execfile(\"" + filePathToRun + "\")");
             // await raw_mode.interruptProgram(0);
             let run_dir_path = filePathToRun.substring(0, filePathToRun.lastIndexOf("/"));
 
-            raw_mode.exec(`
+            await raw_mode.exec(`
 import sys
 import os
 sys.path.append("` + run_dir_path + `")
@@ -426,7 +432,14 @@ execfile("` + filePathToRun + `")
     const runOnDevice = async () => {
         console.log("Run on device", pathCheckedToRun, allCheckedPaths.current);
 
-        let [files, filePathToRun] = await getRunFileAndCheckedData();
+        // SInce we're running on the device, if the files
+        // to run are open on the computer, we need to open
+        // and upload them, otherwise we don't (does not make
+        // sense to open files on device if we are running
+        // on the device)
+        let openFiles = choseComputer == true;
+
+        let [files, filePathToRun] = await getRunFileAndCheckedData(openFiles);
 
         if(files != undefined){
             // Switch UI
@@ -439,7 +452,7 @@ execfile("` + filePathToRun + `")
     const runInSimulator = async () => {
         console.log("Run in simulator", pathCheckedToRun, allCheckedPaths.current);
 
-        let [files, filePathToRun] = await getRunFileAndCheckedData();
+        let [files, filePathToRun] = await getRunFileAndCheckedData(true);
         
         if(files != undefined){
             switchToSimulatorPanel();
@@ -654,7 +667,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.14.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.15.2024.0</p>
                 </div>
             </div>
 

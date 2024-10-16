@@ -8661,6 +8661,14 @@ html:has(.drawer-open.drawer-open) {
   margin-right: 0.25rem;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
 .block {
   display: block;
 }
@@ -8787,6 +8795,10 @@ html:has(.drawer-open.drawer-open) {
 
 .h-7 {
   height: 1.75rem;
+}
+
+.h-8 {
+  height: 2rem;
 }
 
 .h-full {
@@ -10099,9 +10111,9 @@ html:has(.drawer-open.drawer-open) {
   }
 }
 
-.hover\:bg-base-200:hover {
+.hover\:bg-base-300:hover {
   --tw-bg-opacity: 1;
-  background-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity)));
+  background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)));
 }
 
 .focus\:outline-offset-0:focus {

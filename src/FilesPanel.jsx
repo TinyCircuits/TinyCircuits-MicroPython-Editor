@@ -14,9 +14,24 @@ function FilesPanel(props){
     // Converts file tree to structure that react-arborist can use
     const getData = (tree_parent, data_parent, checked, first=false) => {
         if(first){
-            while(props.allCheckedPaths.length > 0){
-                props.allCheckedPaths.pop();
+            // Only if checkmarks are wanted do empty all the checked paths
+            if((props.checkmarks == true || props.checkmarks == undefined)){
+                while(props.allCheckedPaths.length > 0){
+                    props.allCheckedPaths.pop();
+                }
             }
+
+            if(props.showRoot == true){
+                let rootChildren = [];
+                let root = {id:"/", name:"/", checked:false, children:rootChildren};
+                data_parent.push(root);
+                getData(tree_parent, rootChildren, checked, false);
+                return data_parent;
+            }
+        }
+
+        if(tree_parent == undefined){
+            return data_parent;
         }
 
         tree_parent.forEach(tree_child => {
@@ -32,20 +47,22 @@ function FilesPanel(props){
             // Flag that can be set to check children
             let check_children = checked;
 
-            // If still not checked, see if this node is checked and then
-            // check thr entry + check anything else under this folder, if
-            // this is a folder
-            if(checked == false && path == props.pathCheckedToRun){
-                entry.checked = true;
+            if(props.checkmarks == true || props.checkmarks == undefined){
+                // If still not checked, see if this node is checked and then
+                // check thr entry + check anything else under this folder, if
+                // this is a folder
+                if(checked == false && path == props.pathCheckedToRun.path){
+                    entry.checked = true;
 
-                // If this is a folder, check the rest of the nodes under this
-                if(tree_child.content != undefined){
-                    check_children = true;
+                    // If this is a folder, check the rest of the nodes under this
+                    if(tree_child.content != undefined){
+                        check_children = true;
+                    }
                 }
-            }
 
-            if(entry.checked || checked){
-                props.allCheckedPaths.push({path:path, isFolder:tree_child.content != undefined});
+                if(entry.checked || checked){
+                    props.allCheckedPaths.push({path:path, isFolder:tree_child.content != undefined});
+                }
             }
 
             // If folder, convert the rest of the elements under it/its children
@@ -54,7 +71,9 @@ function FilesPanel(props){
                 getData(tree_child.content, entry.children, check_children, false);
             }
 
-            data_parent.push(entry);
+            if((tree_child.content == undefined && (props.showFiles == true || props.showFiles == undefined)) || tree_child.content != undefined){
+                data_parent.push(entry);
+            }
         });
 
         return data_parent;
@@ -63,7 +82,7 @@ function FilesPanel(props){
     const getRow = (node) => {
         if(node.isLeaf){
             return(
-                <div className={"w-full flex flex-row hover:bg-base-200 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "") + (node.isFocused ? "bg-base-200" : "")}>
+                <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "") + (node.isFocused ? "bg-base-300" : "")}>
                     <div className="flex w-12 w-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-file-earmark-fill" viewBox="0 0 16 16">
                             <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2z"/>
@@ -71,14 +90,19 @@ function FilesPanel(props){
                         <p className='text-nowrap'>{node.data.name}</p>
                     </div>
 
-                    <div className="flex flex-1 w-full">
-                        <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun || props.pathCheckedToRun == "") ? false : true}/>
-                    </div>
+                    {
+                        (props.checkmarks == true || props.checkmarks == undefined) ? 
+                        <div className="flex flex-1 w-full">
+                            <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
+                        </div>
+                                                                                    :
+                        <></>
+                    }
                 </div>
             );
         }else{
             return(
-                <div className={"w-full flex flex-row hover:bg-base-200 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "")}>
+                <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "")}>
                     <div className="flex w-12 w-full">
                         {
                             node.isOpen ?   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-down" viewBox="0 0 16 16">
@@ -92,9 +116,14 @@ function FilesPanel(props){
                         <p className='text-nowrap'>{node.data.name}</p>
                     </div>
 
-                    <div className="flex flex-1 w-full">
-                        <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun || props.pathCheckedToRun == "") ? false : true}/>
-                    </div>
+                    {
+                        (props.checkmarks == true || props.checkmarks == undefined) ? 
+                        <div className="flex flex-1 w-full">
+                            <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
+                        </div>
+                                                                                    :
+                        <></>
+                    }
                 </div>
             );
         }
@@ -113,19 +142,28 @@ function FilesPanel(props){
     const handleClick = (mouseEvent) => {
         let node = treeRef.current.focusedNode;
 
+        let isNodeFolder = node.children != null;
+
+        if(isNodeFolder && props.collapsible == false){
+            node.open();
+
+            // Call selected folder callback and pass the path to the folder
+            if(props.onFolderSelected != undefined) props.onFolderSelected(node.id);
+        }
+
         // If the target is the checkbox, set for run and expand again if folder row.
         // Otherwise, if a file and target is not a checkbox, open the file in a new editor
         if(mouseEvent.target.nodeName == "INPUT"){
             // Node ids are the absolute file paths
             let pathToRun = node.id;
             if(mouseEvent.target.checked){
-                props.setPathCheckedToRun(pathToRun);
+                props.setPathCheckedToRun({path:pathToRun, isFolder:isNodeFolder});
             }else{
-                props.setPathCheckedToRun("");
+                props.setPathCheckedToRun({path:"", isFolder:false});
             }
 
-            if(node.children != null) node.open();
-        }else if(node.children == null){
+            if(isNodeFolder) node.open();
+        }else if(isNodeFolder == false){
             // Only open a code editor if actually selected something and is not a folder
             if(node.isLeaf){
                 props.addCodeEditor(node.id, node.data.name);

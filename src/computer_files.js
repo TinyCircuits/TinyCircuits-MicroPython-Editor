@@ -6,7 +6,7 @@ class ComputerFiles{
         this.setTree = setTree;
     }
 
-    get_tree = () => {
+    getTree = () => {
         return this.tree;
     }
 

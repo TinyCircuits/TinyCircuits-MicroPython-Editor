@@ -7,7 +7,7 @@ class DeviceFiles{
         this.setTree = setTree;
     }
 
-    get_tree = () => {
+    getTree = () => {
         return this.tree;
     }
 
@@ -17,7 +17,7 @@ class DeviceFiles{
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
                 raw_mode.walkFs().then((tree) => {
                     this.tree = tree;
-                    this.setTree(this.tree);
+                    if(this.setTree != undefined) this.setTree(this.tree);
                     raw_mode.end();
                     resolve();
                 }).catch((error) => {

@@ -431,6 +431,8 @@ function App(props){
             await raw_mode.exec(`
 import sys
 import os
+import engine_save
+engine_save._init_saves_dir("/Saves/` + run_dir_path + `")
 sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
 execfile("` + filePathToRun + `")

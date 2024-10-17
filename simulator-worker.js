@@ -1,6 +1,10 @@
 import {loadMicroPython} from "./micropython.mjs"
 
-const stdoutWriter = (line) => {
+const stdout = (line) => {
+    postMessage({message_type:"print_update", value:line});
+};
+
+const stderr = (line) => {
     postMessage({message_type:"print_update", value:line});
 };
 
@@ -10,8 +14,6 @@ let typed_chars_buffer = undefined;
 
 let files_list = [];
 let path_to_run = "";
-
-// const mp = await loadMicroPython({stdout:stdoutWriter});
 
 async function writeFilesystemFile(mp, fetchPath, filePath){
 
@@ -90,7 +92,7 @@ const stdin = () => {
 }
 
 console.log("Loading simulator!");
-const mp = await loadMicroPython({stdout:stdoutWriter, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
+const mp = await loadMicroPython({stdout:stdout, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
 await writeDefaultFilesystem(mp);
 
 // This JS function is called from C code in micropython
@@ -171,10 +173,6 @@ const getTree = (path, content) => {
 
 
 async function run(){
-
-    // mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
-    // await writeDefaultFilesystem(mp);
-
     // Write the actual files to the simulator
     for(let ifx=0; ifx<files_list.length; ifx++){
         // Create the path to the file
@@ -193,6 +191,8 @@ async function run(){
     await mp.runPythonAsync(`
 import sys
 import os
+import engine_save
+engine_save._init_saves_dir("/Saves/` + run_dir_path + `")
 sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
 execfile("` + path_to_run + `")

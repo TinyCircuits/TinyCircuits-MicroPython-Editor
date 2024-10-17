@@ -1,7 +1,7 @@
 import './App.css'
 
 import './tailwind_output.css'
-import { Theme, Input, Button, Toggle } from 'react-daisyui'
+import { Theme, Input, Button, Toggle, Link } from 'react-daisyui'
 
 import React from 'react';
 import { useState } from 'react';
@@ -69,7 +69,7 @@ function Login(props){
                     {/* Form footer */}
                     <div className="flex mt-2">
                         <div className="flex-1 flex h-12 items-center justify-start">
-                            <a>Forgot password?</a>
+                            <Link>Forgot password?</Link>
                         </div>
                         <div className="flex-1 flex h-12 justify-end">
                             <Button color='primary'>{registerEnabled ? "Create" : "Login"}</Button>
@@ -80,7 +80,7 @@ function Login(props){
 
             {/* Privacy Policy */}
             <div className='w-full h-12 justify-end flex'>
-                <a className='m-2'>Privacy Policy</a>
+                <Link className='m-2'>Privacy Policy</Link>
             </div>
         </Theme>
     )

@@ -67,7 +67,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             worker.current.postMessage({message_type:"run", value:pathToRun});
         },
 
-        addTypedChar(char){
+        processChar(char){
             typedCharsList.current.push(char);
             tryFillTypedCharsBuffer();
         },

@@ -27,5 +27,11 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 1. `npm run dev`
 2. `npx tailwindcss -i ./src/tailwind_input.css -o ./tailwind_output.css --watch`
 
+# Pages
+* /
+* /arcade/
+* /arcade/submit/
+* /login/
+
 # Building
 1. `npm run build` (makes a single index.html file thanks to https://www.npmjs.com/package/vite-plugin-singlefile)

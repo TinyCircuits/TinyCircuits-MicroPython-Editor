@@ -754,7 +754,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.16.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.17.2024.0</p>
                 </div>
             </div>
 

@@ -85,8 +85,12 @@ async function writeDefaultFilesystem(mp){
 
 // writeFilesystem();
 
+const stdin = () => {
+    console.log("TEST");
+}
+
 console.log("Loading simulator!");
-const mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
+const mp = await loadMicroPython({stdout:stdoutWriter, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
 await writeDefaultFilesystem(mp);
 
 // This JS function is called from C code in micropython

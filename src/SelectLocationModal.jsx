@@ -8,7 +8,7 @@ function SelectLocationModal(props){
 
     const modalRef = useRef(null);
     const [selectedPath, setSelectedPath] = useState("/");
-    const [createRUNFolderChecked, setCreateRUNFolderChecked] = useState(false);
+    const [createRUNFolderChecked, setCreateRUNFolderChecked] = useState(true);
 
     useEffect(() => {
         if(runAfterLocationSelect != undefined){
@@ -31,6 +31,7 @@ function SelectLocationModal(props){
         let name = pathCheckedToRun.path.substring(pathCheckedToRun.path.lastIndexOf("/")+1);
 
         if(pathCheckedToRun.isFolder && createRUNFolderChecked == true){
+            // Make sure not to add double slashes
             if(selectedPath[selectedPath.length-1] == '/'){
                 return selectedPath + name;
             }else{
@@ -62,10 +63,10 @@ function SelectLocationModal(props){
                     <Checkbox disabled={pathCheckedToRun.isFolder == false} onChange={(event) => setCreateRUNFolderChecked(event.target.checked)} checked={createRUNFolderChecked} size='sm' className='ml-2'/>
                 </div>
                 <div className="h-8 flex items-center mt-2">
-                    <p className="text-nowrap font-bold">Resulting RUN Path:</p>
+                    <p className="text-nowrap font-bold">Final RUN Path:</p>
                     <Input readOnly={true} value={getResultingRUNPath()} size='sm' className='ml-2 w-full' />
                 </div>
-                <p className='mt-4 text-sm'>WARNING: Files/folders selected to RUN will be uploaded to the resulting RUN location which can result in files/folders being overwritten</p>
+                <p className='mt-4 text-sm'>WARNING: Files/folders selected to RUN will be uploaded to the final RUN location which can result in files/folders being overwritten</p>
             </Modal.Body>
 
             <Modal.Actions>

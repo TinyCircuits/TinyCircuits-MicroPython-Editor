@@ -14,10 +14,9 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     const typedCharsBufferSize = 32;
     let typedCharsBuffer = useRef(undefined);    // Finite shared buffer that `typedChars` are placed in for the simulator work to consume on MicroPython vm hook callback
     let typedCharsArray = useRef(undefined);
+    let getTreeResolve = useRef(undefined);
 
     let encoder = useRef(new TextEncoder());
-
-    let worker = useRef(undefined);
 
     const BUTTON_CODE_A            = 0b0000000000000001;
     const BUTTON_CODE_B            = 0b0000000000000010;
@@ -28,6 +27,8 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     const BUTTON_CODE_BUMPER_LEFT  = 0b0000000001000000;
     const BUTTON_CODE_BUMPER_RIGHT = 0b0000000010000000;
     const BUTTON_CODE_MENU         = 0b0000000100000000;
+
+    let worker = useRef(undefined);
 
     const tryFillTypedCharsBuffer = () => {
         // If the first element is zero, that means the worker,
@@ -58,6 +59,10 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
     useImperativeHandle(ref, () => ({
         runSimulator(files, pathToRun){
+            worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
+            worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
+            worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
+
             worker.current.postMessage({message_type:"files", value:files});
             worker.current.postMessage({message_type:"run", value:pathToRun});
         },
@@ -65,6 +70,13 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
         addTypedChar(char){
             typedCharsList.current.push(char);
             tryFillTypedCharsBuffer();
+        },
+
+        async getTree(){
+            return new Promise((resolve, reject) => {
+                worker.current.postMessage({message_type:"tree", value:undefined});
+                getTreeResolve.current = resolve;
+            });
         }
     }))
 
@@ -195,12 +207,10 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                     props.onData(e.data.value);
                 }else if(e.data.message_type == "ready_for_more_typed_chars"){
                     tryFillTypedCharsBuffer();
+                }else if(e.data.message_type == "tree"){
+                    getTreeResolve.current(e.data.value);
                 }
             };
-
-            worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
-            worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
-            worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
         }
     }, [])
 

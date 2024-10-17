@@ -77,16 +77,99 @@ async function writeDefaultFilesystem(mp){
 
     await writeFilesystemFile(mp, "./simulator/filesystem/main.py", "main.py");
 
+    // Create empty games directory
+    mp.FS.mkdirTree("/Games");
+
     // console.log(mp.FS.readdir("/"));
 }
 
 // writeFilesystem();
 
+console.log("Loading simulator!");
+const mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
+await writeDefaultFilesystem(mp);
+
+// This JS function is called from C code in micropython
+// using the VM hook in mpportconfig.h. This allows for
+// doing anything while only micropython is running
+// and not just the engine 
+self.get_serial = () => {
+    let typed_chars = new Uint8Array(typed_chars_buffer);
+
+    if(typed_chars[0] == 1){
+        console.log(typed_chars);
+
+        // Process all buffered chars until see one that's 0, then stop
+        for(let i=1; i<typed_chars.length; i++){
+            if(typed_chars[i] == 0){
+                break;
+            }else{
+                mp.replProcessChar(typed_chars[i]);
+            }
+        }
+
+        // Tell the page we're ready for more data
+        typed_chars[0] = 0;
+        postMessage({message_type:"ready_for_more_typed_chars"});
+    }
+}
+
+// This JS function is called from C code in the engine
+self.get_pressed_buttons = () => {
+    let web_pressed_buttons = new Uint16Array(web_pressed_buttons_buffer)
+    return web_pressed_buttons[0];
+}
+
+// This JS function is called from C code in the engine
+self.update_display = (screen_buffer_to_render_ptr) => {
+    let buffer = new Uint8Array(screen_buffer);
+
+    for(let ipx=0; ipx<128*128*2; ipx++){
+        buffer[ipx] = mp._module.HEAPU8[screen_buffer_to_render_ptr+ipx];
+    }
+
+    postMessage({message_type:"screen_update"});
+}
+
+
+const isPathExcluded = (localPath, fullPath) =>{
+    if(localPath != "." && localPath != ".." && fullPath != "/." && fullPath != "/.." && fullPath != "/tmp" && fullPath != "/home" && fullPath != "/dev" && fullPath != "/proc"){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+
+const getTree = (path, content) => {
+    let dirElements = mp.FS.readdir(path);
+
+    dirElements.forEach(element => {
+        let fullElementPath = (path == "/") ? (path + element) : (path + "/" + element);
+
+        if(isPathExcluded(element, fullElementPath) == false){
+            let stat = mp.FS.lstat(fullElementPath);
+            let isFile = stat.mode == 33206;
+            let isFolder = stat.mode == 16895;
+
+            if(isFile){
+                content.push({name:element, path:fullElementPath, size:mp.FS.lstat(fullElementPath).size});
+            }else if(isFolder){
+                let subContent = [];
+                content.push({name:element, path:fullElementPath, content:subContent});
+                getTree(fullElementPath, subContent);
+            }
+        }
+    });
+
+    return content;
+}
+
+
 async function run(){
 
-    const mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
-
-    await writeDefaultFilesystem(mp);
+    // mp = await loadMicroPython({stdout:stdoutWriter, heapsize:((520*1000) + (2*1024*1024))});
+    // await writeDefaultFilesystem(mp);
 
     // Write the actual files to the simulator
     for(let ifx=0; ifx<files_list.length; ifx++){
@@ -99,54 +182,8 @@ async function run(){
         console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
     }
 
-    // This JS function is called from C code in micropython
-    // using the VM hook in mpportconfig.h. This allows for
-    // doing anything while only micropython is running
-    // and not just the engine 
-    self.get_serial = () => {
-        let typed_chars = new Uint8Array(typed_chars_buffer);
-
-        if(typed_chars[0] == 1){
-            console.log(typed_chars);
-
-            // Process all buffered chars until see one that's 0, then stop
-            for(let i=1; i<typed_chars.length; i++){
-                if(typed_chars[i] == 0){
-                    break;
-                }else{
-                    mp.replProcessChar(typed_chars[i]);
-                }
-            }
-
-            // Tell the page we're ready for more data
-            typed_chars[0] = 0;
-            postMessage({message_type:"ready_for_more_typed_chars"});
-        }
-    }
-
-    // This JS function is called from C code in the engine
-    self.get_pressed_buttons = () => {
-        let web_pressed_buttons = new Uint16Array(web_pressed_buttons_buffer)
-        return web_pressed_buttons[0];
-    }
-
-    // This JS function is called from C code in the engine
-    self.update_display = (screen_buffer_to_render_ptr) => {
-
-        let buffer = new Uint8Array(screen_buffer);
-
-        for(let ipx=0; ipx<128*128*2; ipx++){
-            buffer[ipx] = mp._module.HEAPU8[screen_buffer_to_render_ptr+ipx];
-        }
-
-        postMessage({message_type:"screen_update"});
-    }
-
-    // console.log(mp)
-    // console.log(mp.FS)
-    // console.log(mp.FS.readdir("/"))
-
     let run_dir_path = path_to_run.substring(0, path_to_run.lastIndexOf("/"));
+    console.log(path_to_run);
 
     // Change to directory of file being executed
     await mp.runPythonAsync(`
@@ -168,6 +205,8 @@ onmessage = (e) => {
         typed_chars_buffer = e.data.value;
     }else if(e.data.message_type == "files"){
         files_list = e.data.value;
+    }else if(e.data.message_type == "tree"){
+        postMessage({message_type:"tree", value:getTree("/", [])});
     }else if(e.data.message_type == "run"){
         path_to_run = e.data.value;
         run();

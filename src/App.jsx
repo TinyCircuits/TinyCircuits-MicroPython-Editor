@@ -89,7 +89,7 @@ function App(props){
     }
 
     function onSimulatorTerminalType(value){
-        simulatorRef.current.addTypedChar(value);
+        simulatorRef.current.processChar(value);
     }
 
     const [terminalTabsData, setTerminalTabsData] = useState([
@@ -442,8 +442,40 @@ execfile("` + filePathToRun + `")
     }
 
 
-    const runOnDevice = async (selectedRunPath) => {
-        setRunPathDevice(selectedRunPath);
+    const formatCheckedToSelected = (files, filePathToRun, selectedRunPath) => {
+        // If the device run path is defined, go through all all files
+        // and change their paths to be run at that location
+        if(selectedRunPath != undefined){
+            // 1. If the selected to run main file is:
+            //    `/Games/Collision/main.py`
+            //    then `/Games/Collision/` needs to be replaced with `selectedRunPath`
+            // 2. If the selected to run main folder is:
+            //    `/Games/Collision`
+            //    then all files inside of that needs the portions of their
+            //    paths with `/Games/Collision` replaced with `selectedRunPath`
+            let pathPortionToReplace = "";
+
+            // Figure out common path portion to replace in all files
+            if(pathCheckedToRun.isFolder){
+                pathPortionToReplace = pathCheckedToRun.path;
+            }else{
+                pathPortionToReplace = pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/"));
+            }
+
+            // Edit the paths
+            files.forEach(file => {
+                file.path = file.path.replace(pathPortionToReplace, selectedRunPath);
+            });
+
+            filePathToRun = filePathToRun.replace(pathPortionToReplace, selectedRunPath);
+        }
+
+        return [files, filePathToRun];
+    }
+
+
+    const runOnDevice = async (selectedRunDirPath) => {
+        setRunPathDevice(selectedRunDirPath);
 
         console.log("Run on device", pathCheckedToRun.path, allCheckedPaths.current);
 
@@ -457,33 +489,8 @@ execfile("` + filePathToRun + `")
         let [files, filePathToRun] = await getRunFileAndCheckedData(openFiles);
 
         if(files != undefined){
-
-            // If the device run path is defined, go through all all files
-            // and change their paths to be run at that location
-            if(selectedRunPath != undefined){
-                // 1. If the selected to run main file is:
-                //    `/Games/Collision/main.py`
-                //    then `/Games/Collision/` needs to be replaced with `selectedRunPath`
-                // 2. If the selected to run main folder is:
-                //    `/Games/Collision`
-                //    then all files inside of that needs the portions of their
-                //    paths with `/Games/Collision` replaced with `selectedRunPath`
-                let pathPortionToReplace = "";
-
-                // Figure out common path portion to replace in all files
-                if(pathCheckedToRun.isFolder){
-                    pathPortionToReplace = pathCheckedToRun.path;
-                }else{
-                    pathPortionToReplace = pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/"));
-                }
-
-                // Edit the paths
-                files.forEach(file => {
-                    file.path = file.path.replace(pathPortionToReplace, selectedRunPath);
-                });
-            }
-
             // Switch UI
+            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunDirPath);
             setActiveTerminalTabKey("Device");
             runDevice(files, filePathToRun);
         }
@@ -509,14 +516,16 @@ execfile("` + filePathToRun + `")
     }
 
 
-    const runInSimulator = async (selectedRunPath) => {
-        setRunPathSimulator(selectedRunPath);
+    const runInSimulator = async (selectedRunDirPath) => {
+        setRunPathSimulator(selectedRunDirPath);
 
         console.log("Run in simulator", pathCheckedToRun.path, allCheckedPaths.current);
 
         let [files, filePathToRun] = await getRunFileAndCheckedData(true);
-        
+
         if(files != undefined){
+            // Switch UI
+            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunDirPath);
             switchToSimulatorPanel();
             setActiveTerminalTabKey("Simulator");
             simulatorRef.current.runSimulator(files, filePathToRun);
@@ -531,6 +540,7 @@ execfile("` + filePathToRun + `")
         }
 
         if(runPathSimulator == undefined){
+            setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runInSimulator);
         }else{
             runInSimulator(runPathSimulator);

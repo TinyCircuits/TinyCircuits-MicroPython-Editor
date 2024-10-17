@@ -7,6 +7,7 @@ import FilesPanel from './FilesPanel.jsx'
 import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
 import SimulatorPanel from './SimulatorPanel.jsx'
+import AddPanel from './AddPanel.jsx'
 import CodePanel from './CodePanel.jsx'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
 import SelectLocationModal from './SelectLocationModal.jsx'
@@ -42,8 +43,10 @@ function App(props){
     let [simulatorFiles, setSimulatorFiles] = useState(undefined);
     let [mainFiles, setMainFiles] = useState(undefined);
 
-    const [editorTabsData, setEditorTabsData] = useState([]);
     const [choseComputer, setChoseComputer] = useState(undefined);
+
+    const addTab = { id:"add_tab", saved:true, closeable:false, children:{title:"+", component:<AddPanel choseComputer={choseComputer}/>} };
+    const [editorTabsData, setEditorTabsData] = useState([addTab]);
     let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
 
     // The active tab key
@@ -76,7 +79,7 @@ function App(props){
         if(value == false && (choseComputer == false || choseComputer == undefined)){
             editorValues.current = {};
             setTree([]);
-            setEditorTabsData([]);
+            setEditorTabsData([addTab]);
             setChoseComputer(undefined);
         }
     }
@@ -171,7 +174,9 @@ function App(props){
         // the tabs
         mainFiles.openFile(path).then((content) => {
             editorValues.current[path] = new TextDecoder().decode(content);
-            editorTabsData.push({ id:path, saved:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
+            let addTab = editorTabsData.pop();  // Remove the add tab (always at end)
+            editorTabsData.push({ id:path, saved:true, closeable:true, children:{title:name, component:<CodePanel path={path} editorValues={editorValues.current} onCodeEditorChanged={onCodeEditorChanged} onCodeEditorSaved={onCodeEditorSaved}/>} })
+            editorTabsData.push(addTab);        // Put the add tab back in (to keep it always at end)
             switchToCodePanel();
             setEditorTabsData([...editorTabsData]);
             setActiveEditorTabKey(path);
@@ -262,7 +267,7 @@ function App(props){
             setChoseComputer(true);
 
             // Get rid of any editor tabs that existed before
-            setEditorTabsData([]);
+            setEditorTabsData([addTab]);
             editorValues.current = {};
 
             // Get rid of any path that was set to run
@@ -283,7 +288,7 @@ function App(props){
                 setChoseComputer(false);
 
                 // Get rid of any editor tabs that existed before
-                setEditorTabsData([]);
+                setEditorTabsData([addTab]);
                 editorValues.current = {};
 
                 // Get rid of any path that was set to run

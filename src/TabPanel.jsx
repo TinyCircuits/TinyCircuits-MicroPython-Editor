@@ -100,7 +100,7 @@ function TabPanel(props){
                                         <div className='flex'>
                                             {m.children.title}
                                             {m.saved ? "" : "*"}
-                                            {addCloseButton(m)}
+                                            {(m.closeable == true) ? addCloseButton(m) : <></>}
                                         </div>
                                     </Tab>
                                 );

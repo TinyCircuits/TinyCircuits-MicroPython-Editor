@@ -92,7 +92,7 @@ const stdin = () => {
 }
 
 console.log("Loading simulator!");
-const mp = await loadMicroPython({stdout:stdout, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
+const mp = await loadMicroPython({stdout:stdout, stderr:stderr, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
 await writeDefaultFilesystem(mp);
 
 // This JS function is called from C code in micropython
@@ -188,6 +188,7 @@ async function run(){
     console.log(path_to_run);
 
     // Change to directory of file being executed
+    try{
     await mp.runPythonAsync(`
 import sys
 import os
@@ -197,6 +198,20 @@ sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
 execfile("` + path_to_run + `")
 `);
+    }catch(error){
+        if(error.name == "PythonError"){
+            // https://stackoverflow.com/a/52947649
+            let lines = error.message.split(/\r\n|\r|\n/);
+            lines.forEach(line => {
+                if(line.length > 0){
+                    stderr(line);
+                }
+            });
+        }else{
+            console.error(error);
+        }
+    }
+    
 }
 
 

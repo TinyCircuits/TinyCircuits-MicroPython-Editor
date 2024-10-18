@@ -45,7 +45,14 @@ function TabPanel(props){
     // a different editor
     const whenTabClicked = (id, evn) => {
         evn.stopPropagation();
-        setActiveTabKey(id);
+
+        // If the active tab is the same as the one just clicked,
+        // unselect all tabs, otherwise, select the clicked tab
+        if(activeTabKey == id){
+            setActiveTabKey(0);
+        }else{
+            setActiveTabKey(id);
+        }
     };
 
     // When a tab is closed, find the index of the tab
@@ -84,7 +91,7 @@ function TabPanel(props){
 
     const addCloseButton = (m) => {
         if(closeable){
-            return <button style={{all:'unset', width:18}} onClick={(evn) => whenTabClosed(m, evn)} className='btn'>x</button>
+            return <button style={{all:'unset', width:18}} onClick={(evn) => whenTabClosed(m, evn)} className="btn">x</button>
         }
     }
 

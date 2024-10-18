@@ -8865,6 +8865,14 @@ html:has(.drawer-open.drawer-open) {
   width: 100%;
 }
 
+.w-3\/4 {
+  width: 75%;
+}
+
+.w-3\/5 {
+  width: 60%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -9028,6 +9036,10 @@ html:has(.drawer-open.drawer-open) {
 
 .rounded-full {
   border-radius: 9999px;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
 }
 
 .rounded-b {
@@ -9275,6 +9287,10 @@ html:has(.drawer-open.drawer-open) {
   padding: 1rem;
 }
 
+.p-8 {
+  padding: 2rem;
+}
+
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -9285,8 +9301,27 @@ html:has(.drawer-open.drawer-open) {
   padding-bottom: 0.5rem;
 }
 
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.py-9 {
+  padding-top: 2.25rem;
+  padding-bottom: 2.25rem;
+}
+
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
 .pl-1 {
   padding-left: 0.25rem;
+}
+
+.pt-8 {
+  padding-top: 2rem;
 }
 
 .text-3xl {
@@ -9514,8 +9549,24 @@ html:has(.drawer-open.drawer-open) {
   outline-style: solid;
 }
 
+.outline-1 {
+  outline-width: 1px;
+}
+
 .outline-offset-0 {
   outline-offset: 0px;
+}
+
+.outline-accent {
+  outline-color: var(--fallback-a,oklch(var(--a)/1));
+}
+
+.outline-neutral {
+  outline-color: var(--fallback-n,oklch(var(--n)/1));
+}
+
+.outline-base-100 {
+  outline-color: var(--fallback-b1,oklch(var(--b1)/1));
 }
 
 .ring {
@@ -10148,6 +10199,21 @@ html:has(.drawer-open.drawer-open) {
 .hover\:bg-base-300:hover {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)));
+}
+
+.hover\:bg-error:hover {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
+}
+
+.hover\:text-black:hover {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.hover\:text-error:hover {
+  --tw-text-opacity: 1;
+  color: var(--fallback-er,oklch(var(--er)/var(--tw-text-opacity)));
 }
 
 .focus\:outline-offset-0:focus {

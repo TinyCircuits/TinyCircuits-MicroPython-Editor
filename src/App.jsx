@@ -40,18 +40,14 @@ function App(props){
 
     let [computerFiles, setComputerFiles] = useState(undefined);
     let [deviceFiles, setDeviceFiles] = useState(undefined);
-    let [simulatorFiles, setSimulatorFiles] = useState(undefined);
     let [mainFiles, setMainFiles] = useState(undefined);
 
     const [choseComputer, setChoseComputer] = useState(undefined);
 
-    const addTab = { id:"add_tab", saved:true, closeable:false, children:{title:"+", component:<AddPanel choseComputer={choseComputer}/>} };
-    const [editorTabsData, setEditorTabsData] = useState([addTab]);
-    let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
-
     // The active tab key
-    const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
-    const [activeTerminalTabKey, setActiveTerminalTabKey] = useState("Device");
+    // const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
+    const [activeEditorTabKey, setActiveEditorTabKey] = useState("addTab");
+    const [activeTerminalTabKey, setActiveTerminalTabKey] = useState("Device"); // Focus device terminal by default
 
     const [currentMainPanel, setCurrentMainPanel] = useState("Code");
 
@@ -59,7 +55,7 @@ function App(props){
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
 
     const errorModalRef = useRef(null);
-    const choosePLatformModalRef = useRef(null);
+    const choosePlatformModalRef = useRef(null);
     const xtermRefDevice = useRef(null);
     const xtermRefSimulator = useRef(null);
 
@@ -70,6 +66,23 @@ function App(props){
 
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
+    
+
+    const chooseFilesPlatform = () => {
+        choosePlatformModalRef.current?.showModal();
+    }
+
+
+    const addNewFile = () => {
+        if(choseComputer == undefined){
+            window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Open a location first, no where to save the new file"}}));
+        }
+    }
+
+    const addTab = { id:"addTab", saved:true, closeable:false, children:{title:"+", component:<AddPanel chooseFilesPlatform={chooseFilesPlatform} addNewFile={addNewFile}/>} };
+    const [editorTabsData, setEditorTabsData] = useState([addTab]);
+    let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
+
 
     const [isSerialConnected, setIsSerialConnected] = useState(false);
     const setIsSerialConnectedWrapper = (value) => {
@@ -84,7 +97,6 @@ function App(props){
         }
     }
 
-    // let serial = undefined;
     let serial = useRef(undefined);
 
     function onDeviceTerminalType(value){
@@ -250,18 +262,13 @@ function App(props){
         xtermRefSimulator.current.write(value + "\r\n");
     }
 
-
-    const chooseFilesPlatform = () => {
-        choosePLatformModalRef.current?.showModal();
-    }
-
     const openComputerFiles = () => {
         let files = new ComputerFiles(setTree);
         setComputerFiles(files);
         setMainFiles(files);
 
         files.openFiles().then(() => {
-            choosePLatformModalRef.current?.close();
+            choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
             setChoseComputer(true);
@@ -282,7 +289,7 @@ function App(props){
             setMainFiles(files);
 
             files.openFiles().then(() => {
-                choosePLatformModalRef.current?.close();
+                choosePlatformModalRef.current?.close();
 
                 // Set this so that the files panel header renders with the correct platform
                 setChoseComputer(false);
@@ -607,7 +614,7 @@ execfile("` + filePathToRun + `")
 
 
             {/* ### Choose platform modal ### */}
-            <Modal ref={choosePLatformModalRef}>
+            <Modal ref={choosePlatformModalRef}>
                 <Modal.Header className="font-bold">Choose platform to open folder from:</Modal.Header>
                 <Modal.Body className="">
                     <div className="w-full h-full flex flex-row justify-evenly">
@@ -640,7 +647,7 @@ execfile("` + filePathToRun + `")
             <div className="w-full h-16 bg-base-100 border-b-base-300 border-b-4 flex items-center">
                 <div className="h-full flex-1 flex flex-row items-center">
                     <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
-                        Open
+                        Open Location
                     </Button>
 
                     <div>
@@ -677,9 +684,9 @@ execfile("` + filePathToRun + `")
                         </svg>
                     </Button>
                     <Button variant={currentMainPanel == "Simulator" ? "outline" : ""} onClick={switchToSimulatorPanel} size='md' color="secondary" shape="square" className="mx-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                            <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
-                        </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
+                        <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>
+                    </svg>
                     </Button>
                     <Button variant={currentMainPanel == "Image" ? "outline" : ""} onClick={switchToImagePanel} size='md' color="secondary" shape="square">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
@@ -741,7 +748,7 @@ execfile("` + filePathToRun + `")
 
                                 {/* IMAGE PANEL */}
                                 <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Image" ? "z-10" : "z-0 invisible")}>
-                                    <div className="left-0 right-0 top-0 bottom-0 z-20 absolute bg-success">
+                                    <div className="left-0 right-0 top-0 bottom-0 z-20 absolute bg-base-200">
                                     </div>
                                 </div>
 
@@ -761,7 +768,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.17.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.18.2024.0</p>
                 </div>
             </div>
 

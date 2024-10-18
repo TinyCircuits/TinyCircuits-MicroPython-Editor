@@ -215,7 +215,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     }, [])
 
     return(
-        <div ref={this} className="w-full h-full flex justify-center items-center">
+        <div ref={this} className="w-full h-full flex justify-center items-center bg-base-200">
             <canvas ref={canvasRef} width="128" height="128" className="w-96 aspect-square">
                 Canvas that displays simulator frames
             </canvas>

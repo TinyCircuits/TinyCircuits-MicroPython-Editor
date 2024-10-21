@@ -174,7 +174,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             }, false);
 
             console.log("Starting simulator worker!");
-            worker.current = new Worker("simulator-worker.js", { type: "module" });
+            worker.current = new Worker("./simulator-worker.js", { type: "module" });
 
             worker.current.onerror = (data) => {
                 console.error(data);

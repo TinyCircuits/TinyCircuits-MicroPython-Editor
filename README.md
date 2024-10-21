@@ -34,4 +34,4 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 * /login/
 
 # Building
-1. `npm run build` (makes a single index.html file thanks to https://www.npmjs.com/package/vite-plugin-singlefile)
+1. `npm run build`

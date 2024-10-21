@@ -46,7 +46,7 @@ function App(props){
 
     // The active tab key
     // const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
-    const [activeEditorTabKey, setActiveEditorTabKey] = useState("addTab");
+    const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
     const [activeTerminalTabKey, setActiveTerminalTabKey] = useState("Device"); // Focus device terminal by default
 
     const [currentMainPanel, setCurrentMainPanel] = useState("Code");
@@ -74,9 +74,9 @@ function App(props){
 
 
     const addNewFile = () => {
-        if(choseComputer == undefined){
-            window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Open a location first, no where to save the new file"}}));
-        }
+        // if(choseComputer == undefined){
+        //     window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Open a location first, no where to save the new file"}}));
+        // }
     }
 
     const addTab = { id:"addTab", saved:true, closeable:false, children:{title:"+", component:<AddPanel chooseFilesPlatform={chooseFilesPlatform} addNewFile={addNewFile}/>} };
@@ -735,7 +735,7 @@ execfile("` + filePathToRun + `")
                                     <div className="left-0 right-0 top-0 bottom-0 z-20 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
                                     </div>
                                     <div className="left-0 right-0 top-0 bottom-0 z-30 absolute">
-                                        <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey}/>
+                                        <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey} unselectable={false}/>
                                     </div>
                                 </div>
 
@@ -768,7 +768,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.18.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.21.2024.0</p>
                 </div>
             </div>
 

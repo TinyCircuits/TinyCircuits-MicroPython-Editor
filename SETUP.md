@@ -18,3 +18,4 @@ These are the steps taken to set this project up the first time. This is for ref
 16. `npm install use-resize-observer`
 17. `npm install vite-plugin-singlefile`
 18. `npm install pocketbase`
+19. `npm install email-validator`

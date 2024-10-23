@@ -74,12 +74,28 @@ function App(props){
 
 
     const addNewFile = () => {
-        // if(choseComputer == undefined){
-        //     window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Open a location first, no where to save the new file"}}));
-        // }
+        console.log("Add new file");
     }
 
-    const addTab = { id:"addTab", saved:true, closeable:false, children:{title:"+", component:<AddPanel chooseFilesPlatform={chooseFilesPlatform} addNewFile={addNewFile}/>} };
+    const openDeviceFile = async () => {
+        console.log("Open device file");
+
+        await deviceFiles.openFiles();                      // Update internal tree
+        setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
+    }
+
+    const openComputerFile = () => {
+        console.log("Open computer file");
+    }
+
+    const openSimulatorFile = async () => {
+        console.log("Open simulator file");
+
+        setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
+        setRunAfterLocationSelect(() => runInSimulator);
+    }
+
+    const addTab = { id:"addTab", saved:true, closeable:false, children:{title:"+", component:<AddPanel addNewFile={addNewFile} openDeviceFile={openDeviceFile} openComputerFile={openComputerFile} openSimulatorFile={openSimulatorFile}/>} };
     const [editorTabsData, setEditorTabsData] = useState([addTab]);
     let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
 
@@ -158,10 +174,6 @@ function App(props){
 
     const switchToSimulatorPanel = () => {
         setCurrentMainPanel("Simulator");
-    }
-
-    const switchToImagePanel = () => {
-        setCurrentMainPanel("Image");
     }
 
 
@@ -682,20 +694,14 @@ execfile("` + filePathToRun + `")
 
                 <div className="h-full flex-1 flex flex-row justify-center items-center">
 
-                    <Button variant={currentMainPanel == "Code" ? "outline" : ""} onClick={switchToCodePanel} size='md' color="secondary" shape="square">
+                    <Button title="Code panel" variant={currentMainPanel == "Code" ? "outline" : ""} onClick={switchToCodePanel} size='md' color="secondary" shape="square">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
                             <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
                         </svg>
                     </Button>
-                    <Button variant={currentMainPanel == "Simulator" ? "outline" : ""} onClick={switchToSimulatorPanel} size='md' color="secondary" shape="square" className="mx-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
-                        <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>
-                    </svg>
-                    </Button>
-                    <Button variant={currentMainPanel == "Image" ? "outline" : ""} onClick={switchToImagePanel} size='md' color="secondary" shape="square">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
-                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
+                    <Button title="Simulator panel" variant={currentMainPanel == "Simulator" ? "outline" : ""} onClick={switchToSimulatorPanel} size='md' color="secondary" shape="square" className="mx-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
+                            <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>
                         </svg>
                     </Button>
                 </div>
@@ -747,12 +753,6 @@ execfile("` + filePathToRun + `")
                                 <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
                                     <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
                                         <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
-                                    </div>
-                                </div>
-
-                                {/* IMAGE PANEL */}
-                                <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Image" ? "z-10" : "z-0 invisible")}>
-                                    <div className="left-0 right-0 top-0 bottom-0 z-20 absolute bg-base-200">
                                     </div>
                                 </div>
 

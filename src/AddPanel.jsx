@@ -5,13 +5,7 @@ function AddPanel(props){
     return (
         <div className="w-full h-full flex flex-row bg-base-200 items-center justify-evenly">
 
-            <div className="w-3/5 bg-base-300 flex flex-row items-center justify-between p-8 outline outline-base-100 outline-neutral rounded-lg overflow-hidden">
-                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.chooseFilesPlatform}>
-                    Open Location
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-folder-fill" viewBox="0 0 16 16">
-                        <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
-                    </svg>
-                </Button>
+            <div className="w-2/5 bg-base-300 flex flex-row items-center justify-between p-8 outline outline-base-100 outline-neutral rounded-lg overflow-hidden">
                 
                 <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.addNewFile}>
                     New File
@@ -21,7 +15,7 @@ function AddPanel(props){
                 </Button>
 
 
-                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}}>
+                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.openDeviceFile}>
                     Open Device File
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
                         <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
@@ -33,7 +27,7 @@ function AddPanel(props){
                 </Button>
 
 
-                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}}>
+                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.openComputerFile}>
                     Open Computer File
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
                         <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
@@ -44,7 +38,7 @@ function AddPanel(props){
                 </Button>
 
 
-                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}}>
+                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.openSimulatorFile}>
                     Open Simulator File
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
                         <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>

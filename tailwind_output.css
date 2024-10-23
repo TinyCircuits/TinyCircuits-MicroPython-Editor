@@ -8877,6 +8877,10 @@ html:has(.drawer-open.drawer-open) {
   width: 100%;
 }
 
+.w-2\/5 {
+  width: 40%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }

@@ -16,6 +16,8 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     let typedCharsArray = useRef(undefined);
     let getTreeResolve = useRef(undefined);
 
+    let ran = useRef(false);
+
     let encoder = useRef(new TextEncoder());
 
     const BUTTON_CODE_A            = 0b0000000000000001;
@@ -32,7 +34,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
     const tryFillTypedCharsBuffer = () => {
         // If the first element is zero, that means the worker,
-        // used anything in the buffer try to refill it
+        // used everything in the buffer, try to refill it
         if(typedCharsArray.current[0] == 0){
             let index = 1;
 
@@ -48,23 +50,23 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 typedCharsArray.current[0] = 1;
             }
 
-            // Minus one since first element is used for signal
+            // Put the typed and buffer characters into the shared array
             while(index < typedCharsBufferSize && typedCharsList.current.length != 0){
                 let char = typedCharsList.current.shift();
                 typedCharsArray.current[index] = encoder.current.encode(char)[0];
                 index += 1;
             }
         }
+
+        // This should really only be called if the simulator is not actually running anything: TODO
+        if(ran.current == false) worker.current.postMessage({message_type:"typed"});
     }
 
     useImperativeHandle(ref, () => ({
         runSimulator(files, pathToRun){
-            worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
-            worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
-            worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
-
             worker.current.postMessage({message_type:"files", value:files});
             worker.current.postMessage({message_type:"run", value:pathToRun});
+            ran.current = true;
         },
 
         processChar(char){
@@ -207,6 +209,10 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                     props.onData(e.data.value);
                 }else if(e.data.message_type == "ready_for_more_typed_chars"){
                     tryFillTypedCharsBuffer();
+                }else if(e.data.message_type == "ready"){
+                    worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
+                    worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
+                    worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
                 }else if(e.data.message_type == "tree"){
                     getTreeResolve.current(e.data.value);
                 }

@@ -88,12 +88,13 @@ async function writeDefaultFilesystem(mp){
 // writeFilesystem();
 
 const stdin = () => {
-    console.log("TEST");
+    console.log("STDIN TEST");
 }
 
 console.log("Loading simulator!");
-const mp = await loadMicroPython({stdout:stdout, stderr:stderr, stdin:stdin, heapsize:((520*1000) + (2*1024*1024))});
+const mp = await loadMicroPython({stdout:stdout, stderr:stderr, stdin:stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
 await writeDefaultFilesystem(mp);
+await mp.replInit();
 
 // This JS function is called from C code in micropython
 // using the VM hook in mpportconfig.h. This allows for
@@ -103,8 +104,6 @@ self.get_serial = () => {
     let typed_chars = new Uint8Array(typed_chars_buffer);
 
     if(typed_chars[0] == 1){
-        console.log(typed_chars);
-
         // Process all buffered chars until see one that's 0, then stop
         for(let i=1; i<typed_chars.length; i++){
             if(typed_chars[i] == 0){
@@ -138,7 +137,7 @@ self.update_display = (screen_buffer_to_render_ptr) => {
 }
 
 
-const isPathExcluded = (localPath, fullPath) =>{
+const isPathExcluded = (localPath, fullPath) => {
     if(localPath != "." && localPath != ".." && fullPath != "/." && fullPath != "/.." && fullPath != "/tmp" && fullPath != "/home" && fullPath != "/dev" && fullPath != "/proc"){
         return false;
     }else{
@@ -226,8 +225,13 @@ onmessage = (e) => {
         files_list = e.data.value;
     }else if(e.data.message_type == "tree"){
         postMessage({message_type:"tree", value:getTree("/", [])});
+    }else if(e.data.message_type == "typed"){
+        self.get_serial();
     }else if(e.data.message_type == "run"){
         path_to_run = e.data.value;
         run();
     }
 };
+
+// Let the main thread know the worker is ready
+postMessage({message_type:"ready"})

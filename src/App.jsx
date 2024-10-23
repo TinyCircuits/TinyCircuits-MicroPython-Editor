@@ -258,8 +258,13 @@ function App(props){
     }
 
     function onSimulatorData(value){
-        // MicroPython webassembly is buffered by line
-        xtermRefSimulator.current.write(value + "\r\n");
+        // Not sure if this is the way to do this, but it works...
+        if(value[0] == 10){
+            xtermRefSimulator.current.write('\r');
+            xtermRefSimulator.current.write(value);
+        }else{
+            xtermRefSimulator.current.write(value);
+        }
     }
 
     const openComputerFiles = () => {
@@ -354,7 +359,6 @@ function App(props){
                     continue;
                 }
 
-                
                 let filePath = allCheckedPaths.current[icx].path;
                 let lastIndexOfSlash = filePath.lastIndexOf("/");
                 let secondToLastIndexOfSlash = filePath.lastIndexOf("/", lastIndexOfSlash-1);

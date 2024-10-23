@@ -182,7 +182,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 console.error(data);
             };
   
-            worker.current.onmessage = (e) => {
+            worker.current.onmessage = async (e) => {
                 if(e.data.message_type == "screen_update"){
                     let buffer = new Uint8Array(screenBuffer.current);
 
@@ -201,9 +201,11 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                         screenArray.current[(ipx*4)+3] = 255;
                     }
 
-                    let imageData = new ImageData(screenArray.current, 128, 128);
+                    // let imageData = new ImageData(screenArray.current, 128, 128);
+                    // let imageBitmap = await createImageBitmap(imageData, 0, 0, 128, 128);
+                    // ctx.current.drawImage(imageBitmap, 0, 0);
 
-                    // Draw image data to the canvas
+                    let imageData = new ImageData(screenArray.current, 128, 128);
                     ctx.current.putImageData(imageData, 0, 0);
                 }else if(e.data.message_type == "print_update"){
                     props.onData(e.data.value);

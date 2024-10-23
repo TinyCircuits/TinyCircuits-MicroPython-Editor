@@ -84,7 +84,7 @@ function FilesPanel(props){
             return(
                 <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "") + (node.isFocused ? "bg-base-300" : "")}>
                     <div className="flex w-12 w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-file-earmark-fill" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="min-w-[16px] min-h-[16px] bi bi-file-earmark-fill" viewBox="0 0 16 16">
                             <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2z"/>
                         </svg>
                         <p className='text-nowrap'>{node.data.name}</p>
@@ -105,11 +105,11 @@ function FilesPanel(props){
                 <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "")}>
                     <div className="flex w-12 w-full">
                         {
-                            node.isOpen ?   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-down" viewBox="0 0 16 16">
+                            node.isOpen ?   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="min-w-[16px] min-h-[16px] bi bi-chevron-down" viewBox="0 0 16 16">
                                                 <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
                                             </svg>
                                         :
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="min-w-[16px] min-h-[16px] bi bi-chevron-right" viewBox="0 0 16 16">
                                                 <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
                                             </svg>
                         }
@@ -129,7 +129,7 @@ function FilesPanel(props){
         }
     }
 
-    function Node({ node, style, dragHandle }) {
+    function Node({ node, style, dragHandle }){
         /* This node instance can do many things. See the API reference. */
         return (
             <div style={style} ref={dragHandle} onClick={() => node.isInternal && node.toggle()}>

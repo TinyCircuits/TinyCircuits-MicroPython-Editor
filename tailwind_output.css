@@ -8821,8 +8821,16 @@ html:has(.drawer-open.drawer-open) {
   height: 100%;
 }
 
+.h-\[16px\] {
+  height: 16px;
+}
+
 .min-h-0 {
   min-height: 0px;
+}
+
+.min-h-\[16px\] {
+  min-height: 16px;
 }
 
 .w-1 {
@@ -8845,12 +8853,12 @@ html:has(.drawer-open.drawer-open) {
   width: 3.5rem;
 }
 
-.w-24 {
-  width: 6rem;
+.w-2\/5 {
+  width: 40%;
 }
 
-.w-3\/5 {
-  width: 60%;
+.w-24 {
+  width: 6rem;
 }
 
 .w-32 {
@@ -8877,8 +8885,12 @@ html:has(.drawer-open.drawer-open) {
   width: 100%;
 }
 
-.w-2\/5 {
-  width: 40%;
+.w-\[16px\] {
+  width: 16px;
+}
+
+.min-w-\[16px\] {
+  min-width: 16px;
 }
 
 .flex-1 {

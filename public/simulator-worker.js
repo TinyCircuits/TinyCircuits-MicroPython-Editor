@@ -9,10 +9,10 @@ const stderr = (line) => {
 };
 
 let web_pressed_buttons_buffer = undefined;
+let stop_buffer = undefined;
 let screen_buffer = undefined;
 let typed_chars_buffer = undefined;
 
-let files_list = [];
 let path_to_run = "";
 
 async function writeFilesystemFile(mp, fetchPath, filePath){
@@ -85,11 +85,18 @@ async function writeDefaultFilesystem(mp){
     // console.log(mp.FS.readdir("/"));
 }
 
-// writeFilesystem();
 
 const stdin = () => {
     console.log("STDIN TEST");
 }
+
+
+const stop = () => {
+    console.log("Stopping simulator");
+    postMessage({message_type:"fs", value:getFs("/", [])});
+    self.close();
+}
+
 
 console.log("Loading simulator!");
 const mp = await loadMicroPython({stdout:stdout, stderr:stderr, stdin:stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
@@ -101,6 +108,12 @@ await mp.replInit();
 // doing anything while only micropython is running
 // and not just the engine 
 self.get_serial = () => {
+    // If the stop buffer is being told to stop, then stop
+    if(stop_buffer[0] == 1){
+        stop_buffer[0] = 0;
+        stop();
+    }
+
     let typed_chars = new Uint8Array(typed_chars_buffer);
 
     if(typed_chars[0] == 1){
@@ -137,6 +150,8 @@ self.update_display = (screen_buffer_to_render_ptr) => {
 }
 
 
+// While building tree to represent simulator file system,
+// some paths should not be included
 const isPathExcluded = (localPath, fullPath) => {
     if(localPath != "." && localPath != ".." && fullPath != "/." && fullPath != "/.." && fullPath != "/tmp" && fullPath != "/home" && fullPath != "/dev" && fullPath != "/proc"){
         return false;
@@ -146,6 +161,8 @@ const isPathExcluded = (localPath, fullPath) => {
 }
 
 
+// Builds list/dict tree structure in format needed
+// for display in custom file panel
 const getTree = (path, content) => {
     let dirElements = mp.FS.readdir(path);
 
@@ -171,24 +188,39 @@ const getTree = (path, content) => {
 }
 
 
+// Returns a list of all folders and files with absolute paths
+// and file data
+const getFs = (path, list) => {
+    let dirElements = mp.FS.readdir(path);
+
+    dirElements.forEach(element => {
+        let fullElementPath = (path == "/") ? (path + element) : (path + "/" + element);
+
+        if(isPathExcluded(element, fullElementPath) == false){
+            let stat = mp.FS.lstat(fullElementPath);
+            let isFile = stat.mode == 33206;
+            let isFolder = stat.mode == 16895;
+
+            if(isFile){
+                list.push({name:element, path:fullElementPath, size:mp.FS.lstat(fullElementPath).size, data:mp.FS.readFile(fullElementPath, {encoding:"binary"})});
+            }else if(isFolder){
+                list.push({name:element, path:fullElementPath});
+                getFs(fullElementPath, list);
+            }
+        }
+    });
+
+    return list;
+}
+
+
 async function run(){
-    // Write the actual files to the simulator
-    for(let ifx=0; ifx<files_list.length; ifx++){
-        // Create the path to the file
-        let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
-        mp.FS.mkdirTree(path);
-
-        mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
-        
-        console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
-    }
-
+    // Get the full path to the directory where the main file lives
     let run_dir_path = path_to_run.substring(0, path_to_run.lastIndexOf("/"));
-    console.log(path_to_run);
 
     // Change to directory of file being executed
     try{
-    await mp.runPythonAsync(`
+        await mp.runPythonAsync(`
 import sys
 import os
 import engine_save
@@ -210,19 +242,33 @@ execfile("` + path_to_run + `")
             console.error(error);
         }
     }
-    
 }
 
 
 onmessage = (e) => {
-    if(e.data.message_type == "screen_buffer_set"){
+    if(e.data.message_type == "stop_buffer_set"){
+        stop_buffer = e.data.value;
+    }else if(e.data.message_type == "screen_buffer_set"){
         screen_buffer = e.data.value;
     }else if(e.data.message_type == "pressed_buttons_buffer_set"){
         web_pressed_buttons_buffer = e.data.value;
     }else if(e.data.message_type == "typed_chars_buffer_set"){
         typed_chars_buffer = e.data.value;
     }else if(e.data.message_type == "files"){
-        files_list = e.data.value;
+        let files_list = e.data.value;
+
+        console.log(files_list);
+        
+        // Write the actual files to the simulator
+        for(let ifx=0; ifx<files_list.length; ifx++){
+            // Create the path to the file
+            let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
+            mp.FS.mkdirTree(path);
+            mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
+            console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
+        }
+    }else if(e.data.message_type == "stop"){
+        stop();
     }else if(e.data.message_type == "tree"){
         postMessage({message_type:"tree", value:getTree("/", [])});
     }else if(e.data.message_type == "typed"){

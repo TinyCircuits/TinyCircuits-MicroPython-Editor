@@ -9,6 +9,8 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     let pressedButtonsArray = useRef(undefined);
     let screenBuffer = useRef(undefined);
     let screenArray = useRef(undefined);
+    let stopBuffer = useRef(undefined);
+    let stopArray = useRef(undefined);
 
     let typedCharsList = useRef([]);            // List that always grows while waiting for simulator worker to consume chars in buffer
     const typedCharsBufferSize = 32;
@@ -16,6 +18,8 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     let typedCharsArray = useRef(undefined);
     let getTreeResolve = useRef(undefined);
 
+    let filesToSimulate = useRef(undefined);
+    let pathToSimulate = useRef(undefined);
     let ran = useRef(false);
 
     let encoder = useRef(new TextEncoder());
@@ -31,6 +35,75 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     const BUTTON_CODE_MENU         = 0b0000000100000000;
 
     let worker = useRef(undefined);
+
+
+    const setupWorker = () => {
+        console.log("Starting simulator worker!");
+        worker.current = new Worker("./simulator-worker.js", { type: "module" });
+
+        worker.current.onerror = (data) => {
+            console.error(data);
+        };
+
+        worker.current.onmessage = async (e) => {
+            if(e.data.message_type == "screen_update"){
+                let buffer = new Uint8Array(screenBuffer.current);
+
+                for(let ipx=0; ipx<128*128; ipx++){
+                    let RGB565_16BIT = 0;
+                    RGB565_16BIT |= (buffer[(ipx*2)+1]) << 8;
+                    RGB565_16BIT |= (buffer[(ipx*2)]) << 0;
+
+                    let R_5BIT = (RGB565_16BIT >> 11) & 0b00011111;
+                    let G_6BIT = (RGB565_16BIT >> 5)  & 0b00111111;
+                    let B_5BIT = (RGB565_16BIT >> 0)  & 0b00011111;
+
+                    screenArray.current[(ipx*4)] =   R_5BIT << 3;
+                    screenArray.current[(ipx*4)+1] = G_6BIT << 2;
+                    screenArray.current[(ipx*4)+2] = B_5BIT << 3;
+                    screenArray.current[(ipx*4)+3] = 255;
+                }
+
+                // let imageData = new ImageData(screenArray.current, 128, 128);
+                // let imageBitmap = await createImageBitmap(imageData, 0, 0, 128, 128);
+                // ctx.current.drawImage(imageBitmap, 0, 0);
+
+                let imageData = new ImageData(screenArray.current, 128, 128);
+                ctx.current.putImageData(imageData, 0, 0);
+            }else if(e.data.message_type == "print_update"){
+                props.onData(e.data.value);
+            }else if(e.data.message_type == "ready_for_more_typed_chars"){
+                tryFillTypedCharsBuffer();
+            }else if(e.data.message_type == "ready"){
+                worker.current.postMessage({message_type:"stop_buffer_set", value:stopBuffer.current});
+                worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
+                worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
+                worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
+            }else if(e.data.message_type == "fs"){
+                console.log("Got simulator files to restore", e.data.value);
+                console.log("Also need to write these files", filesToSimulate.current)
+                setupWorker();
+
+                setTimeout(() => {
+                    worker.current.postMessage({message_type:"files", value:filesToSimulate.current});
+                    worker.current.postMessage({message_type:"files", value:e.data.value});
+                    worker.current.postMessage({message_type:"run", value:pathToSimulate.current});
+                }, 1000);
+                
+                // ran.current = true;
+            }else if(e.data.message_type == "tree"){
+                getTreeResolve.current(e.data.value);
+            }
+        };
+    }
+
+
+    const stopWorker = () => {
+        worker.current.postMessage({message_type:"stop"});
+        stopArray[0] = 1;
+        ran.current = false;
+    }
+
 
     const tryFillTypedCharsBuffer = () => {
         // If the first element is zero, that means the worker,
@@ -62,11 +135,12 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
         if(ran.current == false) worker.current.postMessage({message_type:"typed"});
     }
 
+
     useImperativeHandle(ref, () => ({
         runSimulator(files, pathToRun){
-            worker.current.postMessage({message_type:"files", value:files});
-            worker.current.postMessage({message_type:"run", value:pathToRun});
-            ran.current = true;
+            filesToSimulate.current = files;
+            pathToSimulate.current = pathToRun;
+            stopWorker();
         },
 
         processChar(char){
@@ -105,6 +179,9 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             pressedButtonsArray.current = new Uint16Array(pressedButtonsBuffer.current);
             screenBuffer.current = new SharedArrayBuffer((128*128*2));
             screenArray.current = new Uint8ClampedArray(128*128 * 4);    // Each pixel is 4 bytes, R,G,B,A
+
+            stopBuffer.current = new SharedArrayBuffer(1);
+            stopArray.current = new Uint8Array(stopBuffer.current);
 
             typedCharsBuffer.current = new SharedArrayBuffer(typedCharsBufferSize);
             typedCharsArray.current = new Uint8Array(typedCharsBuffer.current);
@@ -175,50 +252,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 }
             }, false);
 
-            console.log("Starting simulator worker!");
-            worker.current = new Worker("./simulator-worker.js", { type: "module" });
-
-            worker.current.onerror = (data) => {
-                console.error(data);
-            };
-  
-            worker.current.onmessage = async (e) => {
-                if(e.data.message_type == "screen_update"){
-                    let buffer = new Uint8Array(screenBuffer.current);
-
-                    for(let ipx=0; ipx<128*128; ipx++){
-                        let RGB565_16BIT = 0;
-                        RGB565_16BIT |= (buffer[(ipx*2)+1]) << 8;
-                        RGB565_16BIT |= (buffer[(ipx*2)]) << 0;
-
-                        let R_5BIT = (RGB565_16BIT >> 11) & 0b00011111;
-                        let G_6BIT = (RGB565_16BIT >> 5)  & 0b00111111;
-                        let B_5BIT = (RGB565_16BIT >> 0)  & 0b00011111;
-
-                        screenArray.current[(ipx*4)] =   R_5BIT << 3;
-                        screenArray.current[(ipx*4)+1] = G_6BIT << 2;
-                        screenArray.current[(ipx*4)+2] = B_5BIT << 3;
-                        screenArray.current[(ipx*4)+3] = 255;
-                    }
-
-                    // let imageData = new ImageData(screenArray.current, 128, 128);
-                    // let imageBitmap = await createImageBitmap(imageData, 0, 0, 128, 128);
-                    // ctx.current.drawImage(imageBitmap, 0, 0);
-
-                    let imageData = new ImageData(screenArray.current, 128, 128);
-                    ctx.current.putImageData(imageData, 0, 0);
-                }else if(e.data.message_type == "print_update"){
-                    props.onData(e.data.value);
-                }else if(e.data.message_type == "ready_for_more_typed_chars"){
-                    tryFillTypedCharsBuffer();
-                }else if(e.data.message_type == "ready"){
-                    worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
-                    worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
-                    worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
-                }else if(e.data.message_type == "tree"){
-                    getTreeResolve.current(e.data.value);
-                }
-            };
+            setupWorker();
         }
     }, [])
 

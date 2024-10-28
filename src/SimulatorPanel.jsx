@@ -1,14 +1,12 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import SimulatorCanvas from "./SimulatorCanvas.jsx"
 
 const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
-    let canvasRef = useRef(undefined);
-    let canvas = useRef(undefined);
-    let ctx = useRef(undefined);
+    let simulatorCanvasRef = useRef(undefined);
 
     let pressedButtonsBuffer = useRef(undefined);
     let pressedButtonsArray = useRef(undefined);
     let screenBuffer = useRef(undefined);
-    let screenArray = useRef(undefined);
     let stopBuffer = useRef(undefined);
     let stopArray = useRef(undefined);
 
@@ -47,29 +45,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
         worker.current.onmessage = async (e) => {
             if(e.data.message_type == "screen_update"){
-                let buffer = new Uint8Array(screenBuffer.current);
-
-                for(let ipx=0; ipx<128*128; ipx++){
-                    let RGB565_16BIT = 0;
-                    RGB565_16BIT |= (buffer[(ipx*2)+1]) << 8;
-                    RGB565_16BIT |= (buffer[(ipx*2)]) << 0;
-
-                    let R_5BIT = (RGB565_16BIT >> 11) & 0b00011111;
-                    let G_6BIT = (RGB565_16BIT >> 5)  & 0b00111111;
-                    let B_5BIT = (RGB565_16BIT >> 0)  & 0b00011111;
-
-                    screenArray.current[(ipx*4)] =   R_5BIT << 3;
-                    screenArray.current[(ipx*4)+1] = G_6BIT << 2;
-                    screenArray.current[(ipx*4)+2] = B_5BIT << 3;
-                    screenArray.current[(ipx*4)+3] = 255;
-                }
-
-                // let imageData = new ImageData(screenArray.current, 128, 128);
-                // let imageBitmap = await createImageBitmap(imageData, 0, 0, 128, 128);
-                // ctx.current.drawImage(imageBitmap, 0, 0);
-
-                let imageData = new ImageData(screenArray.current, 128, 128);
-                ctx.current.putImageData(imageData, 0, 0);
+                simulatorCanvasRef.current.update(new Uint8Array(screenBuffer.current));
             }else if(e.data.message_type == "print_update"){
                 props.onData(e.data.value);
             }else if(e.data.message_type == "ready_for_more_typed_chars"){
@@ -154,113 +130,94 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 getTreeResolve.current = resolve;
             });
         }
-    }))
+    }));
 
     useEffect(() => {
-        if(canvas.current == undefined){
-            console.log("Simulator init!");
+        console.log("Simulator init!");
 
-            canvas.current = canvasRef.current;
-            ctx.current = canvas.current.getContext("2d");
+        // https://stackoverflow.com/a/77908357
+        pressedButtonsBuffer.current = new SharedArrayBuffer(2);
+        pressedButtonsArray.current = new Uint16Array(pressedButtonsBuffer.current);
+        screenBuffer.current = new SharedArrayBuffer((128*128*2));
 
-            canvas.current.style.cssText = "width:512px; height:512px; image-rendering:optimizeQuality; image-rendering:-moz-crisp-edges; image-rendering:-webkit-optimize-contrast; image-rendering:-o-crisp-edges; image-rendering:pixelated; -ms-interpolation-mode:nearest-neighbor;";
+        stopBuffer.current = new SharedArrayBuffer(1);
+        stopArray.current = new Uint8Array(stopBuffer.current);
 
-            ctx.current.imageSmoothingEnabled = false;
-            ctx.current.mozImageSmoothingEnabled = false;
-            ctx.current.oImageSmoothingEnabled = false;
-            ctx.current.webkitImageSmoothingEnabled = false;
-            ctx.current.msImageSmoothingEnabled = false;
+        typedCharsBuffer.current = new SharedArrayBuffer(typedCharsBufferSize);
+        typedCharsArray.current = new Uint8Array(typedCharsBuffer.current);
 
-            ctx.current.fillStyle = "black";
-            ctx.current.fillRect(0, 0, 128, 128);
+        window.addEventListener("keydown", (e) => {
+            if (e.repeat) return;
+            switch(e.key){
+                case 'w':        // DPAD UP
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_UP;
+                break;
+                case 'a':        // DPAD LEFT
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_LEFT;
+                break;
+                case 's':        // DPAD DOWN
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_DOWN;
+                break;
+                case 'd':        // DPAD RIGHT
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_RIGHT;
+                break;
+                case '.':   // A
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_A;
+                break;
+                case ',':    // B
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_B;
+                break;
+                case "Shift":   // BUMPER LEFT
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_LEFT;
+                break;
+                case ' ':    // BUMPER RIGHT
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_RIGHT;
+                break;
+                case "Enter":    // MENU
+                    pressedButtonsArray.current[0] |= BUTTON_CODE_MENU;
+                break;
+            }
+        }, false);
 
-            // https://stackoverflow.com/a/77908357
-            pressedButtonsBuffer.current = new SharedArrayBuffer(2);
-            pressedButtonsArray.current = new Uint16Array(pressedButtonsBuffer.current);
-            screenBuffer.current = new SharedArrayBuffer((128*128*2));
-            screenArray.current = new Uint8ClampedArray(128*128 * 4);    // Each pixel is 4 bytes, R,G,B,A
+        window.addEventListener("keyup", (e) => {
+            if (e.repeat) return;
+            switch(e.key){
+                case 'w':        // DPAD UP
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_UP;
+                break;
+                case 'a':        // DPAD LEFT
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_LEFT;
+                break;
+                case 's':        // DPAD DOWN
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_DOWN;
+                break;
+                case 'd':        // DPAD RIGHT
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_RIGHT;
+                break;
+                case '.':   // A
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_A;
+                break;
+                case ',':    // B
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_B;
+                break;
+                case "Shift":   // BUMPER LEFT
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_LEFT;
+                break;
+                case ' ':    // BUMPER RIGHT
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_RIGHT;
+                break;
+                case "Enter":    // MENU
+                    pressedButtonsArray.current[0] &= ~BUTTON_CODE_MENU;
+                break;
+            }
+        }, false);
 
-            stopBuffer.current = new SharedArrayBuffer(1);
-            stopArray.current = new Uint8Array(stopBuffer.current);
-
-            typedCharsBuffer.current = new SharedArrayBuffer(typedCharsBufferSize);
-            typedCharsArray.current = new Uint8Array(typedCharsBuffer.current);
-
-            window.addEventListener("keydown", (e) => {
-                if (e.repeat) return;
-                switch(e.key){
-                    case 'w':        // DPAD UP
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_UP;
-                    break;
-                    case 'a':        // DPAD LEFT
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_LEFT;
-                    break;
-                    case 's':        // DPAD DOWN
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_DOWN;
-                    break;
-                    case 'd':        // DPAD RIGHT
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_RIGHT;
-                    break;
-                    case '.':   // A
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_A;
-                    break;
-                    case ',':    // B
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_B;
-                    break;
-                    case "Shift":   // BUMPER LEFT
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_LEFT;
-                    break;
-                    case ' ':    // BUMPER RIGHT
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_RIGHT;
-                    break;
-                    case "Enter":    // MENU
-                        pressedButtonsArray.current[0] |= BUTTON_CODE_MENU;
-                    break;
-                }
-            }, false);
-
-            window.addEventListener("keyup", (e) => {
-                if (e.repeat) return;
-                switch(e.key){
-                    case 'w':        // DPAD UP
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_UP;
-                    break;
-                    case 'a':        // DPAD LEFT
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_LEFT;
-                    break;
-                    case 's':        // DPAD DOWN
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_DOWN;
-                    break;
-                    case 'd':        // DPAD RIGHT
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_RIGHT;
-                    break;
-                    case '.':   // A
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_A;
-                    break;
-                    case ',':    // B
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_B;
-                    break;
-                    case "Shift":   // BUMPER LEFT
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_LEFT;
-                    break;
-                    case ' ':    // BUMPER RIGHT
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_RIGHT;
-                    break;
-                    case "Enter":    // MENU
-                        pressedButtonsArray.current[0] &= ~BUTTON_CODE_MENU;
-                    break;
-                }
-            }, false);
-
-            setupWorker();
-        }
+        setupWorker();
     }, [])
 
     return(
         <div ref={this} className="w-full h-full flex justify-center items-center bg-base-200">
-            <canvas ref={canvasRef} width="128" height="128" className="w-96 aspect-square">
-                Canvas that displays simulator frames
-            </canvas>
+            <SimulatorCanvas ref={simulatorCanvasRef}/>
         </div>
     );
 });

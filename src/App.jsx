@@ -69,7 +69,6 @@ function App(props){
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
     const setPathCheckedToRunWrapper = (value) => {
-        console.log(value);
         setPathCheckedToRun(value);
 
         setRunPathDevice("");

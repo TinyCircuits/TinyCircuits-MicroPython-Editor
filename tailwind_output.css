@@ -8821,10 +8821,6 @@ html:has(.drawer-open.drawer-open) {
   height: 100%;
 }
 
-.h-\[16px\] {
-  height: 16px;
-}
-
 .min-h-0 {
   min-height: 0px;
 }
@@ -8883,10 +8879,6 @@ html:has(.drawer-open.drawer-open) {
 
 .w-full {
   width: 100%;
-}
-
-.w-\[16px\] {
-  width: 16px;
 }
 
 .min-w-\[16px\] {

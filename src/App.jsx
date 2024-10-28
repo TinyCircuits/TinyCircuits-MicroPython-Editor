@@ -45,7 +45,6 @@ function App(props){
     const [choseComputer, setChoseComputer] = useState(undefined);
 
     // The active tab key
-    // const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
     const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
     const [activeTerminalTabKey, setActiveTerminalTabKey] = useState("Device"); // Focus device terminal by default
 
@@ -61,12 +60,21 @@ function App(props){
 
     let simulatorRef = useRef(undefined);
 
-    const [runPathDevice, setRunPathDevice] = useState(undefined);
-    const [runPathSimulator, setRunPathSimulator] = useState(undefined);
+    const [runPathDevice, setRunPathDevice] = useState("");
+    const [runPathSimulator, setRunPathSimulator] = useState("");
 
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
     
+    // Whenever a path is checked to run or not run,
+    // need to clear the run location that was set
+    const setPathCheckedToRunWrapper = (value) => {
+        console.log(value);
+        setPathCheckedToRun(value);
+
+        setRunPathDevice("");
+        setRunPathSimulator("");
+    }
 
     const chooseFilesPlatform = () => {
         choosePlatformModalRef.current?.showModal();
@@ -295,7 +303,7 @@ function App(props){
             editorValues.current = {};
 
             // Get rid of any path that was set to run
-            setPathCheckedToRun({path:"", isFolder:false});
+            setPathCheckedToRunWrapper({path:"", isFolder:false});
         });
     }
 
@@ -316,7 +324,7 @@ function App(props){
                 editorValues.current = {};
 
                 // Get rid of any path that was set to run
-                setPathCheckedToRun({path:"", isFolder:false});
+                setPathCheckedToRunWrapper({path:"", isFolder:false});
             })
         });
     }
@@ -536,7 +544,7 @@ execfile("` + filePathToRun + `")
         // If the user chose files from the computer and the path has not
         // been set yet, ask the user to select a path on the device to run
         // the files at
-        if(runPathDevice == undefined && choseComputer){
+        if(runPathDevice == "" && choseComputer){
             await deviceFiles.openFiles();                      // Update internal tree
             setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runOnDevice);
@@ -569,7 +577,7 @@ execfile("` + filePathToRun + `")
             return;
         }
 
-        if(runPathSimulator == undefined){
+        if(runPathSimulator == ""){
             setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runInSimulator);
         }else{
@@ -726,7 +734,7 @@ execfile("` + filePathToRun + `")
                                 {getFilesPanelTitle()}
                             </div>
                             
-                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRun} allCheckedPaths={allCheckedPaths.current}/>
+                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
                         </Panel>
                     </PanelGroup>
 
@@ -772,7 +780,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.21.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.28.2024.0</p>
                 </div>
             </div>
 

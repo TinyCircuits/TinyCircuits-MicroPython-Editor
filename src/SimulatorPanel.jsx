@@ -35,42 +35,43 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     let worker = useRef(undefined);
 
 
-    const setupWorker = () => {
-        console.log("Starting simulator worker!");
-        worker.current = new Worker("./simulator-worker.js", { type: "module" });
+    const setupWorker = async () => {
+        return new Promise((resolve, reject) => {
+            console.log("Starting simulator worker!");
+            worker.current = new Worker("./simulator-worker.js", { type: "module" });
 
-        worker.current.onerror = (data) => {
-            console.error(data);
-        };
+            worker.current.onerror = (data) => {
+                console.error(data);
+            };
 
-        worker.current.onmessage = async (e) => {
-            if(e.data.message_type == "screen_update"){
-                simulatorCanvasRef.current.update(new Uint8Array(screenBuffer.current));
-            }else if(e.data.message_type == "print_update"){
-                props.onData(e.data.value);
-            }else if(e.data.message_type == "ready_for_more_typed_chars"){
-                tryFillTypedCharsBuffer();
-            }else if(e.data.message_type == "ready"){
-                worker.current.postMessage({message_type:"stop_buffer_set", value:stopBuffer.current});
-                worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
-                worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
-                worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
-            }else if(e.data.message_type == "fs"){
-                console.log("Got simulator files to restore", e.data.value);
-                console.log("Also need to write these files", filesToSimulate.current)
-                setupWorker();
+            worker.current.onmessage = async (e) => {
+                if(e.data.message_type == "screen_update"){
+                    simulatorCanvasRef.current.update(new Uint8Array(screenBuffer.current));
+                }else if(e.data.message_type == "print_update"){
+                    props.onData(e.data.value);
+                }else if(e.data.message_type == "ready_for_more_typed_chars"){
+                    tryFillTypedCharsBuffer();
+                }else if(e.data.message_type == "ready"){
+                    worker.current.postMessage({message_type:"stop_buffer_set", value:stopBuffer.current});
+                    worker.current.postMessage({message_type:"screen_buffer_set", value:screenBuffer.current});
+                    worker.current.postMessage({message_type:"pressed_buttons_buffer_set", value:pressedButtonsBuffer.current});
+                    worker.current.postMessage({message_type:"typed_chars_buffer_set", value:typedCharsBuffer.current});
+                    resolve();
+                }else if(e.data.message_type == "fs"){
+                    console.log("Got simulator files to restore", e.data.value);
+                    console.log("Also need to write these files", filesToSimulate.current)
+                    await setupWorker();
 
-                setTimeout(() => {
                     worker.current.postMessage({message_type:"files", value:filesToSimulate.current});
                     worker.current.postMessage({message_type:"files", value:e.data.value});
                     worker.current.postMessage({message_type:"run", value:pathToSimulate.current});
-                }, 1000);
-                
-                // ran.current = true;
-            }else if(e.data.message_type == "tree"){
-                getTreeResolve.current(e.data.value);
-            }
-        };
+                    
+                    // ran.current = true;
+                }else if(e.data.message_type == "tree"){
+                    getTreeResolve.current(e.data.value);
+                }
+            };
+        });
     }
 
 
@@ -161,16 +162,16 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 case 'd':        // DPAD RIGHT
                     pressedButtonsArray.current[0] |= BUTTON_CODE_DPAD_RIGHT;
                 break;
-                case '.':   // A
+                case '.':        // A
                     pressedButtonsArray.current[0] |= BUTTON_CODE_A;
                 break;
-                case ',':    // B
+                case ',':        // B
                     pressedButtonsArray.current[0] |= BUTTON_CODE_B;
                 break;
-                case "Shift":   // BUMPER LEFT
+                case "Shift":    // BUMPER LEFT
                     pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_LEFT;
                 break;
-                case ' ':    // BUMPER RIGHT
+                case ' ':        // BUMPER RIGHT
                     pressedButtonsArray.current[0] |= BUTTON_CODE_BUMPER_RIGHT;
                 break;
                 case "Enter":    // MENU
@@ -194,16 +195,16 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 case 'd':        // DPAD RIGHT
                     pressedButtonsArray.current[0] &= ~BUTTON_CODE_DPAD_RIGHT;
                 break;
-                case '.':   // A
+                case '.':        // A
                     pressedButtonsArray.current[0] &= ~BUTTON_CODE_A;
                 break;
-                case ',':    // B
+                case ',':        // B
                     pressedButtonsArray.current[0] &= ~BUTTON_CODE_B;
                 break;
-                case "Shift":   // BUMPER LEFT
+                case "Shift":    // BUMPER LEFT
                     pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_LEFT;
                 break;
-                case ' ':    // BUMPER RIGHT
+                case ' ':        // BUMPER RIGHT
                     pressedButtonsArray.current[0] &= ~BUTTON_CODE_BUMPER_RIGHT;
                 break;
                 case "Enter":    // MENU

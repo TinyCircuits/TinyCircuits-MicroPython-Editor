@@ -107,7 +107,7 @@ await mp.replInit();
 // using the VM hook in mpportconfig.h. This allows for
 // doing anything while only micropython is running
 // and not just the engine 
-self.get_serial = () => {
+self.main_call = () => {
     // If the stop buffer is being told to stop, then stop
     if(stop_buffer[0] == 1){
         stop_buffer[0] = 0;
@@ -264,7 +264,9 @@ onmessage = (e) => {
             // Create the path to the file
             let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
             mp.FS.mkdirTree(path);
-            mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
+            if(files_list[ifx].data != undefined){
+                mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
+            }
             console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
         }
     }else if(e.data.message_type == "stop"){
@@ -272,7 +274,7 @@ onmessage = (e) => {
     }else if(e.data.message_type == "tree"){
         postMessage({message_type:"tree", value:getTree("/", [])});
     }else if(e.data.message_type == "typed"){
-        self.get_serial();
+        self.main_call();
     }else if(e.data.message_type == "run"){
         path_to_run = e.data.value;
         run();

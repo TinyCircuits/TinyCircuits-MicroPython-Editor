@@ -8657,6 +8657,10 @@ html:has(.drawer-open.drawer-open) {
   margin-right: 0.75rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -8863,6 +8867,10 @@ html:has(.drawer-open.drawer-open) {
 
 .w-40 {
   width: 10rem;
+}
+
+.w-48 {
+  width: 12rem;
 }
 
 .w-5 {
@@ -9561,6 +9569,10 @@ html:has(.drawer-open.drawer-open) {
 
 .outline-neutral {
   outline-color: var(--fallback-n,oklch(var(--n)/1));
+}
+
+.outline-success {
+  outline-color: var(--fallback-su,oklch(var(--su)/1));
 }
 
 .ring {

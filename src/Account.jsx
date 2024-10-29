@@ -5,7 +5,7 @@ import { Theme, Input, Button, Toggle, Link } from 'react-daisyui'
 
 import React from 'react';
 import { useState, useRef } from 'react';
-
+import { createRoot } from 'react-dom/client';
 
 
 
@@ -20,3 +20,7 @@ function Account(props){
 
 
 export default Account
+
+// Start access to the DOM in here to reduce number of main files needed
+const root = createRoot(document.getElementById('root'));
+root.render(<Account/>);

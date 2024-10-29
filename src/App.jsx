@@ -9,6 +9,7 @@ import TerminalPanel from './TerminalPanel.jsx'
 import SimulatorPanel from './SimulatorPanel.jsx'
 import AddPanel from './AddPanel.jsx'
 import CodePanel from './CodePanel.jsx'
+import PocketBase from 'pocketbase'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
 import SelectLocationModal from './SelectLocationModal.jsx'
 
@@ -27,6 +28,7 @@ import{
     PanelGroup,
     PanelResizeHandle,
 } from "react-resizable-panels";
+import { createRoot } from 'react-dom/client'
 
 
 
@@ -65,6 +67,8 @@ function App(props){
 
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
+
+    const pb = useRef(new PocketBase('http://127.0.0.1:8090'));
     
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
@@ -713,8 +717,9 @@ execfile("` + filePathToRun + `")
                     </Button>
                 </div>
 
-                <div className="h-full flex-1 flex flex-row items-center">
-                    
+                <div className="h-full flex-1 flex flex-row items-center justify-end">
+                    <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'> Arcade </Button>
+                    <Button size="sm" color='secondary' tag="a" target="_blank" rel="noopener" href={pb.current.authStore.isValid ? "/account/" : "/login/"} className='mr-2'> {pb.current.authStore.isValid ? "Account" : "Login"} </Button>
                 </div>
             </div>
 
@@ -779,7 +784,7 @@ execfile("` + filePathToRun + `")
 
             <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.28.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.29.2024.0</p>
                 </div>
             </div>
 
@@ -789,3 +794,7 @@ execfile("` + filePathToRun + `")
 
 
 export default App
+
+// Start access to the DOM in here to reduce number of main files needed
+const root = createRoot(document.getElementById('root'));
+root.render(<App/>);

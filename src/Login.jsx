@@ -7,6 +7,7 @@ import React from 'react';
 import { useState, useRef } from 'react';
 import PocketBase from 'pocketbase'
 import EmailValidator from 'email-validator'
+import { createRoot } from 'react-dom/client';
 
 
 
@@ -230,8 +231,8 @@ function Login(props){
                         {/* Form footer */}
                         <div className="flex mt-2">
                             <div className="flex-1 w-full h-12 items-center flex flex-row justify-evenly">
-                                <Link>Forgot password?</Link>
-                                <Link>Resend Verifcation</Link>
+                                <Link target="_blank" href="/login/forgot/">Forgot password?</Link>
+                                <Link target="_blank" href="/login/resend/">Resend Verification</Link>
                             </div>
                             <div className="flex h-12 justify-end">
                                 <Button color='primary' onClick={onSubmit}>{registerEnabled ? "Create Account" : "Login"}</Button>
@@ -273,3 +274,7 @@ function Login(props){
 
 
 export default Login
+
+// Start access to the DOM in here to reduce number of main files needed
+const root = createRoot(document.getElementById('root'));
+root.render(<Login/>);

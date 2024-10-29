@@ -2,6 +2,7 @@ import './App.css'
 import './tailwind_output.css'
 import { Theme } from 'react-daisyui'
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 
 function Arcade(props){
@@ -16,3 +17,7 @@ function Arcade(props){
 
 
 export default Arcade
+
+// Start access to the DOM in here to reduce number of main files needed
+const root = createRoot(document.getElementById('root'));
+root.render(<Arcade/>);

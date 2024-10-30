@@ -69,6 +69,10 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                     // ran.current = true;
                 }else if(e.data.message_type == "tree"){
                     getTreeResolve.current(e.data.value);
+                }else if(e.data.message_type == "worker_set_progress"){
+                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: e.data.value}}));
+                }else if(e.data.message_type == "worker_end_progress"){
+                    window.dispatchEvent(new CustomEvent("end_progress"));
                 }
             };
         });

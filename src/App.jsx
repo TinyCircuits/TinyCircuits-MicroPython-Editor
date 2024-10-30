@@ -40,6 +40,8 @@ function App(props){
     const [pathCheckedToRun, setPathCheckedToRun] = useState({path:"", isFolder:false});   // The path that was checked to run, can be a folder or file
     let allCheckedPaths = useRef([]);                               // A list of all the paths checked to run under `pathCheckedToRun` (including it)   
 
+    const [progress, setProgress] = useState(0.0);
+
     let [computerFiles, setComputerFiles] = useState(undefined);
     let [deviceFiles, setDeviceFiles] = useState(undefined);
     let [mainFiles, setMainFiles] = useState(undefined);
@@ -460,8 +462,11 @@ function App(props){
                     let fileDirPath = files[ifx].path.substring(0, files[ifx].path.lastIndexOf("/"));
                     await raw_mode.makePath(fileDirPath);
                     await raw_mode.writeFile(files[ifx].path, files[ifx].data, 1024);
+                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: ifx/(files.length-1)}}));
                 }
             }
+
+            window.dispatchEvent(new CustomEvent("end_progress"));
 
             let run_dir_path = filePathToRun.substring(0, filePathToRun.lastIndexOf("/"));
 
@@ -607,6 +612,18 @@ execfile("` + filePathToRun + `")
             setErrorMsg(event.detail.customMessage);
             setErrorMsgDetails(event.detail.errorStr);
             handleShowErrorMsg();
+        });
+
+        window.addEventListener("set_progress", (event) => {
+            setProgress(event.detail.progress);
+        });
+
+        window.addEventListener("end_progress", (event) => {
+            setProgress(1.0);
+
+            setTimeout(() => {
+                setProgress(0.0)
+            }, 250);
         });
 
         try{
@@ -776,7 +793,7 @@ execfile("` + filePathToRun + `")
                 <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
                     <div className="h-full flex-1 flex items-center justify-center">
                         <p className="text-sm ml-2 font-extralight">{""}</p>
-                        <Progress className='mx-1' color="primary" value={0.0}></Progress>
+                        <Progress className='mx-1' color="primary" value={progress}></Progress>
                     </div>
                     <div className="h-full flex-1 flex flex-row-reverse items-center">
                         <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.30.2024.0</p>

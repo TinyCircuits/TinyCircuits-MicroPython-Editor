@@ -268,7 +268,10 @@ onmessage = (e) => {
                 mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
             }
             console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
+            postMessage({message_type:"worker_set_progress", value:(ifx/(files_list.length-1))})
         }
+
+        postMessage({message_type:"worker_end_progress"});
     }else if(e.data.message_type == "stop"){
         stop();
     }else if(e.data.message_type == "tree"){

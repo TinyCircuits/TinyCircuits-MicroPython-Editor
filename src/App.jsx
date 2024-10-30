@@ -2,7 +2,7 @@ import { useState, useRef, Children, useCallback, useEffect} from 'react'
 import './App.css'
 
 import './tailwind_output.css'
-import { Theme, Button, Modal, Form, Checkbox, Progress, Input, Join, Accordion, Pagination} from 'react-daisyui'
+import { Theme, Button, Modal, Progress, Input} from 'react-daisyui'
 import FilesPanel from './FilesPanel.jsx'
 import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
@@ -44,7 +44,7 @@ function App(props){
     let [deviceFiles, setDeviceFiles] = useState(undefined);
     let [mainFiles, setMainFiles] = useState(undefined);
 
-    const [choseComputer, setChoseComputer] = useState(undefined);
+    let choseComputer = useRef(undefined);
 
     // The active tab key
     const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
@@ -67,8 +67,6 @@ function App(props){
 
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
-
-    const pb = useRef(new PocketBase('http://127.0.0.1:8090'));
     
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
@@ -116,12 +114,15 @@ function App(props){
         setIsSerialConnected(value);
 
         // Reset all of these so that the editor is reset
-        if(value == false && (choseComputer == false || choseComputer == undefined)){
+        if(value == false && (choseComputer.current == false)){
             editorValues.current = {};
             setTree([]);
             setEditorTabsData([addTab]);
-            setChoseComputer(undefined);
+            choseComputer.current = undefined;
         }
+
+        // Reset this no matter what
+        setRunPathDevice("");
     }
 
     let serial = useRef(undefined);
@@ -230,7 +231,6 @@ function App(props){
     function onSerialDisconnect(){
         console.log("Serial disconnect")
         serial.current.disconnect();
-        this.setIsSerialConnectedWrapper(false);
     }
 
     const connectSerial = async () => {
@@ -299,7 +299,7 @@ function App(props){
             choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
-            setChoseComputer(true);
+            choseComputer.current = true;
 
             // Get rid of any editor tabs that existed before
             setEditorTabsData([addTab]);
@@ -320,7 +320,7 @@ function App(props){
                 choosePlatformModalRef.current?.close();
 
                 // Set this so that the files panel header renders with the correct platform
-                setChoseComputer(false);
+                choseComputer.current = false;
 
                 // Get rid of any editor tabs that existed before
                 setEditorTabsData([addTab]);
@@ -334,9 +334,9 @@ function App(props){
 
     const getFilesPanelTitle = () => {
         const getTitle = () => {
-            if(choseComputer == undefined){
+            if(choseComputer.current == undefined){
                 return "Files";
-            }else if(choseComputer){
+            }else if(choseComputer.current){
                 return "Files: Computer";
             }else{
                 return "Files: Device";
@@ -454,7 +454,7 @@ function App(props){
             // Only if the file system panel has computer files
             // open do we want to upload the files to the device
             // before running
-            if(choseComputer == true){
+            if(choseComputer.current == true){
                 for(let ifx=0; ifx<files.length; ifx++){
                     console.log(files[ifx]);
                     let fileDirPath = files[ifx].path.substring(0, files[ifx].path.lastIndexOf("/"));
@@ -463,8 +463,6 @@ function App(props){
                 }
             }
 
-            // console.log("execfile(\"" + filePathToRun + "\")");
-            // await raw_mode.interruptProgram(0);
             let run_dir_path = filePathToRun.substring(0, filePathToRun.lastIndexOf("/"));
 
             await raw_mode.exec(`
@@ -515,8 +513,8 @@ execfile("` + filePathToRun + `")
     }
 
 
-    const runOnDevice = async (selectedRunDirPath) => {
-        setRunPathDevice(selectedRunDirPath);
+    const runOnDevice = async (selectedRunPath) => {
+        setRunPathDevice(selectedRunPath);
 
         console.log("Run on device", pathCheckedToRun.path, allCheckedPaths.current);
 
@@ -525,13 +523,13 @@ execfile("` + filePathToRun + `")
         // and upload them, otherwise we don't (does not make
         // sense to open files on device if we are running
         // on the device)
-        let openFiles = choseComputer == true;
+        let openFiles = choseComputer.current == true;
 
         let [files, filePathToRun] = await getRunFileAndCheckedData(openFiles);
 
         if(files != undefined){
             // Switch UI
-            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunDirPath);
+            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunPath);
             setActiveTerminalTabKey("Device");
             runDevice(files, filePathToRun);
         }
@@ -547,18 +545,23 @@ execfile("` + filePathToRun + `")
         // If the user chose files from the computer and the path has not
         // been set yet, ask the user to select a path on the device to run
         // the files at
-        if(runPathDevice == "" && choseComputer){
+        if(runPathDevice == "" && choseComputer.current){
             await deviceFiles.openFiles();                      // Update internal tree
             setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runOnDevice);
         }else{
-            runOnDevice(runPathDevice);
+            // Only want the path, so get rid of file name in path is a file
+            if(pathCheckedToRun.isFolder == false){
+                runOnDevice(pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/")));
+            }else{
+                runOnDevice(pathCheckedToRun.path);
+            }
         }
     }
 
 
-    const runInSimulator = async (selectedRunDirPath) => {
-        setRunPathSimulator(selectedRunDirPath);
+    const runInSimulator = async (selectedRunPath) => {
+        setRunPathSimulator(selectedRunPath);
 
         console.log("Run in simulator", pathCheckedToRun.path, allCheckedPaths.current);
 
@@ -566,7 +569,7 @@ execfile("` + filePathToRun + `")
 
         if(files != undefined){
             // Switch UI
-            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunDirPath);
+            [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunPath);
             switchToSimulatorPanel();
             setActiveTerminalTabKey("Simulator");
             simulatorRef.current.runSimulator(files, filePathToRun);
@@ -584,7 +587,12 @@ execfile("` + filePathToRun + `")
             setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runInSimulator);
         }else{
-            runInSimulator(runPathSimulator);
+            // Only want the path, so get rid of file name in path is a file
+            if(pathCheckedToRun.isFolder == false){
+                runInSimulator(pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/")));
+            }else{
+                runInSimulator(pathCheckedToRun.path);
+            }
         }
     }
 
@@ -603,7 +611,7 @@ execfile("` + filePathToRun + `")
 
         try{
             if(serial.current == undefined){
-                serial.current = new WebSerialOverride(setIsSerialConnectedWrapper);
+                serial.current = new WebSerialOverride((value) => {setIsSerialConnectedWrapper(value)});
                 serial.current.receiveCallback = onSerialData;
                 serial.current.activityCallback = onSerialActivity;
                 serial.current.disconnectCallback = onSerialDisconnect;
@@ -678,26 +686,26 @@ execfile("` + filePathToRun + `")
                     </Button>
 
                     <div>
-                        <Button onClick={handleSerialConnectButton} disabled={(choseComputer == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                        <Button onClick={handleSerialConnectButton} disabled={(choseComputer.current == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                             {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
                         </Button>
-                        <Button onClick={onRunOnDevice} disabled={(choseComputer == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={onRunOnDevice} disabled={(choseComputer.current == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             Run
                         </Button>
-                        <Input value={runPathDevice} className='w-24' disabled={(choseComputer == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Input value={runPathDevice} className='w-24' disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                         </Input>
-                        <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             ...
                         </Button>
                     </div>
 
                     <div>
-                        <Button onClick={onRunInSimulator} disabled={choseComputer == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                        <Button onClick={onRunInSimulator} disabled={choseComputer.current == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                             Simulate
                         </Button>
-                        <Input value={runPathSimulator} className='w-24' disabled={choseComputer == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Input value={runPathSimulator} className='w-24' disabled={choseComputer.current == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                         </Input>
-                        <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                        <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer.current == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             ...
                         </Button>
                     </div>
@@ -719,7 +727,6 @@ execfile("` + filePathToRun + `")
 
                 <div className="h-full flex-1 flex flex-row items-center justify-end">
                     <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'> Arcade </Button>
-                    <Button size="sm" color='secondary' tag="a" target="_blank" rel="noopener" href={pb.current.authStore.isValid ? "/account/" : "/login/"} className='mr-2'> {pb.current.authStore.isValid ? "Account" : "Login"} </Button>
                 </div>
             </div>
 
@@ -782,9 +789,13 @@ execfile("` + filePathToRun + `")
                 </Panel>
             </PanelGroup>
 
-            <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4">
+            <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
+                <div className="h-full flex-1 flex items-center justify-center">
+                    <p className="text-sm ml-2 font-extralight">{""}</p>
+                    <Progress className='mx-1' color="primary" value={0.0}></Progress>
+                </div>
                 <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.29.2024.0</p>
+                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.30.2024.0</p>
                 </div>
             </div>
 

@@ -29,9 +29,13 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 
 # Pages
 * /
+* /login/
+* /login/forgot/
+* /login/resend/
+* /login/resend/confirm/
 * /arcade/
 * /arcade/submit/
-* /login/
+* /account/
 
 # Building
 1. `npm run build`

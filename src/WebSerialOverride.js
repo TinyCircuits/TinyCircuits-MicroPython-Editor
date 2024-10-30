@@ -5,6 +5,11 @@ class WebSerialOverride extends WebSerial{
     constructor(setIsSerialConnected){
         super();
         this.setIsSerialConnected = setIsSerialConnected;
+        
+        // Flag that is managed at this layer to prevent
+        // disconnect callback from calling `disconnect()`
+        // after already called
+        this.disconnected = true;
     }
 
     // Override this function from ViperIDE
@@ -14,6 +19,9 @@ class WebSerialOverride extends WebSerial{
     async requestAccess(vendorID, productID){
         this.port = await this.serial.requestPort({filters: [{usbVendorId: vendorID, usbProductID: productID}]});
         this.setIsSerialConnected(true);
+
+        // Not disconnected anymore, set
+        this.disconnected = false;
 
         try{
             const pi = this.port.getInfo()
@@ -27,8 +35,30 @@ class WebSerialOverride extends WebSerial{
     }
 
     async disconnect(){
-        await super.disconnect();        
+        // Don't do anything if already disconnected
+        if(this.disconnected){
+            return;
+        }
+
+        // Now disconnected
+        this.disconnected = true;
+
+        try{
+            await this.reader.releaseLock();
+            await this.writer.releaseLock();
+        }catch(error){
+            console.error(error);
+        }
+
+        await this.port.close();
+        
         this.setIsSerialConnected(false);
+    }
+
+    async write(data){
+        if(this.writer != undefined && this.writer != null){
+            await super.write(data);
+        }
     }
 }
 

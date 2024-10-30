@@ -2,14 +2,14 @@ import { useState, useRef, Children, useCallback, useEffect} from 'react'
 import './App.css'
 
 import './tailwind_output.css'
-import { Theme, Button, Modal, Progress, Input} from 'react-daisyui'
+import { Theme, Button, Modal, Progress, Input, Join} from 'react-daisyui'
 import FilesPanel from './FilesPanel.jsx'
 import TabPanel from './TabPanel.jsx'
 import TerminalPanel from './TerminalPanel.jsx'
 import SimulatorPanel from './SimulatorPanel.jsx'
 import AddPanel from './AddPanel.jsx'
 import CodePanel from './CodePanel.jsx'
-import PocketBase from 'pocketbase'
+import CustomModal from './CustomModal.jsx'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
 import SelectLocationModal from './SelectLocationModal.jsx'
 
@@ -598,7 +598,7 @@ execfile("` + filePathToRun + `")
 
 
     const handleShowErrorMsg = useCallback(() => {
-        errorModalRef.current?.showModal();
+        errorModalRef.current.showModal();
         console.log(errorMsg);
     }, [errorModalRef]);
 
@@ -622,14 +622,13 @@ execfile("` + filePathToRun + `")
     }, []);
 
     return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-300 flex flex-col">
+        <Theme dataTheme="dim" className="w-full h-full bg-base-300 overflow-hidden" style={{scrollbarWidth:"0px"}}>
 
             <SelectLocationModal pathCheckedToRun={pathCheckedToRun} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect} runLocationSelectTree={runLocationSelectTree}/>
 
             {/* ### Error modal ### */}
-            <Modal ref={errorModalRef}>
-                <Modal.Header className="font-bold text-error">ERROR:</Modal.Header>
-                <Modal.Body className="text-error">
+            <CustomModal title="ERROR:" titleColor="error" outlineColor="error" ref={errorModalRef}>
+                <div className="text-error">
                     {errorMsg}
 
                     {errorMsgDetails != undefined ? (<details>
@@ -637,167 +636,154 @@ execfile("` + filePathToRun + `")
                                                         {errorMsgDetails}
                                                     </details>) 
                                                   : <></>}
-                    
-                </Modal.Body>
-
-                <Modal.Actions>
-                    <form method="dialog">
-                        <Button>Close</Button>
-                    </form>
-                </Modal.Actions>
-            </Modal>
+                </div>
+            </CustomModal>
 
 
             {/* ### Choose platform modal ### */}
-            <Modal ref={choosePlatformModalRef}>
-                <Modal.Header className="font-bold">Choose platform to open folder from:</Modal.Header>
-                <Modal.Body className="">
-                    <div className="w-full h-full flex flex-row justify-evenly">
-                        <Button size="lg" onClick={openComputerFiles}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
-                            </svg>
-                            <p>Computer</p>
-                        </Button>
-
-                        <Button size="lg" onClick={openDeviceFiles}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
-                                <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
-                                <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5"/>
-                            </svg>
-                            <p>Device</p>
-                        </Button>
-                    </div>
-                </Modal.Body>
-
-                <Modal.Actions>
-                    <form method="dialog">
-                        <Button>Close</Button>
-                    </form>
-                </Modal.Actions>
-            </Modal>
-
-
-            {/* ### Header and open files button ### */}
-            <div className="w-full h-16 bg-base-100 border-b-base-300 border-b-4 flex items-center">
-                <div className="h-full flex-1 flex flex-row items-center">
-                    <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
-                        Open Location
+            <CustomModal title="Choose platform to open folder from:" outlineColor="base-content" ref={choosePlatformModalRef}>
+                <div className="w-full h-full flex flex-row justify-evenly">
+                    <Button size="lg" onClick={openComputerFiles}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                            <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
+                        </svg>
+                        <p>Computer</p>
                     </Button>
 
-                    <div>
-                        <Button onClick={handleSerialConnectButton} disabled={(choseComputer.current == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
-                            {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
+                    <Button size="lg" onClick={openDeviceFiles}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
+                            <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+                            <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5"/>
+                        </svg>
+                        <p>Device</p>
+                    </Button>
+                </div>
+            </CustomModal>
+
+
+            <div className="w-full h-full flex flex-col" style={{scrollbarWidth:"0px"}}>
+                {/* ### Header and open files button ### */}
+                <div className="w-full h-16 bg-base-100 border-b-base-300 border-b-4 flex items-center">
+                    <div className="h-full flex-1 flex flex-row items-center">
+                        <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
+                            Open Location
                         </Button>
-                        <Button onClick={onRunOnDevice} disabled={(choseComputer.current == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                            Run
+
+                        <Join>
+                            <Button onClick={handleSerialConnectButton} disabled={(choseComputer.current == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                                {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
+                            </Button>
+                            <Button onClick={onRunOnDevice} disabled={(choseComputer.current == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                                Run
+                            </Button>
+                            <Input value={runPathDevice} className='w-24' disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            </Input>
+                            <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                                ...
+                            </Button>
+                        </Join>
+
+                        <Join>
+                            <Button onClick={onRunInSimulator} disabled={choseComputer.current == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                                Simulate
+                            </Button>
+                            <Input value={runPathSimulator} className='w-24' disabled={choseComputer.current == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            </Input>
+                            <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer.current == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                                ...
+                            </Button>
+                        </Join>
+                    </div>
+
+                    <div className="h-full flex-1 flex flex-row justify-center items-center">
+
+                        <Button title="Code panel" variant={currentMainPanel == "Code" ? "outline" : ""} onClick={switchToCodePanel} size='md' color="secondary" shape="square">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
+                                <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
+                            </svg>
                         </Button>
-                        <Input value={runPathDevice} className='w-24' disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                        </Input>
-                        <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                            ...
+                        <Button title="Simulator panel" variant={currentMainPanel == "Simulator" ? "outline" : ""} onClick={switchToSimulatorPanel} size='md' color="secondary" shape="square" className="mx-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
+                                <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>
+                            </svg>
                         </Button>
                     </div>
 
-                    <div>
-                        <Button onClick={onRunInSimulator} disabled={choseComputer.current == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
-                            Simulate
-                        </Button>
-                        <Input value={runPathSimulator} className='w-24' disabled={choseComputer.current == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                        </Input>
-                        <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer.current == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                            ...
-                        </Button>
+                    <div className="h-full flex-1 flex flex-row items-center justify-end">
+                        <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'> Arcade </Button>
                     </div>
                 </div>
 
-                <div className="h-full flex-1 flex flex-row justify-center items-center">
 
-                    <Button title="Code panel" variant={currentMainPanel == "Code" ? "outline" : ""} onClick={switchToCodePanel} size='md' color="secondary" shape="square">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
-                            <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
-                        </svg>
-                    </Button>
-                    <Button title="Simulator panel" variant={currentMainPanel == "Simulator" ? "outline" : ""} onClick={switchToSimulatorPanel} size='md' color="secondary" shape="square" className="mx-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-horizontal" viewBox="0 0 16 16">
-                            <path d="M1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm11.5 1a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1m2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1M1 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5M1.25 9h5.5a.25.25 0 0 1 0 .5h-5.5a.25.25 0 0 1 0-.5"/>
-                        </svg>
-                    </Button>
-                </div>
+                {/* ### Main panel group ### */}
+                <PanelGroup direction="horizontal">
+                    
+                    {/* ### Left panel group ### */}
+                    <Panel className="bg-base-100" defaultSize={17} minSize={2} maxSize={98}>
+                        <PanelGroup direction="vertical">
 
-                <div className="h-full flex-1 flex flex-row items-center justify-end">
-                    <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'> Arcade </Button>
+                            {/* ### File panel ### */}
+                            {/* <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}> */}
+                            <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
+                                <div className="pl-1 w-full h-7 bg-base-200 flex items-center font-bold text-nowrap select-none">
+                                    {getFilesPanelTitle()}
+                                </div>
+                                
+                                <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
+                            </Panel>
+                        </PanelGroup>
+
+                    </Panel>
+
+                    <PanelResizeHandle className="w-1 bg-base-300"/>
+
+                    {/* Right panel group */}
+                    <Panel>
+                        <PanelGroup direction="vertical">
+                            <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
+                                <div className={"w-full h-full relative"}>
+
+                                    {/* CODE PANEL */}
+                                    <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Code" ? "z-10" : "z-0 invisible")}>
+                                        <div className="left-0 right-0 top-0 bottom-0 z-20 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
+                                        </div>
+                                        <div className="left-0 right-0 top-0 bottom-0 z-30 absolute">
+                                            <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey} unselectable={false}/>
+                                        </div>
+                                    </div>
+
+                                    {/* SIMULATOR PANEL */}
+                                    <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
+                                        <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
+                                            <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Panel>
+
+                            <PanelResizeHandle className="h-1 bg-base-300" />
+
+                            <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
+                                {/* <PanelHeader title="Terminal" /> */}
+                                {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
+                                <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
+                            </Panel>
+                        </PanelGroup>
+                    </Panel>
+                </PanelGroup>
+
+                <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
+                    <div className="h-full flex-1 flex items-center justify-center">
+                        <p className="text-sm ml-2 font-extralight">{""}</p>
+                        <Progress className='mx-1' color="primary" value={0.0}></Progress>
+                    </div>
+                    <div className="h-full flex-1 flex flex-row-reverse items-center">
+                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.30.2024.0</p>
+                    </div>
                 </div>
             </div>
 
-
-            {/* ### Main panel group ### */}
-            <PanelGroup direction="horizontal">
-                
-                {/* ### Left panel group ### */}
-                <Panel className="bg-base-100" defaultSize={17} minSize={2} maxSize={98}>
-                    <PanelGroup direction="vertical">
-
-                        {/* ### File panel ### */}
-                        {/* <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}> */}
-                        <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
-                            <div className="pl-1 w-full h-7 bg-base-200 flex items-center font-bold text-nowrap select-none">
-                                {getFilesPanelTitle()}
-                            </div>
-                            
-                            <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
-                        </Panel>
-                    </PanelGroup>
-
-                </Panel>
-
-                <PanelResizeHandle className="w-1 bg-base-300"/>
-
-                {/* Right panel group */}
-                <Panel>
-                    <PanelGroup direction="vertical">
-                        <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
-                            <div className={"w-full h-full relative"}>
-
-                                {/* CODE PANEL */}
-                                <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Code" ? "z-10" : "z-0 invisible")}>
-                                    <div className="left-0 right-0 top-0 bottom-0 z-20 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
-                                    </div>
-                                    <div className="left-0 right-0 top-0 bottom-0 z-30 absolute">
-                                        <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey} unselectable={false}/>
-                                    </div>
-                                </div>
-
-                                {/* SIMULATOR PANEL */}
-                                <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
-                                    <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
-                                        <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </Panel>
-
-                        <PanelResizeHandle className="h-1 bg-base-300" />
-
-                        <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
-                            {/* <PanelHeader title="Terminal" /> */}
-                            {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
-                            <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
-                        </Panel>
-                    </PanelGroup>
-                </Panel>
-            </PanelGroup>
-
-            <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
-                <div className="h-full flex-1 flex items-center justify-center">
-                    <p className="text-sm ml-2 font-extralight">{""}</p>
-                    <Progress className='mx-1' color="primary" value={0.0}></Progress>
-                </div>
-                <div className="h-full flex-1 flex flex-row-reverse items-center">
-                    <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.30.2024.0</p>
-                </div>
-            </div>
 
         </Theme>
     )

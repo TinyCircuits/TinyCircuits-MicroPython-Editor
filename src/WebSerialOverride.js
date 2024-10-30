@@ -51,6 +51,10 @@ class WebSerialOverride extends WebSerial{
         }
 
         await this.port.close();
+
+        this.reader = null;
+        this.writer = null;
+        this.port = null;
         
         this.setIsSerialConnected(false);
     }

@@ -8643,6 +8643,18 @@ html:has(.drawer-open.drawer-open) {
   z-index: 30;
 }
 
+.z-\[200\] {
+  z-index: 200;
+}
+
+.z-\[201\] {
+  z-index: 201;
+}
+
+.z-\[202\] {
+  z-index: 202;
+}
+
 .m-2 {
   margin: 0.5rem;
 }
@@ -8826,8 +8838,21 @@ html:has(.drawer-open.drawer-open) {
   height: 2rem;
 }
 
+.h-fit {
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
 .h-full {
   height: 100%;
+}
+
+.h-40 {
+  height: 10rem;
+}
+
+.h-80 {
+  height: 20rem;
 }
 
 .min-h-0 {
@@ -8836,6 +8861,20 @@ html:has(.drawer-open.drawer-open) {
 
 .min-h-\[16px\] {
   min-height: 16px;
+}
+
+.min-h-fit {
+  min-height: -moz-fit-content;
+  min-height: fit-content;
+}
+
+.min-h-max {
+  min-height: -moz-max-content;
+  min-height: max-content;
+}
+
+.min-h-full {
+  min-height: 100%;
 }
 
 .w-1 {
@@ -8888,6 +8927,11 @@ html:has(.drawer-open.drawer-open) {
 
 .w-96 {
   width: 24rem;
+}
+
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content;
 }
 
 .w-full {
@@ -9071,6 +9115,11 @@ html:has(.drawer-open.drawer-open) {
 .rounded-b {
   border-bottom-right-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
+}
+
+.rounded-b-lg {
+  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
 }
 
 .rounded-e {
@@ -9546,6 +9595,10 @@ html:has(.drawer-open.drawer-open) {
   opacity: 0.5;
 }
 
+.opacity-80 {
+  opacity: 0.8;
+}
+
 .shadow {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
@@ -9564,6 +9617,10 @@ html:has(.drawer-open.drawer-open) {
   outline-offset: 0px;
 }
 
+.outline-accent {
+  outline-color: var(--fallback-a,oklch(var(--a)/1));
+}
+
 .outline-base-100 {
   outline-color: var(--fallback-b1,oklch(var(--b1)/1));
 }
@@ -9578,6 +9635,10 @@ html:has(.drawer-open.drawer-open) {
 
 .outline-success {
   outline-color: var(--fallback-su,oklch(var(--su)/1));
+}
+
+.outline-base-content {
+  outline-color: var(--fallback-bc,oklch(var(--bc)/1));
 }
 
 .ring {
@@ -9719,6 +9780,8 @@ html:has(.drawer-open.drawer-open) {
 .\[--tab-border-color\:\$\{borderColor\}\] {
   --tab-border-color: ${borderColor};
 }
+
+/* https://github.com/saadeghi/daisyui/issues/3040 */
 
 @media (hover:hover) {
   .table .\*\:hover > *tr:hover,

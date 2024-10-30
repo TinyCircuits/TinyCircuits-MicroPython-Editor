@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button, Modal, Input, Checkbox} from 'react-daisyui'
+import CustomModal from './CustomModal';
 import FilesPanel from './FilesPanel';
 
 
@@ -43,41 +44,30 @@ function SelectLocationModal(props){
     }
 
     const onRUN = (event) => {
+        modalRef.current.close();
         setRunAfterLocationSelect(undefined);
         runAfterLocationSelect(getResultingRUNPath());
     }
 
     return(
-        <Modal ref={modalRef}>
-            <Modal.Header className="font-bold">Select RUN Location Folder:</Modal.Header>
-            <Modal.Body>
-                <div className="w-full h-full bg-base-200">
-                    <FilesPanel tree={runLocationSelectTree} showRoot={true} checkmarks={false} showFiles={false} collapsible={false} onFolderSelected={onFolderSelected}/>
-                </div>
-                <div className="h-8 flex items-center mt-2">
-                    <p className="text-nowrap font-bold">Selected RUN Path:</p>
-                    <Input onChange={onSelectedPathInputChange} value={selectedPath} size='sm' className='ml-2 w-full' />
-                </div>
-                <div className="h-8 flex items-center mt-2">
-                    <p className="text-nowrap font-bold">Create RUN folder:</p>
-                    <Checkbox disabled={pathCheckedToRun.isFolder == false} onChange={(event) => setCreateRUNFolderChecked(event.target.checked)} checked={createRUNFolderChecked} size='sm' className='ml-2'/>
-                </div>
-                <div className="h-8 flex items-center mt-2">
-                    <p className="text-nowrap font-bold">Final RUN Path:</p>
-                    <Input readOnly={true} value={getResultingRUNPath()} size='sm' className='ml-2 w-full' />
-                </div>
-                <p className='mt-4 text-sm'>WARNING: Files/folders selected to RUN will be uploaded to the final RUN location which can result in files/folders being overwritten</p>
-            </Modal.Body>
-
-            <Modal.Actions>
-                <form method="dialog">
-                    <Button color='success' onClick={onRUN}>RUN</Button>
-                </form>
-                <form method="dialog">
-                    <Button onClick={() => {setRunAfterLocationSelect(undefined)}}>Cancel</Button>
-                </form>
-            </Modal.Actions>
-        </Modal>
+        <CustomModal title="Select RUN Location Folder:" titleColor="base-content" btn="Run" onBtnClick={onRUN} outlineColor="base-content" ref={modalRef}>
+            <div className="w-full h-full bg-base-200">
+                <FilesPanel tree={runLocationSelectTree} showRoot={true} checkmarks={false} showFiles={false} collapsible={false} onFolderSelected={onFolderSelected}/>
+            </div>
+            <div className="h-8 flex items-center mt-2">
+                <p className="text-nowrap font-bold">Selected RUN Path:</p>
+                <Input onChange={onSelectedPathInputChange} value={selectedPath} size='sm' className='ml-2 w-full' />
+            </div>
+            <div className="h-8 flex items-center mt-2">
+                <p className="text-nowrap font-bold">Create RUN folder:</p>
+                <Checkbox disabled={pathCheckedToRun.isFolder == false} onChange={(event) => setCreateRUNFolderChecked(event.target.checked)} checked={createRUNFolderChecked} size='sm' className='ml-2'/>
+            </div>
+            <div className="h-8 flex items-center mt-2">
+                <p className="text-nowrap font-bold">Final RUN Path:</p>
+                <Input readOnly={true} value={getResultingRUNPath()} size='sm' className='ml-2 w-full' />
+            </div>
+            <p className='mt-4 text-sm'>WARNING: Files/folders selected to RUN will be uploaded to the final RUN location which can result in files/folders being overwritten</p>
+        </CustomModal>
     );
 }
 

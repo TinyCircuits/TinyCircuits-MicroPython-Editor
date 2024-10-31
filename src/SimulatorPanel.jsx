@@ -46,7 +46,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
             worker.current.onmessage = async (e) => {
                 if(e.data.message_type == "screen_update"){
-                    simulatorCanvasRef.current.update(new Uint8Array(screenBuffer.current));
+                    await simulatorCanvasRef.current.update(new Uint8Array(screenBuffer.current));
                 }else if(e.data.message_type == "print_update"){
                     props.onData(e.data.value);
                 }else if(e.data.message_type == "ready_for_more_typed_chars"){

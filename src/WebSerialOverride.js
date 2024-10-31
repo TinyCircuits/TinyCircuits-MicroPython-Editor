@@ -12,6 +12,14 @@ class WebSerialOverride extends WebSerial{
         this.disconnected = true;
     }
 
+    async delay(ms){
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve();
+            }, ms);
+        });
+    }
+
     // Override this function from ViperIDE
     // since it shows all connected devices
     // when we only want to show Thumby Color
@@ -63,6 +71,28 @@ class WebSerialOverride extends WebSerial{
         if(this.writer != undefined && this.writer != null){
             await super.write(data);
         }
+    }
+
+    // Call this to get the device back into a soft
+    // rebooted mode
+    async reset(){
+        let endTransaction = await this.startTransaction();
+
+        await this.write("\x03");   // Interrupt any program
+        if(await this.readUntil(">", 500) == undefined){
+            await this.readUntil(">>>", 500);
+        }
+
+        await this.write("\x02");   // Exit raw mode if in it
+        await this.readUntil(">>>", 3000);
+
+        await this.write("\x04");   // Soft reboot
+        await this.readUntil("Engine", 500);
+
+        await this.write("\x03");   // Interrupt main
+        await this.readUntil(">>>", 500);
+
+        endTransaction();
     }
 }
 

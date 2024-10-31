@@ -451,8 +451,10 @@ function App(props){
 
 
     const runDevice = (files, filePathToRun) => {
+        console.log("Going into raw mode to run on device...");
         MpRawMode.begin(serial.current).then(async (raw_mode) => {
-    
+            console.log("In raw mode, starting file upload...");
+
             // Only if the file system panel has computer files
             // open do we want to upload the files to the device
             // before running
@@ -546,6 +548,8 @@ execfile("` + filePathToRun + `")
             window.dispatchEvent(new CustomEvent("show_error", {detail: {customMessage: "Nothing checked to run"}}));
             return;
         }
+
+        await serial.current.reset();
 
         // If the user chose files from the computer and the path has not
         // been set yet, ask the user to select a path on the device to run
@@ -660,14 +664,14 @@ execfile("` + filePathToRun + `")
             {/* ### Choose platform modal ### */}
             <CustomModal title="Choose platform to open folder from:" outlineColor="base-content" ref={choosePlatformModalRef}>
                 <div className="w-full h-full flex flex-row justify-evenly">
-                    <Button size="lg" onClick={openComputerFiles}>
+                    <Button size="lg" onClick={openComputerFiles} variant='outline'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
                             <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
                         </svg>
                         <p>Computer</p>
                     </Button>
 
-                    <Button size="lg" onClick={openDeviceFiles}>
+                    <Button size="lg" onClick={openDeviceFiles} variant='outline'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
                             <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
                             <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5"/>
@@ -727,7 +731,12 @@ execfile("` + filePathToRun + `")
                     </div>
 
                     <div className="h-full flex-1 flex flex-row items-center justify-end">
-                        <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'> Arcade </Button>
+                        <Button size="sm" color='accent' tag="a" target="_blank" rel="noopener" href="/arcade/" className='mr-2'>
+                            Arcade
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
+                            </svg>
+                        </Button>
                     </div>
                 </div>
 
@@ -740,9 +749,8 @@ execfile("` + filePathToRun + `")
                         <PanelGroup direction="vertical">
 
                             {/* ### File panel ### */}
-                            {/* <Panel className="bg-base-100 w-full h-full" defaultSize={71.8} minSize={2} maxSize={98}> */}
                             <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
-                                <div className="pl-1 w-full h-7 bg-base-200 flex items-center font-bold text-nowrap select-none">
+                                <div className="pl-1 w-full h-8 bg-base-200 flex items-center font-bold text-nowrap select-none">
                                     {getFilesPanelTitle()}
                                 </div>
                                 
@@ -796,7 +804,7 @@ execfile("` + filePathToRun + `")
                         <Progress className='mx-1' color="primary" value={progress}></Progress>
                     </div>
                     <div className="h-full flex-1 flex flex-row-reverse items-center">
-                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.30.2024.0</p>
+                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.31.2024.0</p>
                     </div>
                 </div>
             </div>

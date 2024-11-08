@@ -9,18 +9,18 @@ import { createRoot } from 'react-dom/client';
 
 
 
-function Confirm(props){
+function EmailConfirm(props){
 
     return (
         <Theme dataTheme="dim" className="w-full h-full bg-base-100 flex flex-col">
-            Confirm
+            Email Confirm
         </Theme>
     )
 }
 
 
-export default Confirm
+export default EmailConfirm
 
 // Start access to the DOM in here to reduce number of main files needed
 const root = createRoot(document.getElementById('root'));
-root.render(<Confirm/>);
+root.render(<EmailConfirm/>);

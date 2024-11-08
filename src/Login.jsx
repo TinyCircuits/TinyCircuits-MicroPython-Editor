@@ -33,6 +33,7 @@ function Login(props){
     let passwordFieldRef = useRef(undefined);
     let passwordConfirmFieldRef = useRef(undefined);
 
+    
     const onPasswordShow = (event, show, setter) => {
         if(show){
             setter(false);
@@ -46,6 +47,59 @@ function Login(props){
             setRegisterEnabled(false);
         }else{
             setRegisterEnabled(true);
+        }
+    }
+
+    const login = async () => {
+        console.log("Login");
+
+        try{
+            pbUser.current = await pb.current.collection('users').authWithPassword(email, password);
+            setErrorMsg(undefined);
+            setLoggedIn(true);
+        }catch(error){
+            if(error.name == "ClientResponseError 400"){
+                setErrorMsg(error.message + " Are the email and password correct?");
+            }else{
+                setErrorMsg(error.message);
+            }
+            console.error(error);
+        }
+    }
+
+
+    const register = async () => {
+        console.log("Register");
+
+        const data = {
+            "username": username,
+            "email":    email,
+            "emailVisibility": false,
+            "password": password,
+            "passwordConfirm": passwordConfirm
+        };
+
+        if(password != passwordConfirm){
+            setErrorMsg("*'Password' and 'Confirm Password' fields do not match");
+            return;
+        }
+
+        try{
+            const record = await pb.current.collection('users').create(data);
+            setErrorMsg(undefined);
+            setRegistered(true);
+        }catch(error){
+            setErrorMsg(error.message);
+            console.error(error);
+        }
+
+        try{
+            await pb.current.collection('users').requestVerification(email);
+            setErrorMsg(undefined);
+            setSentVerification(true);
+        }catch(error){
+            setErrorMsg(error.message);
+            console.error(error);
         }
     }
 
@@ -80,59 +134,14 @@ function Login(props){
         }
 
         if(registerEnabled){
-            console.log("Register");
-
-            const data = {
-                "username": username,
-                "email":    email,
-                "emailVisibility": false,
-                "password": password,
-                "passwordConfirm": passwordConfirm
-            };
-
-            if(password != passwordConfirm){
-                setErrorMsg("*'Password' and 'Confirm Password' fields do not match");
-                return;
-            }
-
-            try{
-                const record = await pb.current.collection('users').create(data);
-                setErrorMsg(undefined);
-                setRegistered(true);
-            }catch(error){
-                setErrorMsg(error.message);
-                console.error(error);
-            }
-
-            try{
-                await pb.current.collection('users').requestVerification(email);
-                setErrorMsg(undefined);
-                setSentVerification(true);
-            }catch(error){
-                setErrorMsg(error.message);
-                console.error(error);
-            }
-
+            register();
         }else{
-            console.log("Login");
-
-            try{
-                pbUser.current = await pb.current.collection('users').authWithPassword(email, password);
-                setErrorMsg(undefined);
-                setLoggedIn(true);
-            }catch(error){
-                if(error.name == "ClientResponseError 400"){
-                    setErrorMsg(error.message + " Are the email and password correct?");
-                }else{
-                    setErrorMsg(error.message);
-                }
-                console.error(error);
-            }
+            login();
         }
     }
 
 
-    const getForm = () => {
+    const renderForm = () => {
 
         if(loggedIn){
             return(
@@ -262,7 +271,7 @@ function Login(props){
                 <p className='m-2'>TinyCircuits MicroPython Editor Login</p>
             </div>
 
-            {getForm()}
+            {renderForm()}
 
             {/* Privacy Policy */}
             <div className='w-full h-12 justify-end flex'>

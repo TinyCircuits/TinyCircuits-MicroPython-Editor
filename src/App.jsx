@@ -804,7 +804,7 @@ execfile("` + filePathToRun + `")
                         <Progress className='mx-1' color="primary" value={progress}></Progress>
                     </div>
                     <div className="h-full flex-1 flex flex-row-reverse items-center">
-                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V10.31.2024.0</p>
+                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.08.2024.0</p>
                     </div>
                 </div>
             </div>

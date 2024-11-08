@@ -38,7 +38,7 @@ function Resend(props){
 
         // Send verification request and output message depending on what happens
         try{
-            await pb.current.collection('users').requestVerification('test@example.com');
+            await pb.current.collection('users').requestVerification(email);
             showSuccessMsg("Email sent!");
 
             setTimeout(() => {
@@ -51,7 +51,7 @@ function Resend(props){
     }
 
     // If the msg is not empty, render it
-    const getMsg = () => {
+    const renderMsg = () => {
         if(msg.text == ""){
             return;
         }
@@ -77,7 +77,7 @@ function Resend(props){
                     <Button onClick={() => {sendVerificationEmail()}} color="primary" className='w-48 mt-2'>Send Verification Email</Button>
                 </div>
 
-                {getMsg()}
+                {renderMsg()}
             </div>
         </Theme>
     )

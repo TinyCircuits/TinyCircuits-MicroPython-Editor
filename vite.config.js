@@ -10,10 +10,13 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login/index.html'),
-        resend: resolve(__dirname, 'login/resend/index.html'),
-        email_confirm: resolve(__dirname, 'login/resend/confirm/index.html'),
+
         forgot: resolve(__dirname, 'login/forgot/index.html'),
-        password_confirm: resolve(__dirname, 'login/forgot/confirm/index.html'),
+        confirm_password: resolve(__dirname, 'login/confirm/password/index.html'),
+
+        resend: resolve(__dirname, 'login/resend/index.html'),
+        confirm_email: resolve(__dirname, 'login/confirm/email/index.html'),
+
         account: resolve(__dirname, 'account/index.html'),
         arcade: resolve(__dirname, 'arcade/index.html'),
         submit: resolve(__dirname, 'arcade/submit/index.html'),

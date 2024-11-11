@@ -5,7 +5,7 @@ import { Theme, Input, Button, Swap, Toggle, Link } from 'react-daisyui'
 
 import React from 'react';
 import { useState, useRef } from 'react';
-import PocketBase from 'pocketbase'
+import User from './user';
 import EmailValidator from 'email-validator'
 import { createRoot } from 'react-dom/client';
 
@@ -16,7 +16,7 @@ function Login(props){
 
     // https://pocketbase.io/docs/authentication/#authenticate-as-app-user
     // https://github.com/pocketbase/js-sdk?tab=readme-ov-file#usage
-    const pb = useRef(new PocketBase('http://127.0.0.1:8090'));
+    const user = useRef(new User());
     let pbUser = useRef(undefined);
 
     const [registerEnabled, setRegisterEnabled] = useState(false);
@@ -50,11 +50,11 @@ function Login(props){
         }
     }
 
-    const login = async () => {
+    const login = async (email, password) => {
         console.log("Login");
 
         try{
-            pbUser.current = await pb.current.collection('users').authWithPassword(email, password);
+            pbUser.current = await user.current.collection('users').authWithPassword(email, password);
             setErrorMsg(undefined);
             setLoggedIn(true);
         }catch(error){
@@ -68,7 +68,7 @@ function Login(props){
     }
 
 
-    const register = async () => {
+    const register = async (email, username, password, passwordConfirm) => {
         console.log("Register");
 
         const data = {
@@ -85,7 +85,7 @@ function Login(props){
         }
 
         try{
-            const record = await pb.current.collection('users').create(data);
+            const record = await user.current.collection('users').create(data);
             setErrorMsg(undefined);
             setRegistered(true);
         }catch(error){
@@ -94,7 +94,7 @@ function Login(props){
         }
 
         try{
-            await pb.current.collection('users').requestVerification(email);
+            await user.current.collection('users').requestVerification(email);
             setErrorMsg(undefined);
             setSentVerification(true);
         }catch(error){
@@ -128,15 +128,15 @@ function Login(props){
         }else if(password.length < 8){
             setErrorMsg("*Password needs to be at least 8 characters long");
             return;
-        }else if(registerEnabled && passwordConfirm <= 0){
+        }else if(registerEnabled && passwordConfirm.length <= 0){
             setErrorMsg("*Please re-type your password in the 'Confirm Password' field");
             return;
         }
 
         if(registerEnabled){
-            register();
+            register(email, username, password, passwordConfirm);
         }else{
-            login();
+            login(email, password);
         }
     }
 
@@ -144,23 +144,26 @@ function Login(props){
     const renderForm = () => {
 
         if(loggedIn){
+            setTimeout(() => {
+                window.location.pathname = "/";
+            }, 1500);
+
             return(
                 <div className="w-full h-full flex flex-col items-center justify-center text-success text-lg">
-                    <p>Logged in!</p>
+                    <p>Logged in! Going back to main page...</p>
                 </div>
             );
         }else if(registered && sentVerification){
             return(
                 <div className="w-full h-full flex flex-col items-center justify-center">
                     <p className='text-success text-lg'>Registered! Check your email to verify your account before logging in.</p>
-                    <Button color="primary" className='mt-4' onClick={() => {setRegistered(false); setRegisterEnabled(false);}}>Login</Button>
                 </div>
             );
         }else if(registered && sentVerification == false){
             return(
                 <div className="w-full h-full flex flex-col items-center justify-center">
                     <p className='text-success text-lg'>Registered!</p><p className='text-error text-lg'>Email verification could not be sent, would you like to retry?</p>
-                    <Button color="primary" className='mt-4' onClick={() => {window.location.href = "resend"}}>Resend</Button>
+                    <Button color="primary" className='mt-4' onClick={() => {window.location.href = "resend/"}}>Resend</Button>
                 </div>
             );
         }else{
@@ -183,14 +186,14 @@ function Login(props){
 
                         {/* Username email input */}
                         <div className="flex">
-                            <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Email</p>
+                            <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Email</p>
                             <Input ref={emailFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                         </div>
 
                         {registerEnabled ?
                             // Username input
                             <div className="flex mt-2">
-                                <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Username</p>
+                                <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Username</p>
                                 <Input ref={usernameFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                             </div> 
                                         :
@@ -198,7 +201,7 @@ function Login(props){
                         
                         {/* Password input */}
                         <div className="flex mt-2 relative">
-                            <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Password</p>
+                            <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Password</p>
                             <Input ref={passwordFieldRef} className='w-72' type={showPassword ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                             <Swap onClick={(event) => onPasswordShow(event, showPassword, setShowPassword)} className="absolute right-0 translate-y-[-50%] top-[50%] mr-2" onElement={
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-eye-slash" viewBox="0 0 16 16">
@@ -218,7 +221,7 @@ function Login(props){
                         {registerEnabled ?
                             // Confirm password input
                             <div className="flex mt-2 relative">
-                                <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Confirm Password</p>
+                                <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Confirm Password</p>
                                 <Input ref={passwordConfirmFieldRef} className='w-72' type={showPasswordConfirm ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                                 <Swap onClick={(event) => onPasswordShow(event, showPasswordConfirm, setShowPasswordConfirm)} className="absolute right-0 translate-y-[-50%] top-[50%] mr-2" onElement={
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-eye-slash" viewBox="0 0 16 16">

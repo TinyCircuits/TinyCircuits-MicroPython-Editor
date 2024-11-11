@@ -12,6 +12,7 @@ import CodePanel from './CodePanel.jsx'
 import CustomModal from './CustomModal.jsx'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
 import SelectLocationModal from './SelectLocationModal.jsx'
+import User from './user.js'
 
 import React from 'react';
 
@@ -35,6 +36,7 @@ import { createRoot } from 'react-dom/client'
 
 
 function App(props){
+    let user = useRef(new User());
 
     const [tree, setTree] = useState([]);
     const [pathCheckedToRun, setPathCheckedToRun] = useState({path:"", isFolder:false});   // The path that was checked to run, can be a folder or file
@@ -642,6 +644,11 @@ execfile("` + filePathToRun + `")
         }
     }, []);
 
+
+    const test = () => {
+        console.log(user.current.loggedIn())
+    }
+
     return (
         <Theme dataTheme="dim" className="w-full h-full bg-base-300 overflow-hidden" style={{scrollbarWidth:"0px"}}>
 
@@ -804,11 +811,11 @@ execfile("` + filePathToRun + `")
                         <Progress className='mx-1' color="primary" value={progress}></Progress>
                     </div>
                     <div className="h-full flex-1 flex flex-row-reverse items-center">
-                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.08.2024.0</p>
+                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.11.2024.0</p>
                     </div>
                 </div>
             </div>
-
+            {test()}
 
         </Theme>
     )

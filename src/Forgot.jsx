@@ -2,14 +2,15 @@ import './App.css'
 
 import './tailwind_output.css'
 import { Theme, Input, Button, Swap, Toggle, Link } from 'react-daisyui'
-import PocketBase from 'pocketbase'
+import User from './user';
 import React, { useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import EmailValidator from 'email-validator'
 
 
 
 function Forgot(props){
-    let pb = useRef(new PocketBase('http://127.0.0.1:8090'));
+    let user = useRef(new User());
     let emailFieldRef = useRef(undefined);
 
     const [msg, setMsg] = useState({success:true, text:""});
@@ -36,7 +37,7 @@ function Forgot(props){
 
         // Send verification request and output message depending on what happens
         try{
-            await pb.collection('users').requestPasswordReset(email);
+            await user.current.collection('users').requestPasswordReset(email);
             showSuccessMsg("Email sent!");
 
             setTimeout(() => {

@@ -31,9 +31,9 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 * /
 * /login/
 * /login/forgot/
-* /login/forgot/confirm/
+* /login/confirm/password/
 * /login/resend/
-* /login/resend/confirm/
+* /login/confirm/email/
 * /arcade/
 * /arcade/submit/
 * /account/

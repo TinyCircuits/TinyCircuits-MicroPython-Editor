@@ -12,6 +12,12 @@ class User extends PocketBase{
     loggedIn = () => {
         return this.pb.authStore.isValid;
     }
+
+
+    logout = () => {
+        // "logout" the last authenticated account
+        this.pb.authStore.clear();
+    }
 }
 
 

@@ -105,6 +105,10 @@ function Login(props){
 
 
     const onSubmit = async (event) => {
+        if(event.code != undefined && event.code != "Enter"){
+            return;
+        }
+
         const email           = emailFieldRef.current.value;
         const username        = (usernameFieldRef.current == undefined) ? undefined : usernameFieldRef.current.value;
         const password        = passwordFieldRef.current.value;
@@ -187,14 +191,14 @@ function Login(props){
                         {/* Username email input */}
                         <div className="flex">
                             <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Email</p>
-                            <Input ref={emailFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+                            <Input onKeyDown={onSubmit} ref={emailFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                         </div>
 
                         {registerEnabled ?
                             // Username input
                             <div className="flex mt-2">
                                 <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Username</p>
-                                <Input ref={usernameFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+                                <Input onKeyDown={onSubmit} ref={usernameFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                             </div> 
                                         :
                             ""}
@@ -202,7 +206,7 @@ function Login(props){
                         {/* Password input */}
                         <div className="flex mt-2 relative">
                             <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Password</p>
-                            <Input ref={passwordFieldRef} className='w-72' type={showPassword ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+                            <Input onKeyDown={onSubmit} ref={passwordFieldRef} className='w-72' type={showPassword ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                             <Swap onClick={(event) => onPasswordShow(event, showPassword, setShowPassword)} className="absolute right-0 translate-y-[-50%] top-[50%] mr-2" onElement={
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-eye-slash" viewBox="0 0 16 16">
                                     <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
@@ -222,7 +226,7 @@ function Login(props){
                             // Confirm password input
                             <div className="flex mt-2 relative">
                                 <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none text-nowrap">Confirm Password</p>
-                                <Input ref={passwordConfirmFieldRef} className='w-72' type={showPasswordConfirm ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+                                <Input onKeyDown={onSubmit} ref={passwordConfirmFieldRef} className='w-72' type={showPasswordConfirm ? "text" : "password"} style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
                                 <Swap onClick={(event) => onPasswordShow(event, showPasswordConfirm, setShowPasswordConfirm)} className="absolute right-0 translate-y-[-50%] top-[50%] mr-2" onElement={
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-eye-slash" viewBox="0 0 16 16">
                                         <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>

@@ -20,6 +20,7 @@ import ComputerFiles from './computer_files.js'
 import DeviceFiles from './device_files.js'
 import WebSerialOverride from './WebSerialOverride.js'
 import AccountIcon from './AccountIcon.jsx'
+import Footer from './Footer.jsx'
 
 
 import{
@@ -32,8 +33,7 @@ import{
 } from "react-resizable-panels";
 import { createRoot } from 'react-dom/client'
 
-
-
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents } from './Page.jsx'
 
 
 function App(props){
@@ -387,7 +387,6 @@ function App(props){
                     continue;
                 }
 
-                console.warn(allCheckedPaths.current[icx].path);
                 let filePath = allCheckedPaths.current[icx].path;
                 let lastIndexOfSlash = filePath.lastIndexOf("/");
                 let secondToLastIndexOfSlash = filePath.lastIndexOf("/", lastIndexOfSlash-1);
@@ -647,48 +646,49 @@ execfile("` + filePathToRun + `")
     }, []);
 
 
-    return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-300 overflow-hidden" style={{scrollbarWidth:"0px"}}>
+    return(
+        <Page>
+            <PageModalContents>
+                <SelectLocationModal pathCheckedToRun={pathCheckedToRun} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect} runLocationSelectTree={runLocationSelectTree}/>
 
-            <SelectLocationModal pathCheckedToRun={pathCheckedToRun} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect} runLocationSelectTree={runLocationSelectTree}/>
+                {/* ### Error modal ### */}
+                <CustomModal title="ERROR:" titleColor="error" outlineColor="error" ref={errorModalRef}>
+                    <div className="text-error">
+                        {errorMsg}
 
-            {/* ### Error modal ### */}
-            <CustomModal title="ERROR:" titleColor="error" outlineColor="error" ref={errorModalRef}>
-                <div className="text-error">
-                    {errorMsg}
-
-                    {errorMsgDetails != undefined ? (<details>
-                                                        <summary>Error Details</summary>
-                                                        {errorMsgDetails}
-                                                    </details>) 
-                                                  : <></>}
-                </div>
-            </CustomModal>
-
-
-            {/* ### Choose platform modal ### */}
-            <CustomModal title="Choose platform to open folder from:" outlineColor="base-content" ref={choosePlatformModalRef}>
-                <div className="w-full h-full flex flex-row justify-evenly">
-                    <Button size="lg" onClick={openComputerFiles} variant='outline'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                            <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
-                        </svg>
-                        <p>Computer</p>
-                    </Button>
-
-                    <Button size="lg" onClick={openDeviceFiles} variant='outline'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
-                            <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
-                            <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5"/>
-                        </svg>
-                        <p>Device</p>
-                    </Button>
-                </div>
-            </CustomModal>
+                        {errorMsgDetails != undefined ? (<details>
+                                                            <summary>Error Details</summary>
+                                                            {errorMsgDetails}
+                                                        </details>) 
+                                                    : <></>}
+                    </div>
+                </CustomModal>
 
 
-            <div className="w-full h-full flex flex-col" style={{scrollbarWidth:"0px"}}>
-                {/* ### Header and open files button ### */}
+                {/* ### Choose platform modal ### */}
+                <CustomModal title="Choose platform to open folder from:" outlineColor="base-content" ref={choosePlatformModalRef}>
+                    <div className="w-full h-full flex flex-row justify-evenly">
+                        <Button size="lg" onClick={openComputerFiles} variant='outline'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25"/>
+                            </svg>
+                            <p>Computer</p>
+                        </Button>
+
+                        <Button size="lg" onClick={openDeviceFiles} variant='outline'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cpu-fill" viewBox="0 0 16 16">
+                                <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+                                <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5"/>
+                            </svg>
+                            <p>Device</p>
+                        </Button>
+                    </div>
+                </CustomModal>
+            </PageModalContents>
+
+
+
+            <PageHeaderContents>
                 <div className="w-full h-16 bg-base-100 border-b-base-300 border-b-4 flex items-center">
                     <div className="h-full flex-1 flex flex-row items-center">
                         <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
@@ -746,78 +746,100 @@ execfile("` + filePathToRun + `")
                         <AccountIcon user={user.current} className='mr-4'/>
                     </div>
                 </div>
+            </PageHeaderContents>
 
 
-                {/* ### Main panel group ### */}
-                <PanelGroup direction="horizontal">
-                    
-                    {/* ### Left panel group ### */}
-                    <Panel className="bg-base-100" defaultSize={17} minSize={2} maxSize={98}>
-                        <PanelGroup direction="vertical">
 
-                            {/* ### File panel ### */}
-                            <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
-                                <div className="pl-1 w-full h-8 bg-base-200 flex items-center font-bold text-nowrap select-none">
-                                    {getFilesPanelTitle()}
-                                </div>
-                                
-                                <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
-                            </Panel>
-                        </PanelGroup>
+            <PageBodyContents>
+                <div className="w-full h-full flex flex-col" style={{scrollbarWidth:"0px"}}>
+                    {/* ### Main panel group ### */}
+                    <PanelGroup direction="horizontal">
+                        
+                        {/* ### Left panel group ### */}
+                        <Panel className="bg-base-100" defaultSize={17} minSize={2} maxSize={98}>
+                            <PanelGroup direction="vertical">
 
-                    </Panel>
-
-                    <PanelResizeHandle className="w-1 bg-base-300"/>
-
-                    {/* Right panel group */}
-                    <Panel>
-                        <PanelGroup direction="vertical">
-                            <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
-                                <div className={"w-full h-full relative"}>
-
-                                    {/* CODE PANEL */}
-                                    <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Code" ? "z-10" : "z-0 invisible")}>
-                                        <div className="left-0 right-0 top-0 bottom-0 z-20 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
-                                        </div>
-                                        <div className="left-0 right-0 top-0 bottom-0 z-30 absolute">
-                                            <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey} unselectable={false}/>
-                                        </div>
+                                {/* ### File panel ### */}
+                                <Panel className="bg-base-100 w-full h-full" minSize={2} maxSize={98}>
+                                    <div className="pl-1 w-full h-8 bg-base-200 flex items-center font-bold text-nowrap select-none">
+                                        {getFilesPanelTitle()}
                                     </div>
+                                    
+                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
+                                </Panel>
+                            </PanelGroup>
 
-                                    {/* SIMULATOR PANEL */}
-                                    <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
-                                        <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
-                                            <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
+                        </Panel>
+
+                        <PanelResizeHandle className="w-1 bg-base-300"/>
+
+                        {/* Right panel group */}
+                        <Panel>
+                            <PanelGroup direction="vertical">
+                                <Panel className="bg-base-100" defaultSize={71.8} minSize={2} maxSize={98}>
+                                    <div className={"w-full h-full relative"}>
+
+                                        {/* CODE PANEL */}
+                                        <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Code" ? "z-10" : "z-0 invisible")}>
+                                            <div className="left-0 right-0 top-0 bottom-0 z-20 absolute opacity-5" style={{backgroundImage:"url(\"logo.svg\")", backgroundRepeat:"no-repeat", backgroundPosition:"center", backgroundSize:"22%", backgroundBlendMode:"multiply"}}>
+                                            </div>
+                                            <div className="left-0 right-0 top-0 bottom-0 z-30 absolute">
+                                                <TabPanel tabsData={editorTabsData} setTabsData={setEditorTabsData} draggable={false} closeable={true} activeTabKey={activeEditorTabKey} setActiveTabKey={setActiveEditorTabKey} unselectable={false}/>
+                                            </div>
                                         </div>
+
+                                        {/* SIMULATOR PANEL */}
+                                        <div className={"left-0 right-0 top-0 bottom-0 absolute " + (currentMainPanel == "Simulator" ? "z-10" : "z-0 invisible")}>
+                                            <div className="left-0 right-0 top-0 bottom-0 z-20 absolute">
+                                                <SimulatorPanel ref={simulatorRef} onData={onSimulatorData}/>
+                                            </div>
+                                        </div>
+
                                     </div>
+                                </Panel>
 
-                                </div>
-                            </Panel>
+                                <PanelResizeHandle className="h-1 bg-base-300" />
 
-                            <PanelResizeHandle className="h-1 bg-base-300" />
-
-                            <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
-                                {/* <PanelHeader title="Terminal" /> */}
-                                {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
-                                <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
-                            </Panel>
-                        </PanelGroup>
-                    </Panel>
-                </PanelGroup>
-
-                <div className="w-full h-6 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
-                    <div className="h-full flex-1 flex items-center justify-center">
-                        <p className="text-sm ml-2 font-extralight">{""}</p>
-                        <Progress className='mx-1' color="primary" value={progress}></Progress>
-                    </div>
-                    <div className="h-full flex-1 flex flex-row-reverse items-center">
-                        <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.11.2024.0</p>
-                    </div>
+                                <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
+                                    {/* <PanelHeader title="Terminal" /> */}
+                                    {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
+                                    <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
+                                </Panel>
+                            </PanelGroup>
+                        </Panel>
+                    </PanelGroup>
                 </div>
-            </div>
-        </Theme>
-    )
+            </PageBodyContents>
+
+
+
+            <PageFooterContents>
+                <div className="w-full h-7 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
+                    <div className="h-full flex-1 flex items-center justify-center">
+                         <p className="text-sm ml-2 font-extralight">{""}</p>
+                        <Progress className='mx-1' color="primary" value={progress}></Progress>
+                     </div>
+
+                    <Footer />
+                </div>
+            </PageFooterContents>
+        </Page>
+    );
 }
+
+
+
+// function App(props){
+
+
+//     return (
+        // <Theme dataTheme="dim" className="w-full h-full bg-base-300 overflow-hidden" style={{scrollbarWidth:"0px"}}>
+
+
+            
+        // </Theme>
+//     )
+// }
 
 
 export default App

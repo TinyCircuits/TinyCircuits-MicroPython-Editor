@@ -19,7 +19,7 @@ function ConfirmEmail(props){
             return(
                 <>
                     <p className="text-success text-lg">Success! Email verifed!</p>
-                    <Button color="primary" className='mt-4' tag="a" rel="noopener" href='http://localhost:5173/login/'>Login</Button>
+                    <Button color="primary" className='mt-4' tag="a" rel="noopener" href='/login/'>Login</Button>
                 </>
             ); 
         }else{

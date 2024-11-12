@@ -20,6 +20,8 @@ export default defineConfig({
         account: resolve(__dirname, 'account/index.html'),
         arcade: resolve(__dirname, 'arcade/index.html'),
         submit: resolve(__dirname, 'arcade/submit/index.html'),
+
+        privacy: resolve(__dirname, 'privacy/index.html'),
       },
     },
   },

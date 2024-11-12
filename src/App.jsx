@@ -387,6 +387,7 @@ function App(props){
                     continue;
                 }
 
+                console.warn(allCheckedPaths.current[icx].path);
                 let filePath = allCheckedPaths.current[icx].path;
                 let lastIndexOfSlash = filePath.lastIndexOf("/");
                 let secondToLastIndexOfSlash = filePath.lastIndexOf("/", lastIndexOfSlash-1);

@@ -55,9 +55,13 @@ class ComputerFiles{
             let chose_directory_success = async (result) => {
                 this.dir_handle = result;
 
+                // Add the directly selected folder to the tree (root)
                 this.tree = [];
+                let content = [];
+                this.tree.push({name:this.dir_handle.name, path:this.dir_handle.name, content:content});
+                
                 this.full_path_files = {};
-                this.build_tree(this.dir_handle, this.tree, "").then(() => {
+                this.build_tree(this.dir_handle, content, this.dir_handle.name).then(() => {
                     this.setTree(this.tree);
                     resolve();
                 }).catch((error) => {

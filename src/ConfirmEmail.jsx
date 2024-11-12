@@ -7,6 +7,8 @@ import React, { useState } from 'react';
 import { useRef, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
+import Footer from './Footer';
 
 
 function ConfirmEmail(props){
@@ -49,9 +51,23 @@ function ConfirmEmail(props){
     }, []);
 
     return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-100 flex flex-col items-center justify-center">
-            {renderConfirmedOrNot()}
-        </Theme>
+        <Page>
+            <PageHeaderContents>
+                <div className='w-full h-full flex items-center'>
+                    <p className='text-lg font-bold ml-4'>Automatic Email Verification</p>
+                </div>
+            </PageHeaderContents>
+
+            <PageBodyContents>
+                <div className="w-full h-full bg-base-100 flex flex-col items-center justify-center">
+                    {renderConfirmedOrNot()}
+                </div>                
+            </PageBodyContents>
+
+            <PageFooterContents>
+                <Footer />
+            </PageFooterContents>
+        </Page>
     )
 }
 

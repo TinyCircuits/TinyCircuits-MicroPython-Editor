@@ -7,6 +7,8 @@ import React, { useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import EmailValidator from 'email-validator'
 
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
+import Footer from './Footer';
 
 
 function Forgot(props){
@@ -65,22 +67,36 @@ function Forgot(props){
 
 
     return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-100 flex flex-col items-center justify-center">
-            <div className="flex flex-col">
-                <p className="font-bold text-lg mb-2">Enter Email:</p>
-
-                <div className="flex">
-                    <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Email</p>
-                    <Input ref={emailFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+        <Page>
+            <PageHeaderContents>
+                <div className='w-full h-full flex items-center'>
+                    <p className='text-lg font-bold ml-4'>Request Password Reset</p>
                 </div>
+            </PageHeaderContents>
 
-                <div className="w-full flex flex-row justify-end">
-                    <Button onClick={() => {sendPasswordReset()}} color="primary" className='w-50 mt-2'>Send Password Reset Email</Button>
+            <PageBodyContents>
+                <div className='w-full h-full flex flex-col justify-center items-center'>
+                    <div className="flex flex-col">
+                        <p className="font-bold text-lg mb-2">Enter Email:</p>
+
+                        <div className="flex">
+                            <p className="w-40 h-12 bg-base-300 flex items-center justify-center rounded-l-full p-4 select-none">Email</p>
+                            <Input ref={emailFieldRef} className='w-72' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}/>
+                        </div>
+
+                        <div className="w-full flex flex-row justify-end">
+                            <Button onClick={() => {sendPasswordReset()}} color="primary" className='w-50 mt-2'>Send Password Reset Email</Button>
+                        </div>
+
+                        {renderMsg()}
+                    </div>
                 </div>
+            </PageBodyContents>
 
-                {renderMsg()}
-            </div>
-        </Theme>
+            <PageFooterContents>
+                <Footer />
+            </PageFooterContents>
+        </Page>
     )
 }
 

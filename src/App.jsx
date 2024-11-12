@@ -689,7 +689,7 @@ execfile("` + filePathToRun + `")
 
 
             <PageHeaderContents>
-                <div className="w-full h-16 bg-base-100 border-b-base-300 border-b-4 flex items-center">
+                <div className="w-full h-16 border-b-base-300 border-b-4 flex items-center">
                     <div className="h-full flex-1 flex flex-row items-center">
                         <Button className="ml-2" size="sm" color="primary" onClick={chooseFilesPlatform} title="Open a folder from your computer or MicroPython device">
                             Open Location

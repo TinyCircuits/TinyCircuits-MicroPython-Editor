@@ -9,7 +9,8 @@ import User from './user';
 import EmailValidator from 'email-validator'
 import { createRoot } from 'react-dom/client';
 
-
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
+import Footer from './Footer';
 
 
 function Login(props){
@@ -272,19 +273,21 @@ function Login(props){
 
 
     return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-100 flex flex-col">
-            {/* Page header */}
-            <div className='w-full h-12 font-bold text-lg'>
-                <p className='m-2'>TinyCircuits MicroPython Editor Login</p>
-            </div>
+        <Page>
+            <PageHeaderContents>
+                <div className='w-full h-full flex items-center'>
+                    <p className='text-lg font-bold ml-4'>TinyCircuits MicroPython Editor Login</p>
+                </div>
+            </PageHeaderContents>
 
-            {renderForm()}
-
-            {/* Privacy Policy */}
-            <div className='w-full h-12 justify-end flex'>
-                <Link className='m-2'>Privacy Policy</Link>
-            </div>
-        </Theme>
+            <PageBodyContents>
+                {renderForm()}
+            </PageBodyContents>
+            
+            <PageFooterContents>
+                <Footer />
+            </PageFooterContents>
+        </Page>
     )
 }
 

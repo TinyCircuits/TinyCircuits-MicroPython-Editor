@@ -8671,6 +8671,10 @@ html:has(.drawer-open.drawer-open) {
   margin: 0px;
 }
 
+.m-4 {
+  margin: 1rem;
+}
+
 .mx-1 {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -8716,6 +8720,10 @@ html:has(.drawer-open.drawer-open) {
 
 .mr-4 {
   margin-right: 1rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
 }
 
 .block {

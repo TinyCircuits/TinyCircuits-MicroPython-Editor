@@ -39,7 +39,7 @@ function Page(props){
 
     const getChildElement = (typeName) => {
         for(let i=0; i<children.length; i++){
-            if(children[i].type.name == typeName){
+            if(children[i].type != undefined && children[i].type.name == typeName){
                 let child = children[i];
                 return child;
             }
@@ -47,18 +47,18 @@ function Page(props){
     }
 
     return(
-        <Theme dataTheme="dim" className={"absolute left-0 right-0 top-0 bottom-0 flex flex-col" + " " + className}>
+        <Theme dataTheme="dim" className={"absolute left-0 right-0 top-0 bottom-0 flex flex-col overflex-hidden" + " " + className}>
             {getChildElement("PageModalContents")}
 
-            <div className="w-full h-16 bg-error">
+            <div className="w-full h-16">
                 {getChildElement("PageHeaderContents")}
             </div>
 
-            <div className="w-full h-full bg-warning">
+            <div className="w-full h-full">
                 {getChildElement("PageBodyContents")}
             </div>
 
-            <div className="w-full h-7 bg-success">
+            <div className="w-full h-9 bg-base-200">
                 {getChildElement("PageFooterContents")}
             </div>
         </Theme>

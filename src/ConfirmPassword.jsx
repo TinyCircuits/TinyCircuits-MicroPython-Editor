@@ -7,6 +7,8 @@ import React from 'react';
 import { useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
+import Footer from './Footer';
 
 
 function ConfirmPassword(props){
@@ -149,12 +151,26 @@ function ConfirmPassword(props){
 
 
     return (
-        <Theme dataTheme="dim" className="w-full h-full bg-base-100 flex flex-col items-center justify-center">
-            <div className="flex flex-col">
-                {renderForm()}
-                {renderMsg()}
-            </div>
-        </Theme>
+        <Page>
+            <PageHeaderContents>
+                <div className='w-full h-full flex items-center'>
+                    <p className='text-lg font-bold ml-4'>Reset Password</p>
+                </div>
+            </PageHeaderContents>
+
+            <PageBodyContents>
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                    <div className="flex flex-col">
+                        {renderForm()}
+                        {renderMsg()}
+                    </div>
+                </div>
+            </PageBodyContents>
+
+            <PageFooterContents>
+                <Footer />
+            </PageFooterContents>
+        </Page>
     )
 }
 

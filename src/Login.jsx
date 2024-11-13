@@ -11,6 +11,7 @@ import { createRoot } from 'react-dom/client';
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
+import { handleThrowback } from './throwback';
 
 
 function Login(props){
@@ -150,12 +151,15 @@ function Login(props){
 
         if(loggedIn){
             setTimeout(() => {
-                window.location.pathname = "/";
+                // If there is not a throwback url string, just go back to the main page
+                if(!handleThrowback()){
+                    window.location.pathname = "/";
+                }
             }, 1500);
 
             return(
                 <div className="w-full h-full flex flex-col items-center justify-center text-success text-lg">
-                    <p>Logged in! Going back to main page...</p>
+                    <p>Logged in! Redirecting...</p>
                 </div>
             );
         }else if(registered && sentVerification){

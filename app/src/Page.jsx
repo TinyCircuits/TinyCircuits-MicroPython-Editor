@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Theme } from "react-daisyui";
 
 
@@ -34,32 +35,25 @@ function PageModalContents(props){
 }
 
 
+// Because component names get minifed, the order of children dictates
+// where they go inside the parent page component
 function Page(props){
     const {className, children} = props;
 
-    const getChildElement = (typeName) => {
-        for(let i=0; i<children.length; i++){
-            if(children[i].type != undefined && children[i].type.name == typeName){
-                let child = children[i];
-                return child;
-            }
-        }
-    }
-
     return(
         <Theme dataTheme="dim" className={"absolute left-0 right-0 top-0 bottom-0 flex flex-col overflex-hidden" + " " + className}>
-            {getChildElement("PageModalContents")}
+            {children.length == 4 ? children[0] : <></>}
 
             <div className="w-full h-16">
-                {getChildElement("PageHeaderContents")}
+                {children.length == 4 ? children[1] : children[0]}
             </div>
 
             <div className="w-full h-full">
-                {getChildElement("PageBodyContents")}
+                {children.length == 4 ? children[2] : children[1]}
             </div>
 
             <div className="w-full h-9 bg-base-200">
-                {getChildElement("PageFooterContents")}
+                {children.length == 4 ? children[3] : children[2]}
             </div>
         </Theme>
     );

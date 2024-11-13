@@ -23,9 +23,26 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
     * https://www.joshwcomeau.com/react/usememo-and-usecallback/
 
 
-# Running:
-1. `npm run dev`
-2. `npx tailwindcss -i ./src/tailwind_input.css -o ./tailwind_output.css --watch`
+# Running without backend:
+1. `cd app`
+2. `npm run dev`
+3. `npx tailwindcss -i ./src/tailwind_input.css -o ./tailwind_output.css --watch`
+4. Access: `http://localhost:5173/`
+
+
+# Running with backend:
+1. ./pocketbase serve
+2. `cd app`
+3. `npm run build_watch`
+4. `npx tailwindcss -i ./src/tailwind_input.css -o ./tailwind_output.css --watch`
+5. Access `http://localhost:8090/`
+
+NOTE on 404: https://github.com/pocketbase/pocketbase/discussions/3767
+
+
+# Building
+1. `npm run build`
+
 
 # Pages
 * /
@@ -37,6 +54,3 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 * /arcade/
 * /arcade/submit/
 * /account/
-
-# Building
-1. `npm run build`

@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# User data
+/pb_data/
+
+# Executable
+pocketbase
+
+# Build
+/pb_public/

@@ -6,6 +6,8 @@ import { resolve } from 'path'
 // https://vite.dev/guide/build.html#multi-page-app
 export default defineConfig({
   build: {
+    outDir: '../pb_public',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),

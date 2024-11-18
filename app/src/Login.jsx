@@ -12,6 +12,7 @@ import { createRoot } from 'react-dom/client';
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
 import { handleThrowback } from './throwback';
+import setupRoot from './root';
 
 
 function Login(props){
@@ -298,6 +299,4 @@ function Login(props){
 
 export default Login
 
-// Start access to the DOM in here to reduce number of main files needed
-const root = createRoot(document.getElementById('root'));
-root.render(<Login/>);
+setupRoot(<Login/>);

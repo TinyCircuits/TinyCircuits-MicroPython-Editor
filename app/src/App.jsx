@@ -21,6 +21,7 @@ import DeviceFiles from './device_files.js'
 import WebSerialOverride from './WebSerialOverride.js'
 import AccountIcon from './AccountIcon.jsx'
 import Footer from './Footer.jsx'
+import setupRoot from './root.js'
 
 
 import{
@@ -844,6 +845,4 @@ execfile("` + filePathToRun + `")
 
 export default App
 
-// Start access to the DOM in here to reduce number of main files needed
-const root = createRoot(document.getElementById('root'));
-root.render(<App/>);
+setupRoot(<App/>);

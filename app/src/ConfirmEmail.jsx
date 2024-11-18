@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client';
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
+import setupRoot from './root';
 
 
 function ConfirmEmail(props){
@@ -74,6 +75,4 @@ function ConfirmEmail(props){
 
 export default ConfirmEmail
 
-// Start access to the DOM in here to reduce number of main files needed
-const root = createRoot(document.getElementById('root'));
-root.render(<ConfirmEmail/>);
+setupRoot(<ConfirmEmail/>);

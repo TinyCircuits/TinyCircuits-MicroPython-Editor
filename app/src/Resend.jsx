@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client'
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
+import setupRoot from './root'
 
 
 function Resend(props){
@@ -101,6 +102,4 @@ function Resend(props){
 
 export default Resend
 
-// Start access to the DOM in here to reduce number of main files needed
-const root = createRoot(document.getElementById('root'));
-root.render(<Resend/>);
+setupRoot(<Resend/>);

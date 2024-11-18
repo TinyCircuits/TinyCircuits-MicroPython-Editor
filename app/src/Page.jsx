@@ -48,7 +48,7 @@ function Page(props){
                 {children.length == 4 ? children[1] : children[0]}
             </div>
 
-            <div className="w-full h-full">
+            <div className="relative w-full h-full flex">
                 {children.length == 4 ? children[2] : children[1]}
             </div>
 

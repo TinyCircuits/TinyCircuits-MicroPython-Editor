@@ -8687,8 +8687,8 @@ html:has(.drawer-open.drawer-open) {
   margin-bottom: 0.5rem;
 }
 
-.mb-6 {
-  margin-bottom: 1.5rem;
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
 .mb-8 {
@@ -8737,14 +8737,6 @@ html:has(.drawer-open.drawer-open) {
 
 .mt-4 {
   margin-top: 1rem;
-}
-
-.mb-3 {
-  margin-bottom: 0.75rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
 }
 
 .block {
@@ -8943,6 +8935,10 @@ html:has(.drawer-open.drawer-open) {
   width: 18rem;
 }
 
+.w-80 {
+  width: 20rem;
+}
+
 .w-96 {
   width: 24rem;
 }
@@ -8951,20 +8947,12 @@ html:has(.drawer-open.drawer-open) {
   width: 100%;
 }
 
-.w-80 {
-  width: 20rem;
-}
-
 .min-w-\[16px\] {
   min-width: 16px;
 }
 
 .flex-1 {
   flex: 1 1 0%;
-}
-
-.flex-\[0\.5\] {
-  flex: 0.5;
 }
 
 .shrink {
@@ -9175,11 +9163,6 @@ html:has(.drawer-open.drawer-open) {
 .rounded-t {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
-}
-
-.rounded-l-lg {
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
 }
 
 .rounded-bl {
@@ -9410,18 +9393,6 @@ html:has(.drawer-open.drawer-open) {
   padding-left: 0.25rem;
 }
 
-.pl-2 {
-  padding-left: 0.5rem;
-}
-
-.pr-1 {
-  padding-right: 0.25rem;
-}
-
-.pr-2 {
-  padding-right: 0.5rem;
-}
-
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
@@ -9516,26 +9487,6 @@ html:has(.drawer-open.drawer-open) {
 .diagonal-fractions {
   --tw-numeric-fraction: diagonal-fractions;
   font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
-}
-
-.leading-none {
-  line-height: 1;
-}
-
-.leading-5 {
-  line-height: 1.25rem;
-}
-
-.leading-6 {
-  line-height: 1.5rem;
-}
-
-.leading-7 {
-  line-height: 1.75rem;
-}
-
-.leading-8 {
-  line-height: 2rem;
 }
 
 .text-accent {
@@ -10329,16 +10280,19 @@ html:has(.drawer-open.drawer-open) {
   background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)));
 }
 
-.hover\:bg-warning:hover {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-wa,oklch(var(--wa)/var(--tw-bg-opacity)));
-}
-
 .hover\:outline:hover {
   outline-style: solid;
 }
 
 .hover\:outline-1:hover {
+  outline-width: 1px;
+}
+
+.focus\:outline:focus {
+  outline-style: solid;
+}
+
+.focus\:outline-1:focus {
   outline-width: 1px;
 }
 

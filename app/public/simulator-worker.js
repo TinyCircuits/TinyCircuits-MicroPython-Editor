@@ -1,19 +1,8 @@
 import {loadMicroPython} from "./micropython.mjs"
+import BusyWorkerReceiver from "../src/busy_worker_receiver";
+import dbgconsole from "../src/dbgconsole";
 
-const stdout = (line) => {
-    postMessage({message_type:"print_update", value:line});
-};
 
-const stderr = (line) => {
-    postMessage({message_type:"print_update", value:line});
-};
-
-let web_pressed_buttons_buffer = undefined;
-let stop_buffer = undefined;
-let screen_buffer = undefined;
-let typed_chars_buffer = undefined;
-
-let path_to_run = "";
 
 async function writeFilesystemFile(mp, fetchPath, filePath){
 
@@ -82,72 +71,9 @@ async function writeDefaultFilesystem(mp){
     // Create empty games directory
     mp.FS.mkdirTree("/Games");
 
-    // console.log(mp.FS.readdir("/"));
+    // dbgconsole(mp.FS.readdir("/"));
 }
 
-
-const stdin = () => {
-    console.log("STDIN TEST");
-}
-
-
-const stop = () => {
-    console.log("Stopping simulator");
-    postMessage({message_type:"fs", value:getFs("/", [])});
-    self.close();
-}
-
-
-console.log("Loading simulator!");
-const mp = await loadMicroPython({stdout:stdout, stderr:stderr, stdin:stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
-await writeDefaultFilesystem(mp);
-await mp.replInit();
-
-// This JS function is called from C code in micropython
-// using the VM hook in mpportconfig.h. This allows for
-// doing anything while only micropython is running
-// and not just the engine 
-self.main_call = () => {
-    // If the stop buffer is being told to stop, then stop
-    if(stop_buffer[0] == 1){
-        stop_buffer[0] = 0;
-        stop();
-    }
-
-    let typed_chars = new Uint8Array(typed_chars_buffer);
-
-    if(typed_chars[0] == 1){
-        // Process all buffered chars until see one that's 0, then stop
-        for(let i=1; i<typed_chars.length; i++){
-            if(typed_chars[i] == 0){
-                break;
-            }else{
-                mp.replProcessChar(typed_chars[i]);
-            }
-        }
-
-        // Tell the page we're ready for more data
-        typed_chars[0] = 0;
-        postMessage({message_type:"ready_for_more_typed_chars"});
-    }
-}
-
-// This JS function is called from C code in the engine
-self.get_pressed_buttons = () => {
-    let web_pressed_buttons = new Uint16Array(web_pressed_buttons_buffer)
-    return web_pressed_buttons[0];
-}
-
-// This JS function is called from C code in the engine
-self.update_display = (screen_buffer_to_render_ptr) => {
-    let buffer = new Uint8Array(screen_buffer);
-
-    for(let ipx=0; ipx<128*128*2; ipx++){
-        buffer[ipx] = mp._module.HEAPU8[screen_buffer_to_render_ptr+ipx];
-    }
-
-    postMessage({message_type:"screen_update"});
-}
 
 
 // While building tree to represent simulator file system,
@@ -214,7 +140,7 @@ const getFs = (path, list) => {
 }
 
 
-async function run(){
+async function run(path_to_run){
     // Get the full path to the directory where the main file lives
     let run_dir_path = path_to_run.substring(0, path_to_run.lastIndexOf("/"));
 
@@ -245,44 +171,155 @@ execfile("` + path_to_run + `")
 }
 
 
-onmessage = (e) => {
-    if(e.data.message_type == "stop_buffer_set"){
-        stop_buffer = e.data.value;
-    }else if(e.data.message_type == "screen_buffer_set"){
-        screen_buffer = e.data.value;
-    }else if(e.data.message_type == "pressed_buttons_buffer_set"){
-        web_pressed_buttons_buffer = e.data.value;
-    }else if(e.data.message_type == "typed_chars_buffer_set"){
-        typed_chars_buffer = e.data.value;
-    }else if(e.data.message_type == "files"){
-        let files_list = e.data.value;
 
-        console.log(files_list);
-        
-        // Write the actual files to the simulator
-        for(let ifx=0; ifx<files_list.length; ifx++){
-            // Create the path to the file
-            let path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
-            mp.FS.mkdirTree(path);
-            if(files_list[ifx].data != undefined){
-                mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
-            }
-            console.log("Wrote " + files_list[ifx].path + " to simulator filesystem");
-            postMessage({message_type:"worker_set_progress", value:(ifx/(files_list.length-1))})
-        }
+let receiver = undefined;
 
-        postMessage({message_type:"worker_end_progress"});
-    }else if(e.data.message_type == "stop"){
-        stop();
-    }else if(e.data.message_type == "tree"){
-        postMessage({message_type:"tree", value:getTree("/", [])});
-    }else if(e.data.message_type == "typed"){
-        self.main_call();
-    }else if(e.data.message_type == "run"){
-        path_to_run = e.data.value;
-        run();
-    }
+const mp_stdout = (line) => {
+    receiver.send("print_update", line);
 };
 
-// Let the main thread know the worker is ready
-postMessage({message_type:"ready"})
+const mp_stderr = (line) => {
+    receiver.send("print_update", line);
+};
+
+const mp_stdin = () => {
+    // This doesn't ever seem to get called
+}
+
+const mp = await loadMicroPython({stdout:mp_stdout, stderr:mp_stderr, stdin:mp_stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
+
+
+// Communication link to main thread
+receiver = new BusyWorkerReceiver();
+
+receiver.registerBufferChannel("pressed_buttons", undefined, () => {
+    dbgconsole("Got indication that buttons were pressed!");
+    return receiver.getu16("pressed_buttons", 0);
+});
+
+receiver.registerBufferChannel("typed", undefined, () => {
+    dbgconsole("Typed", receiver.getu8("typed", 0));
+    mp.replProcessChar(receiver.getu8("typed", 0));
+    receiver.clear("typed");
+});
+
+receiver.registerBufferChannel("screen_update", undefined, undefined);
+
+receiver.registerBufferChannel("get_tree", undefined, () => {
+    dbgconsole("Replying with simulator tree...");
+    receiver.send("get_tree", getTree("/", []));
+});
+
+receiver.registerBufferChannel("init_fs", undefined, () => {
+    dbgconsole("Setting up fs first time");
+    writeDefaultFilesystem(mp);
+});
+
+receiver.registerBufferChannel("get_fs", undefined, () => {
+    dbgconsole("Replying with simulator tree...");
+    receiver.send("get_fs", getFs("/", []));
+});
+
+
+receiver.registerBufferChannel("upload_files_and_run", undefined, (filesAndPath) => {
+    dbgconsole("Got files");
+    
+    let files_list = filesAndPath["filesList"];
+    let run_path = filesAndPath["runPath"];
+
+    // Write the actual files to the simulator
+    for(let ifx=0; ifx<files_list.length; ifx++){
+        
+        if(files_list[ifx].data != undefined){
+            // Get the path to the file
+            let file_path = files_list[ifx].path.substring(0, files_list[ifx].path.lastIndexOf("/"));
+            mp.FS.mkdirTree(file_path);
+            mp.FS.writeFile(files_list[ifx].path, files_list[ifx].data);
+        }else{
+            mp.FS.mkdirTree(files_list[ifx].path);
+        }
+
+        dbgconsole("Wrote " + files_list[ifx].path + " to simulator filesystem");
+    }
+
+    run(run_path);
+});
+
+
+// This JS function is called from C code in micropython
+// using the VM hook in mpportconfig.h. This allows for
+// doing anything while only micropython is running
+// and not just the engine 
+self.main_call = () => {
+    dbgconsole("Main!");
+    receiver.post(receiver.POST_MESSAGE_TYPE_STALLED, undefined, undefined);
+    receiver.check("typed");
+    receiver.check("get_tree");
+    receiver.check("get_fs");
+}
+
+// This JS function is called from C code in the engine
+self.get_pressed_buttons = () => {
+    return receiver.check("pressed_buttons");
+}
+
+// This JS function is called from C code in the engine
+self.update_display = (screen_buffer_to_render_ptr) => {
+    for(let ipx=0; ipx<128*128*2; ipx++){
+        receiver.setu8("screen_update", ipx, mp._module.HEAPU8[screen_buffer_to_render_ptr+ipx]);
+    }
+
+    // This will always post a message since the worker flag will always be false
+    receiver.mark("screen_update");
+}
+
+
+
+dbgconsole("Loading simulator!");
+mp.replInit();
+
+
+// let path_to_run = "";
+
+
+
+
+
+// const stop = () => {
+//     dbgconsole("Stopping simulator");
+//     postMessage({message_type:"fs", value:getFs("/", [])});
+//     self.close();
+// }
+
+
+
+
+
+// onmessage = (e) => {
+//     if(e.data.message_type == "stop_buffer_set"){
+//         stop_buffer = e.data.value;
+//     }else if(e.data.message_type == "screen_buffer_set"){
+//         screen_buffer = e.data.value;
+//     }else if(e.data.message_type == "pressed_buttons_buffer_set"){
+//         web_pressed_buttons_buffer = e.data.value;
+//     }else if(e.data.message_type == "typed_chars_buffer_set"){
+//         typed_chars_buffer = e.data.value;
+//     }else if(e.data.message_type == "files"){
+//         let files_list = e.data.value;
+
+//         dbgconsole(files_list);
+        
+
+
+//         postMessage({message_type:"worker_end_progress"});
+//     }else if(e.data.message_type == "stop"){
+//         stop();
+//     }else if(e.data.message_type == "tree"){
+//         postMessage({message_type:"tree", value:getTree("/", [])});
+//     }else if(e.data.message_type == "typed"){
+//         self.main_call();
+//     }else if(e.data.message_type == "run"){
+//         path_to_run = e.data.value;
+//         run();
+//     }
+// };

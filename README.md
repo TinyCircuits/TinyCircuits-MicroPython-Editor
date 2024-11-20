@@ -31,7 +31,7 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 
 
 # Running with backend:
-1. ./pocketbase serve
+1. `./pocketbase serve`
 2. `cd app`
 3. `npm run build_watch`
 4. `npx tailwindcss -i ./src/tailwind_input.css -o ./tailwind_output.css --watch`

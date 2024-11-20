@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle, useState } from "react";
 
 
 
@@ -8,8 +8,11 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(props, ref){
     let ctx = useRef(undefined);
     let imageData = useRef(undefined);
 
+
     // Setup canvas once
     useEffect(() => {
+        console.log("Created simulator canvas!");
+
         if(canvas.current == undefined){
             console.log("Setting up simulator canvas!");
 
@@ -31,6 +34,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(props, ref){
             imageData.current = new ImageData(128, 128);    // Each pixel is 4 bytes, R,G,B,A
         }
     }, []);
+
 
     useImperativeHandle(ref, () => ({
         async update(RGB565Buffer){
@@ -59,6 +63,7 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(props, ref){
             requestAnimationFrame(render);
         },
     }))
+
 
     return(
         <canvas ref={canvasRef} width="128" height="128" className="w-96 aspect-square">

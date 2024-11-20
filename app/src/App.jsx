@@ -248,6 +248,22 @@ function App(props){
 
                 try{
                     await serial.current.connect();
+                    
+                    let date = new Date();
+                    let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';
+                    console.log(datetime);
+
+                    MpRawMode.begin(serial.current).then(async (raw_mode) => {
+
+                        await raw_mode.exec(`
+import engine_main
+import engine_time
+engine_time.datetime(` + datetime + `)
+                        `, 0, false);
+
+                        raw_mode.end();
+                    });
+
                 }catch(error){
                     // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort/open#exceptions
                     if(error.name == "InvalidStateError"){
@@ -597,6 +613,7 @@ execfile("` + filePathToRun + `")
         }
 
         if(runPathSimulator == ""){
+            console.log("Waiting on simulator tree...");
             setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runInSimulator);
         }else{
@@ -827,20 +844,6 @@ execfile("` + filePathToRun + `")
         </Page>
     );
 }
-
-
-
-// function App(props){
-
-
-//     return (
-        // <Theme dataTheme="dim" className="w-full h-full bg-base-300 overflow-hidden" style={{scrollbarWidth:"0px"}}>
-
-
-            
-        // </Theme>
-//     )
-// }
 
 
 export default App

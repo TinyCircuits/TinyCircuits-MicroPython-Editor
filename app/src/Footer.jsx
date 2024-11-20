@@ -10,7 +10,7 @@ function Footer(props){
     return(
         <div className="flex-1 flex flex-row-reverse items-center">
             <Link href="/privacy/" target="_blank" className='m-2 text-sm underline'>Privacy Policy</Link>
-            <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.18.2024.0</p>
+            <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V11.20.2024.0</p>
         </div>
     )
 }

@@ -8619,6 +8619,14 @@ html:has(.drawer-open.drawer-open) {
   top: 50%;
 }
 
+.top-1 {
+  top: 0.25rem;
+}
+
+.top-\[1px\] {
+  top: 1px;
+}
+
 .isolate {
   isolation: isolate;
 }
@@ -8659,8 +8667,16 @@ html:has(.drawer-open.drawer-open) {
   z-index: 202;
 }
 
+.z-\[10000\] {
+  z-index: 10000;
+}
+
 .m-2 {
   margin: 0.5rem;
+}
+
+.m-auto {
+  margin: auto;
 }
 
 .mx-1 {
@@ -8949,6 +8965,10 @@ html:has(.drawer-open.drawer-open) {
 
 .min-w-\[16px\] {
   min-width: 16px;
+}
+
+.min-w-32 {
+  min-width: 8rem;
 }
 
 .flex-1 {

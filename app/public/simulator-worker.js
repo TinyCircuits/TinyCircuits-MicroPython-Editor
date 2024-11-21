@@ -161,7 +161,7 @@ execfile("` + path_to_run + `")
             let lines = error.message.split(/\r\n|\r|\n/);
             lines.forEach(line => {
                 if(line.length > 0){
-                    stderr(line);
+                    mp_stderr(line);
                 }
             });
         }else{
@@ -186,6 +186,7 @@ const mp_stdin = () => {
     // This doesn't ever seem to get called
 }
 
+console.log("Loading simulator!");
 const mp = await loadMicroPython({stdout:mp_stdout, stderr:mp_stderr, stdin:mp_stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
 
 
@@ -220,6 +221,8 @@ receiver.registerBufferChannel("get_fs", undefined, () => {
     receiver.send("get_fs", getFs("/", []));
 });
 
+receiver.registerBufferChannel("set_progress", undefined, undefined);
+receiver.registerBufferChannel("end_progress", undefined, undefined);
 
 receiver.registerBufferChannel("upload_files_and_run", undefined, (filesAndPath) => {
     dbgconsole("Got files");
@@ -240,7 +243,11 @@ receiver.registerBufferChannel("upload_files_and_run", undefined, (filesAndPath)
         }
 
         dbgconsole("Wrote " + files_list[ifx].path + " to simulator filesystem");
+        postMessage({message_type:"worker_set_progress", value:(ifx/(files_list.length-1))})
+        receiver.send("set_progress", (ifx/(files_list.length-1)));
     }
+
+    receiver.send("end_progress", undefined);
 
     run(run_path);
 });
@@ -274,52 +281,4 @@ self.update_display = (screen_buffer_to_render_ptr) => {
 }
 
 
-
-dbgconsole("Loading simulator!");
 mp.replInit();
-
-
-// let path_to_run = "";
-
-
-
-
-
-// const stop = () => {
-//     dbgconsole("Stopping simulator");
-//     postMessage({message_type:"fs", value:getFs("/", [])});
-//     self.close();
-// }
-
-
-
-
-
-// onmessage = (e) => {
-//     if(e.data.message_type == "stop_buffer_set"){
-//         stop_buffer = e.data.value;
-//     }else if(e.data.message_type == "screen_buffer_set"){
-//         screen_buffer = e.data.value;
-//     }else if(e.data.message_type == "pressed_buttons_buffer_set"){
-//         web_pressed_buttons_buffer = e.data.value;
-//     }else if(e.data.message_type == "typed_chars_buffer_set"){
-//         typed_chars_buffer = e.data.value;
-//     }else if(e.data.message_type == "files"){
-//         let files_list = e.data.value;
-
-//         dbgconsole(files_list);
-        
-
-
-//         postMessage({message_type:"worker_end_progress"});
-//     }else if(e.data.message_type == "stop"){
-//         stop();
-//     }else if(e.data.message_type == "tree"){
-//         postMessage({message_type:"tree", value:getTree("/", [])});
-//     }else if(e.data.message_type == "typed"){
-//         self.main_call();
-//     }else if(e.data.message_type == "run"){
-//         path_to_run = e.data.value;
-//         run();
-//     }
-// };

@@ -82,8 +82,8 @@ function FilesPanel(props){
     const getRow = (node) => {
         if(node.isLeaf){
             return(
-                <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "") + (node.isFocused ? "bg-base-300" : "")}>
-                    <div className="flex w-12 w-full">
+                <div className={"relative w-full hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "") + (node.isFocused ? "bg-base-300" : "")}>
+                    <div className="flex w-full items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="min-w-[16px] min-h-[16px] bi bi-file-earmark-fill" viewBox="0 0 16 16">
                             <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2z"/>
                         </svg>
@@ -92,8 +92,8 @@ function FilesPanel(props){
 
                     {
                         (props.checkmarks == true || props.checkmarks == undefined) ? 
-                        <div className="flex flex-1 w-full">
-                            <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
+                        <div className={"flex flex-1 absolute right-0 top-0 bottom-0 items-center z-[10000] hover:bg-base-300 " + ((node.data.checked) ? "bg-base-300 " : "bg-base-100")}>
+                            <Checkbox size='sm' className='mx-1' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
                         </div>
                                                                                     :
                         <></>
@@ -102,8 +102,8 @@ function FilesPanel(props){
             );
         }else{
             return(
-                <div className={"w-full flex flex-row hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "")}>
-                    <div className="flex w-12 w-full">
+                <div className={"relative w-full hover:bg-base-300 cursor-pointer items-center flex-nowrap " + (node.data.checked ? "bg-base-300 " : "")}>
+                    <div className="flex w-full items-center">
                         {
                             node.isOpen ?   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="min-w-[16px] min-h-[16px] bi bi-chevron-down" viewBox="0 0 16 16">
                                                 <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
@@ -118,8 +118,8 @@ function FilesPanel(props){
 
                     {
                         (props.checkmarks == true || props.checkmarks == undefined) ? 
-                        <div className="flex flex-1 w-full">
-                            <Checkbox size='sm' className='mx-2' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
+                        <div className={"flex flex-1 absolute right-0 top-0 bottom-0 items-center z-[10000] hover:bg-base-300 " + (node.data.checked ? "bg-base-300 " : "bg-base-100")}>
+                            <Checkbox size='sm' className='mx-1' defaultChecked={node.data.checked} color={node.id == props.pathCheckedToRun.path ? "primary" : ""} disabled={(node.id == props.pathCheckedToRun.path || props.pathCheckedToRun.path == "") ? false : true}/>
                         </div>
                                                                                     :
                         <></>
@@ -128,6 +128,7 @@ function FilesPanel(props){
             );
         }
     }
+
 
     function Node({ node, style, dragHandle }){
         /* This node instance can do many things. See the API reference. */

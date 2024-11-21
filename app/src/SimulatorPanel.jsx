@@ -178,6 +178,12 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 sender.current.registerBufferChannel("get_tree", 0, undefined);
                 sender.current.registerBufferChannel("init_fs", 0, undefined);
                 sender.current.registerBufferChannel("get_fs", 0, undefined);
+                sender.current.registerBufferChannel("set_progress", 0, (progress) => {
+                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: progress}}));
+                });
+                sender.current.registerBufferChannel("end_progress", 0, () => {
+                    window.dispatchEvent(new CustomEvent("end_progress"));
+                });
                 sender.current.registerBufferChannel("upload_files_and_run", 0, undefined);
 
                 if(filesList.current.length == 0){

@@ -18,7 +18,17 @@ async function writeFilesystemFile(mp, fetchPath, filePath){
 
 
 async function writeDefaultFilesystem(mp){
+    await writeFilesystemFile(mp, "./simulator/filesystem/main.py", "main.py");
+
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/crash.py", "system/crash.py");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/credits_1_testers.csv", "system/credits_1_testers.csv");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/credits_2_special.csv", "system/credits_2_special.csv");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher_state.py", "system/launcher_state.py");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/run_on_boot.py", "system/run_on_boot.py");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/util.py", "system/util.py");
+
     await writeFilesystemFile(mp, "./simulator/filesystem/system/assets/outrunner_outline.bmp", "system/assets/outrunner_outline.bmp");
+    
 
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/assets/arrow.bmp", "system/launcher/assets/arrow.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/assets/battery.bmp", "system/launcher/assets/battery.bmp");
@@ -31,7 +41,6 @@ async function writeDefaultFilesystem(mp){
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/assets/launcher-screen-thumby-color-icon.bmp", "system/launcher/assets/launcher-screen-thumby-color-icon.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/assets/launcher-settings-header.bmp", "system/launcher/assets/launcher-settings-header.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/assets/launcher-tile-qmark.bmp", "system/launcher/assets/launcher-tile-qmark.bmp");
-
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/battery_indicator.py", "system/launcher/battery_indicator.py");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/credits_screen.py", "system/launcher/credits_screen.py");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/custom_camera.py", "system/launcher/custom_camera.py");
@@ -43,10 +52,13 @@ async function writeDefaultFilesystem(mp){
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/screen_icon.py", "system/launcher/screen_icon.py");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher/settings_screen.py", "system/launcher/settings_screen.py");
 
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/show_splash.py", "system/splash/show_splash.py");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/splash.py", "system/splash/splash.py");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/b.bmp", "system/splash/assets/b.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/C.bmp", "system/splash/assets/C.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/GO.bmp", "system/splash/assets/GO.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/h.bmp", "system/splash/assets/h.bmp");
+    await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/jingle.wav", "system/splash/assets/jingle.wav");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/L.bmp", "system/splash/assets/L.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/m.bmp", "system/splash/assets/m.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/R.bmp", "system/splash/assets/R.bmp");
@@ -54,19 +66,7 @@ async function writeDefaultFilesystem(mp){
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/T.bmp", "system/splash/assets/T.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/u.bmp", "system/splash/assets/u.bmp");
     await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/assets/y.bmp", "system/splash/assets/y.bmp");
-
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/show_splash.py", "system/splash/show_splash.py");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/splash/splash.py", "system/splash/splash.py");
-
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/crash.py", "system/crash.py");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/credits_1_testers.csv", "system/credits_1_testers.csv");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/credits_2_collectors.csv", "system/credits_2_collectors.csv");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/credits_3_special.csv", "system/credits_3_special.csv");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/launcher_state.py", "system/launcher_state.py");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/run_on_boot.py", "system/run_on_boot.py");
-    await writeFilesystemFile(mp, "./simulator/filesystem/system/util.py", "system/util.py");
-
-    await writeFilesystemFile(mp, "./simulator/filesystem/main.py", "main.py");
+    
 
     // Create empty games directory
     mp.FS.mkdirTree("/Games");
@@ -171,7 +171,6 @@ execfile("` + path_to_run + `")
 }
 
 
-
 let receiver = undefined;
 
 const mp_stdout = (line) => {
@@ -195,7 +194,8 @@ receiver = new BusyWorkerReceiver();
 
 receiver.registerBufferChannel("pressed_buttons", undefined, () => {
     dbgconsole("Got indication that buttons were pressed!");
-    return receiver.getu16("pressed_buttons", 0);
+    let buttons_mask = receiver.getu16("pressed_buttons", 0);
+    return buttons_mask;
 });
 
 receiver.registerBufferChannel("typed", undefined, () => {
@@ -250,6 +250,11 @@ receiver.registerBufferChannel("upload_files_and_run", undefined, (filesAndPath)
     receiver.send("end_progress", undefined);
 
     run(run_path);
+});
+
+
+receiver.registerBufferChannel("main_needs_audio", undefined, () => {
+
 });
 
 

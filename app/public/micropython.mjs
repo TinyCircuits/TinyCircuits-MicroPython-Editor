@@ -42,7 +42,7 @@ var readyPromise = new Promise((resolve, reject) => {
 
 // Attempt to auto-detect the environment
 var ENVIRONMENT_IS_WEB = typeof window == 'object';
-var ENVIRONMENT_IS_WORKER = typeof importScripts == 'function';
+var ENVIRONMENT_IS_WORKER = typeof WorkerGlobalScope != 'undefined';
 // N.b. Electron.js environment is simultaneously a NODE-environment, but
 // also a web environment.
 var ENVIRONMENT_IS_NODE = typeof process == 'object' && typeof process.versions == 'object' && typeof process.versions.node == 'string' && process.type != 'renderer';
@@ -152,7 +152,7 @@ readAsync = (filename, binary = true) => {
 } else
 if (ENVIRONMENT_IS_SHELL) {
 
-  if ((typeof process == 'object' && typeof require === 'function') || typeof window == 'object' || typeof importScripts == 'function') throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
+  if ((typeof process == 'object' && typeof require === 'function') || typeof window == 'object' || typeof WorkerGlobalScope != 'undefined') throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
 
 } else
 
@@ -182,7 +182,7 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
     scriptDirectory = scriptDirectory.substr(0, scriptDirectory.replace(/[?#].*/, '').lastIndexOf('/')+1);
   }
 
-  if (!(typeof window == 'object' || typeof importScripts == 'function')) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
+  if (!(typeof window == 'object' || typeof WorkerGlobalScope != 'undefined')) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
 
   {
 // include: web_or_worker_shell_read.js
@@ -417,10 +417,11 @@ var __ATPOSTRUN__ = []; // functions called after the main() is called
 var runtimeInitialized = false;
 
 function preRun() {
-  var preRuns = Module['preRun'];
-  if (preRuns) {
-    if (typeof preRuns == 'function') preRuns = [preRuns];
-    preRuns.forEach(addOnPreRun);
+  if (Module['preRun']) {
+    if (typeof Module['preRun'] == 'function') Module['preRun'] = [Module['preRun']];
+    while (Module['preRun'].length) {
+      addOnPreRun(Module['preRun'].shift());
+    }
   }
   callRuntimeCallbacks(__ATPRERUN__);
 }
@@ -443,10 +444,11 @@ TTY.init();
 function postRun() {
   checkStackCookie();
 
-  var postRuns = Module['postRun'];
-  if (postRuns) {
-    if (typeof postRuns == 'function') postRuns = [postRuns];
-    postRuns.forEach(addOnPostRun);
+  if (Module['postRun']) {
+    if (typeof Module['postRun'] == 'function') Module['postRun'] = [Module['postRun']];
+    while (Module['postRun'].length) {
+      addOnPostRun(Module['postRun'].shift());
+    }
   }
 
   callRuntimeCallbacks(__ATPOSTRUN__);
@@ -733,7 +735,6 @@ function getWasmImports() {
 // Create the wasm instance.
 // Receives the wasm imports, returns the exports.
 function createWasm() {
-  var info = getWasmImports();
   // Load the wasm module and create an instance of using native support in the JS engine.
   // handle a generated wasm instance, receiving its exports and
   // performing other necessary setup
@@ -776,6 +777,8 @@ function createWasm() {
     // When the regression is fixed, can restore the above PTHREADS-enabled path.
     receiveInstance(result['instance']);
   }
+
+  var info = getWasmImports();
 
   // User shell pages can write their own Module.instantiateWasm = function(imports, successCallback) callback
   // to manually instantiate the Wasm module themselves. This allows pages to
@@ -954,16 +957,19 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
 // end include: preamble.js
 
 
-  /** @constructor */
-  function ExitStatus(status) {
-      this.name = 'ExitStatus';
-      this.message = `Program terminated with exit(${status})`;
-      this.status = status;
+  class ExitStatus {
+      name = 'ExitStatus';
+      constructor(status) {
+        this.message = `Program terminated with exit(${status})`;
+        this.status = status;
+      }
     }
 
   var callRuntimeCallbacks = (callbacks) => {
-      // Pass the module as the first argument.
-      callbacks.forEach((f) => f(Module));
+      while (callbacks.length > 0) {
+        // Pass the module as the first argument.
+        callbacks.shift()(Module);
+      }
     };
 
   
@@ -1102,9 +1108,8 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
       assert(typeof ptr == 'number', `UTF8ToString expects a number (got ${typeof ptr})`);
       return ptr ? UTF8ArrayToString(HEAPU8, ptr, maxBytesToRead) : '';
     };
-  var ___assert_fail = (condition, filename, line, func) => {
+  var ___assert_fail = (condition, filename, line, func) =>
       abort(`Assertion failed: ${UTF8ToString(condition)}, at: ` + [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function']);
-    };
 
   var PATH = {
   isAbs:(path) => path.charAt(0) === '/',
@@ -1549,7 +1554,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   var MEMFS = {
   ops_table:null,
   mount(mount) {
-        return MEMFS.createNode(null, '/', 16384 | 511 /* 0777 */, 0);
+        return MEMFS.createNode(null, '/', 16895, 0);
       },
   createNode(parent, name, mode, dev) {
         if (FS.isBlkdev(mode) || FS.isFIFO(mode)) {
@@ -1704,7 +1709,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
           }
         },
   lookup(parent, name) {
-          throw FS.genericErrors[44];
+          throw new FS.ErrnoError(44);
         },
   mknod(parent, name, mode, dev) {
           return MEMFS.createNode(parent, name, mode, dev);
@@ -1750,7 +1755,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
           return entries;
         },
   symlink(parent, newname, oldpath) {
-          var node = MEMFS.createNode(parent, newname, 511 /* 0777 */ | 40960, 0);
+          var node = MEMFS.createNode(parent, newname, 0o777 | 40960, 0);
           node.link = oldpath;
           return node;
         },
@@ -1968,9 +1973,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   
   
   
-  var strError = (errno) => {
-      return UTF8ToString(_strerror(errno));
-    };
+  var strError = (errno) => UTF8ToString(_strerror(errno));
   
   var ERRNO_CODES = {
       'EPERM': 63,
@@ -2107,6 +2110,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   initialized:false,
   ignorePermissions:true,
   ErrnoError:class extends Error {
+        name = 'ErrnoError';
         // We set the `name` property to be able to identify `FS.ErrnoError`
         // - the `name` is a standard ECMA-262 property of error objects. Kind of good to have it anyway.
         // - when using PROXYFS, an error can come from an underlying FS
@@ -2115,9 +2119,6 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         // we'll use the reliable test `err.name == "ErrnoError"` instead
         constructor(errno) {
           super(runtimeInitialized ? strError(errno) : '');
-          // TODO(sbc): Use the inline member declaration syntax once we
-          // support it in acorn and closure.
-          this.name = 'ErrnoError';
           this.errno = errno;
           for (var key in ERRNO_CODES) {
             if (ERRNO_CODES[key] === errno) {
@@ -2127,18 +2128,12 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
           }
         }
       },
-  genericErrors:{
-  },
   filesystems:null,
   syncFSRequests:0,
   readFiles:{
   },
   FSStream:class {
-        constructor() {
-          // TODO(https://github.com/emscripten-core/emscripten/issues/21414):
-          // Use inline field declarations.
-          this.shared = {};
-        }
+        shared = {};
         get object() {
           return this.node;
         }
@@ -2168,21 +2163,21 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         }
       },
   FSNode:class {
+        node_ops = {};
+        stream_ops = {};
+        readMode = 292 | 73;
+        writeMode = 146;
+        mounted = null;
         constructor(parent, name, mode, rdev) {
           if (!parent) {
             parent = this;  // root node sets parent to itself
           }
           this.parent = parent;
           this.mount = parent.mount;
-          this.mounted = null;
           this.id = FS.nextInode++;
           this.name = name;
           this.mode = mode;
-          this.node_ops = {};
-          this.stream_ops = {};
           this.rdev = rdev;
-          this.readMode = 292 | 73;
-          this.writeMode = 146;
         }
         get read() {
           return (this.mode & this.readMode) === this.readMode;
@@ -2648,14 +2643,35 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         }
         return parent.node_ops.mknod(parent, name, mode, dev);
       },
-  create(path, mode) {
-        mode = mode !== undefined ? mode : 438 /* 0666 */;
+  statfs(path) {
+  
+        // NOTE: None of the defaults here are true. We're just returning safe and
+        //       sane values.
+        var rtn = {
+          bsize: 4096,
+          frsize: 4096,
+          blocks: 1e6,
+          bfree: 5e5,
+          bavail: 5e5,
+          files: FS.nextInode,
+          ffree: FS.nextInode - 1,
+          fsid: 42,
+          flags: 2,
+          namelen: 255,
+        };
+  
+        var parent = FS.lookupPath(path, {follow: true}).node;
+        if (parent?.node_ops.statfs) {
+          Object.assign(rtn, parent.node_ops.statfs(parent.mount.opts.root));
+        }
+        return rtn;
+      },
+  create(path, mode = 0o666) {
         mode &= 4095;
         mode |= 32768;
         return FS.mknod(path, mode, 0);
       },
-  mkdir(path, mode) {
-        mode = mode !== undefined ? mode : 511 /* 0777 */;
+  mkdir(path, mode = 0o777) {
         mode &= 511 | 512;
         mode |= 16384;
         return FS.mknod(path, mode, 0);
@@ -2676,7 +2692,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   mkdev(path, mode, dev) {
         if (typeof dev == 'undefined') {
           dev = mode;
-          mode = 438 /* 0666 */;
+          mode = 0o666;
         }
         mode |= 8192;
         return FS.mknod(path, mode, dev);
@@ -2774,7 +2790,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         // do the underlying fs rename
         try {
           old_dir.node_ops.rename(old_node, new_dir, new_name);
-          // update old node (we do this here to avoid each backend 
+          // update old node (we do this here to avoid each backend
           // needing to)
           old_node.parent = new_dir;
         } catch (e) {
@@ -2844,7 +2860,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         if (!link.node_ops.readlink) {
           throw new FS.ErrnoError(28);
         }
-        return PATH_FS.resolve(FS.getPath(link.parent), link.node_ops.readlink(link));
+        return link.node_ops.readlink(link);
       },
   stat(path, dontFollow) {
         var lookup = FS.lookupPath(path, { follow: !dontFollow });
@@ -2949,13 +2965,12 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
           timestamp: Math.max(atime, mtime)
         });
       },
-  open(path, flags, mode) {
+  open(path, flags, mode = 0o666) {
         if (path === "") {
           throw new FS.ErrnoError(44);
         }
         flags = typeof flags == 'string' ? FS_modeStringToFlags(flags) : flags;
         if ((flags & 64)) {
-          mode = typeof mode == 'undefined' ? 438 /* 0666 */ : mode;
           mode = (mode & 4095) | 32768;
         } else {
           mode = 0;
@@ -3244,6 +3259,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         FS.registerDevice(FS.makedev(1, 3), {
           read: () => 0,
           write: (stream, buffer, offset, length, pos) => length,
+          llseek: () => 0,
         });
         FS.mkdev('/dev/null', FS.makedev(1, 3));
         // setup /dev/tty and /dev/tty1
@@ -3277,7 +3293,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         FS.mkdir('/proc/self/fd');
         FS.mount({
           mount() {
-            var node = FS.createNode(proc_self, 'fd', 16384 | 511 /* 0777 */, 73);
+            var node = FS.createNode(proc_self, 'fd', 16895, 73);
             node.node_ops = {
               lookup(parent, name) {
                 var fd = +name;
@@ -3329,12 +3345,6 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         assert(stderr.fd === 2, `invalid handle for stderr (${stderr.fd})`);
       },
   staticInit() {
-        // Some errors may happen quite a bit, to avoid overhead we reuse them (and suffer a lack of stack info)
-        [44].forEach((code) => {
-          FS.genericErrors[code] = new FS.ErrnoError(code);
-          FS.genericErrors[code].stack = '<generic error, no stack>';
-        });
-  
         FS.nameTable = new Array(4096);
   
         FS.mount(MEMFS, {}, '/');
@@ -3520,10 +3530,8 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
         // Lazy chunked Uint8Array (implements get and length from Uint8Array).
         // Actual getting is abstracted away for eventual reuse.
         class LazyUint8Array {
-          constructor() {
-            this.lengthKnown = false;
-            this.chunks = []; // Loaded chunks. Index is the chunk number
-          }
+          lengthKnown = false;
+          chunks = []; // Loaded chunks. Index is the chunk number
           get(idx) {
             if (idx > this.length-1 || idx < 0) {
               return undefined;
@@ -3904,13 +3912,13 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   }
   }
 
-  function syscallGetVarargI() {
+  var syscallGetVarargI = () => {
       assert(SYSCALLS.varargs != undefined);
       // the `+` prepended here is necessary to convince the JSCompiler that varargs is indeed a number.
       var ret = HEAP32[((+SYSCALLS.varargs)>>2)];
       SYSCALLS.varargs += 4;
       return ret;
-    }
+    };
   
   function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
@@ -3994,20 +4002,18 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
   function ___syscall_statfs64(path, size, buf) {
   try {
   
-      path = SYSCALLS.getStr(path);
       assert(size === 64);
-      // NOTE: None of the constants here are true. We're just returning safe and
-      //       sane values.
-      HEAP32[(((buf)+(4))>>2)] = 4096;
-      HEAP32[(((buf)+(40))>>2)] = 4096;
-      HEAP32[(((buf)+(8))>>2)] = 1000000;
-      HEAP32[(((buf)+(12))>>2)] = 500000;
-      HEAP32[(((buf)+(16))>>2)] = 500000;
-      HEAP32[(((buf)+(20))>>2)] = FS.nextInode;
-      HEAP32[(((buf)+(24))>>2)] = 1000000;
-      HEAP32[(((buf)+(28))>>2)] = 42;
-      HEAP32[(((buf)+(44))>>2)] = 2;  // ST_NOSUID
-      HEAP32[(((buf)+(36))>>2)] = 255;
+      var stats = FS.statfs(SYSCALLS.getStr(path));
+      HEAP32[(((buf)+(4))>>2)] = stats.bsize;
+      HEAP32[(((buf)+(40))>>2)] = stats.bsize;
+      HEAP32[(((buf)+(8))>>2)] = stats.blocks;
+      HEAP32[(((buf)+(12))>>2)] = stats.bfree;
+      HEAP32[(((buf)+(16))>>2)] = stats.bavail;
+      HEAP32[(((buf)+(20))>>2)] = stats.files;
+      HEAP32[(((buf)+(24))>>2)] = stats.ffree;
+      HEAP32[(((buf)+(28))>>2)] = stats.fsid;
+      HEAP32[(((buf)+(44))>>2)] = stats.flags;  // ST_NOSUID
+      HEAP32[(((buf)+(36))>>2)] = stats.namelen;
       return 0;
     } catch (e) {
     if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
@@ -4240,6 +4246,7 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
       quit_(code, new ExitStatus(code));
     };
   
+  
   /** @suppress {duplicate } */
   /** @param {boolean|number=} implicit */
   var exitJS = (status, implicit) => {
@@ -4443,8 +4450,10 @@ function create_promise(out_set,out_promise) { const out_set_js = proxy_convert_
       var func = wasmTableMirror[funcPtr];
       if (!func) {
         if (funcPtr >= wasmTableMirror.length) wasmTableMirror.length = funcPtr + 1;
+        /** @suppress {checkTypes} */
         wasmTableMirror[funcPtr] = func = wasmTable.get(funcPtr);
       }
+      /** @suppress {checkTypes} */
       assert(wasmTable.get(funcPtr) == func, 'JavaScript-side Wasm function table mirror is out of date!');
       return func;
     };
@@ -5318,8 +5327,8 @@ var missingLibrarySymbols = [
   'checkWasiClock',
   'wasiRightsToMuslOFlags',
   'wasiOFlagsToMuslOFlags',
-  'createDyncallWrapper',
   'setImmediateWrapped',
+  'safeRequestAnimationFrame',
   'clearImmediateWrapped',
   'polyfillSetImmediate',
   'registerPostMainLoop',
@@ -5331,7 +5340,6 @@ var missingLibrarySymbols = [
   'ExceptionInfo',
   'findMatchingCatch',
   'Browser_asyncPrepareDataCounter',
-  'safeRequestAnimationFrame',
   'arraySum',
   'addDays',
   'getSocketFromFD',
@@ -5404,8 +5412,6 @@ var unexportedSymbols = [
   'DNS',
   'Protocols',
   'Sockets',
-  'initRandomFill',
-  'randomFill',
   'timers',
   'warnOnce',
   'readEmAsmArgsArray',
@@ -5441,6 +5447,8 @@ var unexportedSymbols = [
   'ExitStatus',
   'doReadv',
   'doWritev',
+  'initRandomFill',
+  'randomFill',
   'safeSetTimeout',
   'promiseMap',
   'uncaughtExceptionCount',
@@ -5495,7 +5503,6 @@ unexportedSymbols.forEach(unexportedRuntimeSymbol);
 
 
 var calledRun;
-var calledPrerun;
 
 dependenciesFulfilled = function runCaller() {
   // If run has never been called, and we should call run (INVOKE_RUN is true, and Module.noInitialRun is not false)
@@ -5520,22 +5527,19 @@ function run() {
 
   stackCheckInit();
 
-  if (!calledPrerun) {
-    calledPrerun = 1;
-    preRun();
+  preRun();
 
-    // a preRun added a dependency, run will be called later
-    if (runDependencies > 0) {
-      return;
-    }
+  // a preRun added a dependency, run will be called later
+  if (runDependencies > 0) {
+    return;
   }
 
   function doRun() {
     // run may have just been called through dependencies being fulfilled just in this very frame,
     // or while the async setStatus time below was happening
     if (calledRun) return;
-    calledRun = 1;
-    Module['calledRun'] = 1;
+    calledRun = true;
+    Module['calledRun'] = true;
 
     if (ABORT) return;
 

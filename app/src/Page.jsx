@@ -38,10 +38,10 @@ function PageModalContents(props){
 // Because component names get minifed, the order of children dictates
 // where they go inside the parent page component
 function Page(props){
-    const {className, children} = props;
+    const {className, style, children} = props;
 
     return(
-        <Theme dataTheme="dim" className={"absolute left-0 right-0 top-0 bottom-0 flex flex-col overflex-hidden" + " " + className}>
+        <Theme dataTheme="dim" className={"absolute left-0 right-0 top-0 bottom-0 flex flex-col overflex-hidden" + " " + className} style={style}>
             {children.length == 4 ? children[0] : <></>}
 
             <div className="w-full h-16">

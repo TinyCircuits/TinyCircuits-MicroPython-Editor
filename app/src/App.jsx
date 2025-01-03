@@ -366,7 +366,7 @@ engine_time.datetime(` + datetime + `)
         }
 
         return(
-            <div className="w-full h-full flex">
+            <div className="w-full h-full flex items-center">
                 <div className="flex-1">
                     {getTitle()}
                 </div>

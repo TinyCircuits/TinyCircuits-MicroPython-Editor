@@ -29,9 +29,22 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     let filesList = useRef([]);
     let runPath = useRef(undefined);
 
+    let audioContext = useRef(undefined);
+    let audioProcessorWorkletNode = useRef(undefined);
+
 
     useImperativeHandle(ref, () => ({
         async runSimulator(newRunFiles, nweRunPath){
+
+            audioContext.current = new AudioContext({latencyHint:"playback", sampleRate:22050});
+            await audioContext.current.audioWorklet.addModule("audio-processor.js");
+            audioProcessorWorkletNode.current = new AudioWorkletNode(audioContext.current, "audio-processor");
+            
+            const gainNode = audioContext.current.createGain();
+
+            gainNode
+            .connect(audioProcessorWorkletNode.current)
+            .connect(audioContext.current.destination);
 
             return new Promise((resolve, reject) => {
                 dbgconsole("Asking for simulator fs...");
@@ -163,6 +176,11 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     }
 
 
+    const audioUpdate = async () => {
+
+    }
+
+
     useEffect(() => {
         dbgconsole("Simulator panel init!");
 
@@ -185,6 +203,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                     window.dispatchEvent(new CustomEvent("end_progress"));
                 });
                 sender.current.registerBufferChannel("upload_files_and_run", 0, undefined);
+                sender.current.registerBufferChannel("main_needs_audio", 128, audioUpdate);
 
                 if(filesList.current.length == 0){
                     sender.current.send("init_fs", undefined);

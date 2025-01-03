@@ -39,6 +39,18 @@ function Arcade(props){
     // rerenders the page and game list
     const onSerachType = (event) => {
         setSearchTerm(event.target.value);
+
+        // Put whatever is type into the URL query string
+        // so that users can link to searches
+        const url = new URL(window.location.href);
+
+        if(event.target.value != ""){
+            url.searchParams.set('search', event.target.value);
+        }else{
+            url.searchParams.delete("search");
+        }
+        
+        window.history.pushState(null, '', url.toString());
     }
 
 
@@ -53,8 +65,11 @@ function Arcade(props){
                                                                                              gap:"40px 40px"}}>
                 {
                     games.current.map((game, gameIndex) => {
-                        
-                        if(searchTerm == undefined || game.getName().indexOf(searchTerm) != -1){
+                        // Search for games by what's in the URL query string
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const urlSearchTerm = urlParams.get('search');
+
+                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.getName().indexOf(urlSearchTerm) != -1){
                             return(
                                 <div key={gameIndex} className='w-[170px] h-[170px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100'>
                                     {game.getName()}
@@ -65,6 +80,14 @@ function Arcade(props){
                 }
             </div>
         );
+    }
+
+
+    // Returns the search term already in the URL
+    const getDefaultSearch = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSearchTerm = urlParams.get('search');
+        return urlSearchTerm;
     }
 
 
@@ -162,10 +185,9 @@ function Arcade(props){
             });
 
             // Update search term to update and render list at page load
-            setSearchTerm("");
+            setSearchTerm(getDefaultSearch());
         })
     }, [])
-
 
 
     return (
@@ -185,7 +207,7 @@ function Arcade(props){
                             <div className="w-full h-10 bg-base-300 flex items-center">
                                 <Join>
                                     <p className='mx-2 flex justify-center items-center'>Search:</p>
-                                    <Input onChange={onSerachType} size='sm' className='w-[65%]'/>
+                                    <Input defaultValue={getDefaultSearch()} onChange={onSerachType} size='sm' className='w-[65%]'/>
                                 </Join>
                             </div>
 

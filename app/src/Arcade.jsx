@@ -60,9 +60,10 @@ function Arcade(props){
     const renderGameList = () => {
         return (
             <div className='w-full h-full overflow-auto justify-center items-center' style={{display:"grid",
-                                                                                             gridTemplateColumns: "repeat(auto-fill, minmax(192px, auto))",
-                                                                                             gridTemplateRows: "repeat(auto-fill, minmax(192px, auto))",
-                                                                                             gap:"40px 40px"}}>
+                                                                                             gridTemplateColumns: "repeat(auto-fill, 200px)",
+                                                                                             gridTemplateRows: "repeat(auto-fill, 200px)",
+                                                                                             gap:"40px 40px",
+                                                                                             scrollbarGutter: "stable both-edges"}}>
                 {
                     games.current.map((game, gameIndex) => {
                         // Search for games by what's in the URL query string

@@ -70,7 +70,7 @@ function Arcade(props){
                         const urlParams = new URLSearchParams(window.location.search);
                         const urlSearchTerm = urlParams.get('search');
 
-                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.getName().indexOf(urlSearchTerm) != -1){
+                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.getName().toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
                             return(
                                 <div key={gameIndex} className='w-[170px] h-[170px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100'>
                                     {game.getName()}

@@ -1,6 +1,6 @@
 import './App.css'
 import './tailwind_output.css'
-import { Input, Join, Theme } from 'react-daisyui'
+import { Input, Join, Theme, Button } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -70,6 +70,8 @@ function Arcade(props){
                         const urlParams = new URLSearchParams(window.location.search);
                         const urlSearchTerm = urlParams.get('search');
 
+                        // Only return game tiles when search term is empty
+                        // or when the term matches something in the game title
                         if(urlSearchTerm == undefined || urlSearchTerm == "" || game.getName().toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
                             return(
                                 <div key={gameIndex} className='w-[170px] h-[170px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100'>
@@ -195,7 +197,17 @@ function Arcade(props){
         <Page className="bg-repeat">
             <PageHeaderContents>
                 <div className='w-full h-full flex items-center'>
-                    <p className='text-lg font-bold ml-4'>Arcade</p>
+                    <div className="w-full h-full flex items-center">
+                        <p className='text-lg font-bold ml-4'>Arcade</p>
+                    </div>
+                    <div className="w-full h-full flex items-center flex-row-reverse">
+                        <Button size="sm" color='primary' tag="a" target="" rel="noopener" href="/" className='mr-4'>
+                            Editor
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
+                            </svg>
+                        </Button>
+                    </div>
                 </div>
             </PageHeaderContents>
 

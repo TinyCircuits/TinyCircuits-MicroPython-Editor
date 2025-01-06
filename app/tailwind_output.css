@@ -8951,6 +8951,50 @@ html:has(.drawer-open.drawer-open) {
   height: 170px;
 }
 
+.h-\[182px\] {
+  height: 182px;
+}
+
+.h-\[12px\] {
+  height: 12px;
+}
+
+.h-\[48px\] {
+  height: 48px;
+}
+
+.h-\[24px\] {
+  height: 24px;
+}
+
+.h-\[16px\] {
+  height: 16px;
+}
+
+.h-\[30px\] {
+  height: 30px;
+}
+
+.h-\[180px\] {
+  height: 180px;
+}
+
+.h-\[20px\] {
+  height: 20px;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.h-\[190px\] {
+  height: 190px;
+}
+
+.max-h-full {
+  max-height: 100%;
+}
+
 .min-h-0 {
   min-height: 0px;
 }
@@ -9594,6 +9638,16 @@ html:has(.drawer-open.drawer-open) {
 
 .bg-repeat {
   background-repeat: repeat;
+}
+
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .p-2 {
@@ -10519,6 +10573,10 @@ html:has(.drawer-open.drawer-open) {
 
 .hover\:outline-1:hover {
   outline-width: 1px;
+}
+
+.hover\:outline-success:hover {
+  outline-color: var(--fallback-su,oklch(var(--su)/1));
 }
 
 .focus\:outline-offset-0:focus {

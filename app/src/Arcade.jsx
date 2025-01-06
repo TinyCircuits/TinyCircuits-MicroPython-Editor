@@ -21,10 +21,80 @@ class Game{
         this.mediaURL = mediaURL;
         this.fileURLsList = fileURLsList;
     }
+}
 
-    getName(){
-        return this.name;
+
+function GameTile(props){
+    const {game} = props;
+
+    const ref = useRef(null);
+    const media = useRef(null);
+    const display = useRef(null);
+    const [isInView, setIsInView] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+
+                // When the game tile is in view and its thumbnail has
+                // not been loaded yet, load it, store it, and display
+                if(entry.isIntersecting && media.current == null){
+                    fetch(game.mediaURL).then(async (result) => {
+                        media.current = URL.createObjectURL(await result.blob())
+                        console.log(media.current);
+                        console.log(game.name);
+                        console.log(display.current);
+
+                        display.current.setAttribute("src", media.current);
+
+                        // Only play videos if it is a video
+                        if(display.current.tagName == "video"){
+                            display.current.load();
+                        }
+                    });
+                }
+            },
+        );
+
+        if(ref.current){
+            observer.observe(ref.current);
+        }
+
+        return () => {
+            if(ref.current){
+                observer.unobserve(ref.current);
+            }
+        };
+    }, []);
+
+    const getThumbnail = () => {
+        if(game.mediaURL.indexOf(".webm") != -1){
+            return(
+                <div className="flex h-full">
+                    <video ref={display} autoPlay muted loop className="object-contain w-full h-auto">
+                        <source src="" type="video/webm"></source>
+                    </video>
+                </div>
+            );
+        }else{
+            return(
+                <img ref={display} src="" className="object-cover w-full h-auto">
+                </img>
+            );
+        }
     }
+
+    return(
+        <div ref={ref} className='flex flex-col w-[170px] h-[190px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100 hover:outline-success'>
+            <div className="flex items-center w-full h-[20px] bg-base-300">
+                <p className="font-bold">{game.name}</p>
+            </div>
+            <div className="relative flex items-center justify-center w-full h-[170px]">
+                {getThumbnail()}
+            </div>
+        </div>
+    );
 }
 
 
@@ -72,11 +142,9 @@ function Arcade(props){
 
                         // Only return game tiles when search term is empty
                         // or when the term matches something in the game title
-                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.getName().toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
+                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.name.toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
                             return(
-                                <div key={gameIndex} className='w-[170px] h-[170px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100'>
-                                    {game.getName()}
-                                </div>
+                                <GameTile key={gameIndex} game={game}/>
                             )
                         }
                     })

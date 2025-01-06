@@ -20,38 +20,57 @@ class Game{
         this.descriptionURL = descriptionURL;
         this.mediaURL = mediaURL;
         this.fileURLsList = fileURLsList;
+
+        this.media = undefined;
+        this.description = undefined;
     }
 }
 
 
 function GameTile(props){
-    const {game} = props;
+    const {game, onClick, className} = props;
 
     const ref = useRef(null);
-    const media = useRef(null);
     const display = useRef(null);
     const [isInView, setIsInView] = useState(false);
 
+    const setSrc = () => {
+        if(game.media != undefined){
+            if(display.current == null){
+                return;
+            }
+
+            display.current.setAttribute("src", game.media);
+
+            // Only play videos if it is a video
+            if(display.current.tagName == "video"){
+                display.current.load();
+            }
+        }
+    }
+
     useEffect(() => {
+        setSrc();
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 setIsInView(entry.isIntersecting);
 
-                // When the game tile is in view and its thumbnail has
-                // not been loaded yet, load it, store it, and display
-                if(entry.isIntersecting && media.current == null){
+                // Don't do anything if not visible
+                if(!entry.isIntersecting){
+                    return;
+                }
+
+                if(game.media == undefined){
                     fetch(game.mediaURL).then(async (result) => {
-                        media.current = URL.createObjectURL(await result.blob())
-                        console.log(media.current);
-                        console.log(game.name);
-                        console.log(display.current);
+                        game.media = URL.createObjectURL(await result.blob())
+                        setSrc();
+                    });
+                }
 
-                        display.current.setAttribute("src", media.current);
-
-                        // Only play videos if it is a video
-                        if(display.current.tagName == "video"){
-                            display.current.load();
-                        }
+                if(game.description == undefined){
+                    fetch(game.descriptionURL).then(async (result) => {
+                        game.description = await (await result.blob()).text();
                     });
                 }
             },
@@ -86,7 +105,7 @@ function GameTile(props){
     }
 
     return(
-        <div ref={ref} className='flex flex-col w-[170px] h-[190px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100 hover:outline-success'>
+        <div ref={ref} onClick={onClick} className={'flex flex-col w-[170px] h-[190px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100 hover:outline-success ' + className}>
             <div className="flex items-center w-full h-[20px] bg-base-300">
                 <p className="font-bold">{game.name}</p>
             </div>
@@ -101,14 +120,26 @@ function GameTile(props){
 function Arcade(props){
     
     const [searchTerm, setSearchTerm] = useState(undefined);
+    const [clickedGame, setClickedGame] = useState(undefined);
     let games = useRef([]);
 
+    const setClickedGameWrapper = (game) => {
+        if(clickedGame != undefined && clickedGame.name == game.name){
+            setClickedGame(undefined);
+        }else{
+            setClickedGame(game);
+        }
+    }
 
     // Whenever the user updates the search term
     // store the updated string using state which
     // rerenders the page and game list
     const onSerachType = (event) => {
         setSearchTerm(event.target.value);
+
+        // Reset clicked game on typing since clicked
+        // game may become not visible anymore
+        setClickedGame(undefined);
 
         // Put whatever is type into the URL query string
         // so that users can link to searches
@@ -121,6 +152,17 @@ function Arcade(props){
         }
         
         window.history.pushState(null, '', url.toString());
+    }
+
+
+    const ifGameClickedStyle = (game) => {
+        if(clickedGame == undefined){
+            return "";
+        }
+
+        if(clickedGame.name == game.name){
+            return "outline outline-2 outline-success";
+        }
     }
 
 
@@ -144,7 +186,7 @@ function Arcade(props){
                         // or when the term matches something in the game title
                         if(urlSearchTerm == undefined || urlSearchTerm == "" || game.name.toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
                             return(
-                                <GameTile key={gameIndex} game={game}/>
+                                <GameTile key={gameIndex} game={game} onClick={() => {setClickedGameWrapper(game)}} className={ifGameClickedStyle(game)}/>
                             )
                         }
                     })
@@ -260,6 +302,15 @@ function Arcade(props){
         })
     }, [])
 
+    const getClickedDescription = () => {
+        if(clickedGame == undefined){
+            return <></>;
+        }else{
+            return (
+                <pre className='text-wrap' style={{whiteSpace:"pre-line"}}>{clickedGame.description}</pre>
+            );
+        }
+    }
 
     return (
         <Page className="bg-repeat">
@@ -269,7 +320,7 @@ function Arcade(props){
                         <p className='text-lg font-bold ml-4'>Arcade</p>
                     </div>
                     <div className="w-full h-full flex items-center flex-row-reverse">
-                        <Button size="sm" color='primary' tag="a" target="" rel="noopener" href="/" className='mr-4'>
+                        <Button size="sm" color='secondary' tag="a" target="" rel="noopener" href="/" className='mr-4'>
                             Editor
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
                                 <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
@@ -283,7 +334,7 @@ function Arcade(props){
                 <div className="relative w-full h-full flex justify-center items-center">
                     <div className="absolute w-full top-0 bottom-12 flex flex-row justify-center">
 
-                        <div className="min-w-[175px] max-w-[50%] w-[50%] h-full bg-base-200 flex flex-col">
+                        <div className="min-w-[175px] max-w-[40%] w-[40%] h-full bg-base-200 flex flex-col">
                             {/* HEADER */}
                             <div className="w-full h-10 bg-base-300 flex items-center">
                                 <Join>
@@ -298,15 +349,35 @@ function Arcade(props){
                             </div>
                         </div>
 
-                        <div className="min-w-[325px] w-[325px] h-full bg-base-300 flex flex-col">
-                            {/* HEADER */}
-                            <div className="w-full h-10 bg-base flex items-center">
-                            </div>
-
+                        <div className={(clickedGame != undefined) ? "min-w-[425px] w-[425px]" : "min-w-[0px] w-[0px]" + " h-full bg-base-300 flex flex-col overflow-hidden"}>
                             {/* BODY */}
-                            <div className="w-full h-full bg-base-300">
-                                
-                            </div>
+                            
+                            <div className="flex flex-col w-full h-full bg-base-300">
+                                <div className="flex items-center justify-center w-full h-10">
+                                    <p className="font-bold">{clickedGame == undefined ? "" : clickedGame.name}</p>
+                                </div>
+
+                                {/* TEXT */}
+                                <div className="w-full h-full overflow-auto">
+                                    {getClickedDescription()}
+                                </div>
+
+                                {/* BUTTONS */}
+                                <div className="w-full h-14 border-0 border-t-4 border-base-200 flex items-center justify-evenly">
+                                    <Button color='primary' size='sm'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                        </svg>
+                                        Thumby Download
+                                    </Button>
+                                    <Button color='primary' size='sm'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                        </svg>
+                                        Computer Download
+                                    </Button>
+                                </div>
+                            </div>                            
                         </div>
                     </div>
                 </div>

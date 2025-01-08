@@ -1,12 +1,14 @@
 import './App.css'
 import './tailwind_output.css'
-import { Input, Join, Theme, Button } from 'react-daisyui'
+import { Input, Join, Theme, Button, Progress } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import CustomModal from './CustomModal';
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
 import setupRoot from './root';
+import Pyboard from "./pyboard.js"
 
 
 // Class that hold information about each game on the Arcade
@@ -121,7 +123,11 @@ function Arcade(props){
     
     const [searchTerm, setSearchTerm] = useState(undefined);
     const [clickedGame, setClickedGame] = useState(undefined);
+    const [progress, setProgress] = useState(0.0);
+    const [downloadingGame, setDownloadingGame] = useState(undefined);
     let games = useRef([]);
+    let overwriteModelRef = useRef(undefined);
+    let lastChosenDirHandle = useRef(undefined);
 
     const setClickedGameWrapper = (game) => {
         if(clickedGame != undefined && clickedGame.name == game.name){
@@ -206,6 +212,18 @@ function Arcade(props){
 
     // Fetch game URL list once per page load and parse into `Game`s
     useEffect(() => {
+        window.addEventListener("set_progress", (event) => {
+            setProgress(event.detail.progress);
+        });
+
+        window.addEventListener("end_progress", (event) => {
+            setProgress(1.0);
+
+            setTimeout(() => {
+                setProgress(0.0)
+            }, 250);
+        });
+
         // Don't do anything if already have games
         if(games.length > 0){
             return;
@@ -312,8 +330,127 @@ function Arcade(props){
         }
     }
 
+
+    const thumbyDownloadClickHandler = async () => {
+        console.log("Started");
+
+        const pyboard = new Pyboard();
+
+        try {
+            setDownloadingGame(true);
+
+            // Connect to the device
+            await pyboard.connect();
+            console.log("### a0");
+
+            // Enter raw REPL mode
+            await pyboard.enterRawRepl();
+            console.log("### 1a");
+
+            // List the contents of the root directory
+            const directoryContents = await pyboard.fsListdir('/');
+            console.log('Directory contents:', directoryContents);
+            console.log("### a2");
+
+            for(let i=0; i<clickedGame.fileURLsList.length; i++){
+                const fileURL = clickedGame.fileURLsList[i];
+                const gameFile = await fetch(fileURL);
+                let gameFilePath = "Games/" + fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+                await pyboard.fsPut(new Uint8Array(await gameFile.arrayBuffer()), gameFilePath);
+                window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
+            }
+
+            window.dispatchEvent(new CustomEvent("end_progress"));
+
+            // Exit raw REPL mode
+            await pyboard.exitRawRepl();
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            // Close the connection
+            setDownloadingGame(false);
+            await pyboard.close();
+        }
+    }
+
+
+    const computerDownloadClicked = async () => {
+        overwriteModelRef.current.close();
+
+        let directoryHandle = lastChosenDirHandle.current;
+
+        setDownloadingGame(true);
+
+        for(let i=0; i<clickedGame.fileURLsList.length; i++){
+            const fileURL = clickedGame.fileURLsList[i];
+
+            const gameFile = await fetch(fileURL);
+            let gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/" + clickedGame.name + "/", "");
+            let gameFilePathSegments = gameFilePath.split("/");
+
+            // Recursively build bath and write file
+            const buildPath = async (parentDirHanlde, pathSegments) => {
+                const segment = pathSegments.shift();
+
+                if(pathSegments.length == 0){
+                    const fileHandle = await parentDirHanlde.getFileHandle(segment, {create:true});
+                    const writeable = await fileHandle.createWritable();
+                    await writeable.write(new Uint8Array(await gameFile.arrayBuffer()));
+                    await writeable.close();
+                }else{
+                    const dirHandle = await parentDirHanlde.getDirectoryHandle(segment, {create:true});
+                    await buildPath(dirHandle, pathSegments);
+                }
+                
+            }
+
+            await buildPath(directoryHandle, gameFilePathSegments);
+            window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
+        }
+
+        setDownloadingGame(false);
+
+        window.dispatchEvent(new CustomEvent("end_progress"));
+    };
+
+
+    const computerDownloadClickHandler = async () => {
+        try{
+            // Get the directory handle for what the user chose
+            // and the handle for the folder where the files will
+            // eb downloaded to
+            const directoryHandle = await window.showDirectoryPicker();
+
+            try{
+                lastChosenDirHandle.current = await directoryHandle.getDirectoryHandle(clickedGame.name);
+                overwriteModelRef.current.showModal();
+            }catch(exception){
+                lastChosenDirHandle.current = await directoryHandle.getDirectoryHandle(clickedGame.name, {create:true});
+                computerDownloadClicked();
+            }            
+        }catch(error){
+            // Handle errors, e.g. user cancellation
+            console.error('Error selecting directory:', error);
+        }
+    }
+
+
     return (
         <Page className="bg-repeat">
+            <PageModalContents>
+                {/* ### Choose platform modal ### */}
+                <CustomModal title="Game folder already exists, overwrite it?" outlineColor="base-content" ref={overwriteModelRef}>
+                    <div className="w-full h-full flex flex-row justify-evenly">
+                        <Button size="lg" variant='outline' onClick={computerDownloadClicked}>
+                            <p>Overwrite</p>
+                        </Button>
+                        <Button size="lg" variant='outline' onClick={() => {overwriteModelRef.current.close()}}>
+                            <p>Cancel</p>
+                        </Button>
+                    </div>
+                </CustomModal>
+            </PageModalContents>
+
             <PageHeaderContents>
                 <div className='w-full h-full flex items-center'>
                     <div className="w-full h-full flex items-center">
@@ -364,13 +501,13 @@ function Arcade(props){
 
                                 {/* BUTTONS */}
                                 <div className="w-full h-14 border-0 border-t-4 border-base-200 flex items-center justify-evenly">
-                                    <Button color='primary' size='sm'>
+                                    <Button color='primary' size='sm' onClick={thumbyDownloadClickHandler} disabled={downloadingGame}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                         </svg>
                                         Thumby Download
                                     </Button>
-                                    <Button color='primary' size='sm'>
+                                    <Button color='primary' size='sm' onClick={computerDownloadClickHandler} disabled={downloadingGame}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                         </svg>
@@ -384,53 +521,17 @@ function Arcade(props){
             </PageBodyContents>
 
             <PageFooterContents>
-                <Footer />
+                <div className="w-full h-7 bg-base-100 border-t-base-300 border-t-4 flex flex-row">
+                    <div className="h-full flex-1 flex items-center justify-center">
+                        <p className="text-sm ml-2 font-extralight">{""}</p>
+                        <Progress className='mx-1' color="primary" value={progress}></Progress>
+                     </div>
+
+                    <Footer />
+                </div>
             </PageFooterContents>
         </Page>
     )
-
-
-
-    // return (
-    //     <Page>
-    //         <PageHeaderContents>
-    //             <div className='w-full h-full flex items-center'>
-    //                 <p className='text-lg font-bold ml-4'>Arcade</p>
-    //             </div>
-    //         </PageHeaderContents>
-
-    //         <PageBodyContents>
-    //             <div className="w-full h-full flex justify-center items-center">
-    //                 <div className='absolute min-w-[400px] w-4/6 top-2 bottom-10 bg-base-300 flex flex-col m-auto'>
-    //                     {/* Header */}
-    //                     <div className='w-full h-12 bg-base-200 flex items-center'>
-    //                         <Join>
-    //                             <p className='mx-2 flex justify-center items-center'>Search:</p>
-    //                             <Input onChange={onSerachType} size='sm'/>
-    //                         </Join>
-                            
-    //                     </div>
-
-    //                     <div className='flex w-full h-full'>
-    //                         <div className="w-full min-w-[300px] h-full bg-base-200">
-    //                         </div>
-
-    //                         <div className="min-w-[400px] w-[400px] h-full bg-base-300">
-                                
-    //                         </div>
-    //                     </div>
-
-    //                     {/* Body */}
-    //                     {renderGameList()}
-    //                 </div>
-    //             </div>
-    //         </PageBodyContents>
-
-    //         <PageFooterContents>
-    //             <Footer />
-    //         </PageFooterContents>
-    //     </Page>
-    // )
 }
 
 

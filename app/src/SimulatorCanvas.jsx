@@ -19,17 +19,10 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(props, ref){
             canvas.current = canvasRef.current;
             ref = this;
             ctx.current = canvas.current.getContext("2d", { alpha: false });    // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#turn_off_transparency
-
-            canvas.current.style.cssText = "width:512px; height:512px; image-rendering:optimizeQuality; image-rendering:-moz-crisp-edges; image-rendering:-webkit-optimize-contrast; image-rendering:-o-crisp-edges; image-rendering:pixelated; -ms-interpolation-mode:nearest-neighbor;";
-
-            ctx.current.imageSmoothingEnabled = false;
-            ctx.current.mozImageSmoothingEnabled = false;
-            ctx.current.oImageSmoothingEnabled = false;
-            ctx.current.webkitImageSmoothingEnabled = false;
-            ctx.current.msImageSmoothingEnabled = false;
-
+            
             ctx.current.fillStyle = "black";
             ctx.current.fillRect(0, 0, 128, 128);
+            ctx.current.translate((128)/2, (128)/2);
 
             imageData.current = new ImageData(128, 128);    // Each pixel is 4 bytes, R,G,B,A
         }
@@ -54,19 +47,40 @@ const SimulatorCanvas = forwardRef(function SimulatorCanvas(props, ref){
                     imageData.current.data[(ipx*4)+3] = 255;
                 }
 
-                // let imageBitmap = await createImageBitmap(imageData.current, 0, 0, 128, 128);
-                // ctx.current.drawImage(imageBitmap, 0, 0);
+                createImageBitmap(imageData.current).then((imageBitmap) => {
+                    // ctx.current.drawImage(imageBitmap, 0, 0, 128*scale, 128*scale);
+                    ctx.current.drawImage(imageBitmap, -128/2, -128/2, 128, 128);
+                });
 
-                ctx.current.putImageData(imageData.current, 0, 0);
+                ctx.current.imageSmoothingEnabled = false;
+                ctx.current.mozImageSmoothingEnabled = false;
+                ctx.current.oImageSmoothingEnabled = false;
+                ctx.current.webkitImageSmoothingEnabled = false;
+                ctx.current.msImageSmoothingEnabled = false;
+
+                // ctx.current.putImageData(imageData.current, 0, 0, 0, 0, 256, 256);
             }
 
             requestAnimationFrame(render);
         },
+        toDataURL(){
+            return canvas.current.toDataURL();
+        },
+        captureStream(){
+            return canvas.current.captureStream();
+        },
+        setTransformation(scale, rotation){
+            canvasRef.current.width = 128 * scale;
+            canvasRef.current.height = 128 * scale;
+            ctx.current.translate((128*scale)/2, (128*scale)/2);
+            ctx.current.rotate(rotation * Math.PI / 180);
+            ctx.current.scale(scale, scale);
+        }
     }))
 
 
     return(
-        <canvas ref={canvasRef} width="128" height="128" className="w-96 aspect-square">
+        <canvas ref={canvasRef} width="128" height="128" className="w-96 aspect-square emulator_canvas">
             Canvas that displays simulator frames
         </canvas>
     );

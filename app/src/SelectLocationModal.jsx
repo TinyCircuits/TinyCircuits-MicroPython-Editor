@@ -66,7 +66,6 @@ function SelectLocationModal(props){
                 <p className="text-nowrap font-bold">Final RUN Path:</p>
                 <Input readOnly={true} value={getResultingRUNPath()} size='sm' className='ml-2 w-full' />
             </div>
-            <p className='mt-4 text-sm'>WARNING: Files/folders selected to RUN will be uploaded to the final RUN location which can result in files/folders being overwritten</p>
         </CustomModal>
     );
 }

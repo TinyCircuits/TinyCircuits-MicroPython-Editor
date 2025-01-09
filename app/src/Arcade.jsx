@@ -1,6 +1,6 @@
 import './App.css'
 import './tailwind_output.css'
-import { Input, Join, Theme, Button, Progress } from 'react-daisyui'
+import { Input, Join, Theme, Button, Progress, Select } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import CustomModal from './CustomModal';
@@ -98,6 +98,14 @@ function GameTile(props){
                     </video>
                 </div>
             );
+        }else if(game.mediaURL.indexOf(".mp4") != -1){
+                return(
+                    <div className="flex h-full">
+                        <video ref={display} autoPlay muted loop className="object-contain w-full h-auto">
+                            <source src="" type="video/mp4"></source>
+                        </video>
+                    </div>
+                );
         }else{
             return(
                 <img ref={display} src="" className="object-cover w-full h-auto">
@@ -125,7 +133,11 @@ function Arcade(props){
     const [clickedGame, setClickedGame] = useState(undefined);
     const [progress, setProgress] = useState(0.0);
     const [downloadingGame, setDownloadingGame] = useState(undefined);
-    let games = useRef([]);
+    const [filter, setFilter] = useState(undefined);
+
+    let thumbyColorGames = useRef([]);
+    let thumbyGames = useRef([]);
+
     let overwriteModelRef = useRef(undefined);
     let lastChosenDirHandle = useRef(undefined);
 
@@ -137,6 +149,26 @@ function Arcade(props){
         }
     }
 
+
+    const getURLQuery = (query) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSearchTerm = urlParams.get(query);
+        return urlSearchTerm;
+    }
+
+    const setURLQuery = (query, value) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set(query, value);
+        window.history.pushState(null, '', url.toString());
+    }
+
+    const delURLQuery = (query) => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(query);
+        window.history.pushState(null, '', url.toString());
+    }
+
+
     // Whenever the user updates the search term
     // store the updated string using state which
     // rerenders the page and game list
@@ -147,17 +179,17 @@ function Arcade(props){
         // game may become not visible anymore
         setClickedGame(undefined);
 
-        // Put whatever is type into the URL query string
-        // so that users can link to searches
-        const url = new URL(window.location.href);
-
         if(event.target.value != ""){
-            url.searchParams.set('search', event.target.value);
+            setURLQuery("search", event.target.value);
         }else{
-            url.searchParams.delete("search");
+            delURLQuery("search");
         }
-        
-        window.history.pushState(null, '', url.toString());
+    }
+
+
+    const onFilterChange = (event) => {
+        setFilter(event.target.value);
+        setURLQuery("platform", event.target.value);
     }
 
 
@@ -168,6 +200,23 @@ function Arcade(props){
 
         if(clickedGame.name == game.name){
             return "outline outline-2 outline-success";
+        }
+    }
+
+
+    const renderGameIfAllowed = (game, gameIndex) => {
+        // Search for games by what's in the URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSearchTerm = urlParams.get('search');
+
+        // Only return game tiles when search term is empty
+        // or when the term matches something in the game title
+        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.name.toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
+            return(
+                <GameTile key={gameIndex} game={game} onClick={() => {setClickedGameWrapper(game)}} className={ifGameClickedStyle(game)}/>
+            )
+        }else{
+            return undefined;
         }
     }
 
@@ -183,17 +232,25 @@ function Arcade(props){
                                                                                              gap:"40px 40px",
                                                                                              scrollbarGutter: "stable both-edges"}}>
                 {
-                    games.current.map((game, gameIndex) => {
-                        // Search for games by what's in the URL query string
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const urlSearchTerm = urlParams.get('search');
+                    thumbyColorGames.current.map((game, gameIndex) => {
+                        if(filter == "ThumbyColor"){
+                            let tile = renderGameIfAllowed(game, gameIndex);
 
-                        // Only return game tiles when search term is empty
-                        // or when the term matches something in the game title
-                        if(urlSearchTerm == undefined || urlSearchTerm == "" || game.name.toLowerCase().indexOf(urlSearchTerm.toLowerCase()) != -1){
-                            return(
-                                <GameTile key={gameIndex} game={game} onClick={() => {setClickedGameWrapper(game)}} className={ifGameClickedStyle(game)}/>
-                            )
+                            if(tile != undefined){
+                                return tile;
+                            }
+                        }
+                    })
+                }
+
+                {
+                    thumbyGames.current.map((game, gameIndex) => {
+                        if(filter == "Thumby"){
+                            let tile = renderGameIfAllowed(game, gameIndex);
+
+                            if(tile != undefined){
+                                return tile;
+                            }
                         }
                     })
                 }
@@ -202,11 +259,90 @@ function Arcade(props){
     }
 
 
-    // Returns the search term already in the URL
-    const getDefaultSearch = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSearchTerm = urlParams.get('search');
-        return urlSearchTerm;
+    const parseURLList = (text, outputList) => {
+        text = text.split(/\r\n\s*\r\n|\r\s*\r|\n\s*\n/) // https://stackoverflow.com/a/52947649 + split only on empty line (newline + 0 whitesapce + newline)
+
+        text.forEach((gameTextBlob) => {
+            let gameLines = gameTextBlob.split(/\r\n|\r|\n/); // Split into lines
+
+            // #1: Do not process anything that contains no data (needs to have
+            //     more than one line for `NAME=` and `main.py` or `game.py`)
+            if(gameLines.length <= 1){
+                return;
+            }
+
+            // #2: First line should contain `NAME=` and then the game name.
+            //     Do not process and store anything that does not follow that
+            //     rule. Get the name otherwise
+            if(gameLines[0].indexOf("NAME=") == -1){
+                console.warn("WARNING: Did not process game because it did not contain `NAME=` line:", gameLines);
+                return;
+            }
+
+            let gameName = gameLines[0].substring(5);
+            
+            // #3: Find the `arcade_description.txt` file (named exactly that). Do not
+            //     store or process any games that are missing it. Get the description
+            //     otherwise
+            let gameDescriptionURL = undefined;
+            gameLines.forEach(line => {
+                if(line.indexOf("arcade_description.txt") != -1){
+                    gameDescriptionURL = line;
+                }
+            });
+
+            if(gameDescriptionURL == undefined){
+                console.warn("WARNING: Game does not have a valid description, not processing it:", gameName, gameLines);
+                return;
+            }
+
+            // #4: Find any `.png` or `.webm` file for use for the game `icon`. Do not
+            //     store or process any games without it. If both are found, use the
+            //     `.webm` over the `.png`.
+            let gamePNGURL = undefined;
+            let gameVIDEOMURL = undefined;
+            let gameMediaURL = undefined;
+            gameLines.forEach(line => {
+                if(line.indexOf(".png") != -1){
+                    gamePNGURL = line;
+                }
+
+                if(line.indexOf(".webm") != -1 || line.indexOf(".mp4") != -1){
+                    gameVIDEOMURL = line;
+                }
+            });
+
+            if(gamePNGURL == undefined && gameVIDEOMURL == undefined){
+                console.warn("WARNING: Game does not have a `.png`, `.webm`, or `.mp4`, not processing it:", gameName, gameLines);
+                return;
+            }
+
+            if(gamePNGURL != undefined){
+                gameMediaURL = gamePNGURL;
+            }
+
+            if(gameVIDEOMURL != undefined){
+                gameMediaURL = gameVIDEOMURL;
+            }
+
+            // #5: Now that the `NAME=`, `arcade_description.txt`, `.png`, and `.webm` lines are
+            //     all parsed/found. Filter the game URL text lines down to just the files needed
+            //     to run the game
+            let gameFileURLSList = gameLines.filter((line) => {
+                if(line.indexOf("NAME=")                  != -1 ||
+                    line.indexOf("arcade_description.txt") != -1 ||
+                    line.indexOf(".png")                   != -1 ||
+                    line.indexOf("webm")                   != -1){
+                    return false;
+                }else{
+                    return true;
+                }
+            });
+
+            // #6: Store the game info/URLs in a persistent location so we're
+            //     not fetching stuff from GitHub all the time
+            outputList.push(new Game(gameName, gameDescriptionURL, gameMediaURL, gameFileURLSList));
+        });
     }
 
 
@@ -225,100 +361,37 @@ function Arcade(props){
         });
 
         // Don't do anything if already have games
-        if(games.length > 0){
+        if(thumbyColorGames.length > 0 && thumbyGames.length > 0){
             return;
         }
 
-        fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/refs/heads/master/url_list.txt").then(async (result) => {
-            let text = await result.text();
-            text = text.split(/\r\n\s*\r\n|\r\s*\r|\n\s*\n/) // https://stackoverflow.com/a/52947649 + split only on empty line (newline + 0 whitesapce + newline)
-
-            text.forEach((gameTextBlob) => {
-                let gameLines = gameTextBlob.split(/\r\n|\r|\n/); // Split into lines
-
-                // #1: Do not process anything that contains no data (needs to have
-                //     more than one line for `NAME=` and `main.py` or `game.py`)
-                if(gameLines.length <= 1){
-                    return;
+        fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Color-Games/refs/heads/main/url_list.txt").then(async (result) => {
+            parseURLList(await result.text(), thumbyColorGames.current);
+        }).then(() => {
+            fetch("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/refs/heads/master/url_list.txt").then(async (result) => {
+                parseURLList(await result.text(), thumbyGames.current);
+            }).then(() => {
+                // Grab or set defaults
+                if(getURLQuery("search") != null){
+                    setSearchTerm(getURLQuery("search"));
+                }else{
+                    setSearchTerm(undefined);
                 }
-
-                // #2: First line should contain `NAME=` and then the game name.
-                //     Do not process and store anything that does not follow that
-                //     rule. Get the name otherwise
-                if(gameLines[0].indexOf("NAME=") == -1){
-                    console.warn("WARNING: Did not process game because it did not contain `NAME=` line:", gameLines);
-                    return;
+    
+                if(getURLQuery("platform") != null){
+                    setFilter(getURLQuery("platform"));
+                }else{
+                    setURLQuery("platform", "ThumbyColor");
+                    setFilter("ThumbyColor");
                 }
-
-                let gameName = gameLines[0].substring(5);
-                
-                // #3: Find the `arcade_description.txt` file (named exactly that). Do not
-                //     store or process any games that are missing it. Get the description
-                //     otherwise
-                let gameDescriptionURL = undefined;
-                gameLines.forEach(line => {
-                    if(line.indexOf("arcade_description.txt") != -1){
-                        gameDescriptionURL = line;
-                    }
-                });
-
-                if(gameDescriptionURL == undefined){
-                    console.warn("WARNING: Game does not have a valid description, not processing it:", gameName, gameLines);
-                    return;
-                }
-
-                // #4: Find any `.png` or `.webm` file for use for the game `icon`. Do not
-                //     store or process any games without it. If both are found, use the
-                //     `.webm` over the `.png`.
-                let gamePNGURL = undefined;
-                let gameWEBMURL = undefined;
-                let gameMediaURL = undefined;
-                gameLines.forEach(line => {
-                    if(line.indexOf(".png") != -1){
-                        gamePNGURL = line;
-                    }
-
-                    if(line.indexOf(".webm") != -1){
-                        gameWEBMURL = line;
-                    }
-                });
-
-                if(gamePNGURL == undefined && gameWEBMURL == undefined){
-                    console.warn("WARNING: Game does not have a `.png` or `.webm`, not processing it:", gameName, gameLines);
-                    return;
-                }
-
-                if(gamePNGURL != undefined){
-                    gameMediaURL = gamePNGURL;
-                }
-
-                if(gameWEBMURL != undefined){
-                    gameMediaURL = gameWEBMURL;
-                }
-
-                // #5: Now that the `NAME=`, `arcade_description.txt`, `.png`, and `.webm` lines are
-                //     all parsed/found. Filter the game URL text lines down to just the files needed
-                //     to run the game
-                let gameFileURLSList = gameLines.filter((line) => {
-                    if(line.indexOf("NAME=")                  != -1 ||
-                       line.indexOf("arcade_description.txt") != -1 ||
-                       line.indexOf(".png")                   != -1 ||
-                       line.indexOf("webm")                   != -1){
-                        return false;
-                    }else{
-                        return true;
-                    }
-                });
-
-                // #6: Store the game info/URLs in a persistent location so we're
-                //     not fetching stuff from GitHub all the time
-                games.current.push(new Game(gameName, gameDescriptionURL, gameMediaURL, gameFileURLSList));
             });
-
-            // Update search term to update and render list at page load
-            setSearchTerm(getDefaultSearch());
         })
+
+        
+
+        
     }, [])
+
 
     const getClickedDescription = () => {
         if(clickedGame == undefined){
@@ -355,7 +428,13 @@ function Arcade(props){
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
                 const fileURL = clickedGame.fileURLsList[i];
                 const gameFile = await fetch(fileURL);
-                let gameFilePath = "Games/" + fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+
+                // Convert URL for either ThumbyColor or Thumby game to system file path
+                let gameFilePath = "";
+                gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Color-Games/maain/", "");
+                gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+                gameFilePath = "Games/" + fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+
                 await pyboard.fsPut(new Uint8Array(await gameFile.arrayBuffer()), gameFilePath);
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
             }
@@ -457,7 +536,7 @@ function Arcade(props){
                         <p className='text-lg font-bold ml-4'>Arcade</p>
                     </div>
                     <div className="w-full h-full flex items-center flex-row-reverse">
-                        <Button size="sm" color='secondary' tag="a" target="" rel="noopener" href="/" className='mr-4'>
+                        <Button size="sm" color='info' tag="a" target="" rel="noopener" href="/" className='mr-4'>
                             Editor
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
                                 <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
@@ -473,10 +552,18 @@ function Arcade(props){
 
                         <div className="min-w-[175px] max-w-[40%] w-[40%] h-full bg-base-200 flex flex-col">
                             {/* HEADER */}
-                            <div className="w-full h-10 bg-base-300 flex items-center">
+                            <div className="w-full h-10 bg-base-300 flex items-center justify-evenly">
                                 <Join>
                                     <p className='mx-2 flex justify-center items-center'>Search:</p>
-                                    <Input defaultValue={getDefaultSearch()} onChange={onSerachType} size='sm' className='w-[65%]'/>
+                                    <Input defaultValue={getURLQuery("search")} onChange={onSerachType} size='sm' className='w-[65%]'/>
+                                </Join>
+
+                                <Join>
+                                    <p className='mx-2 flex justify-center items-center'>Platform:</p>
+                                    <Select className="mx-1" size="sm" value={filter} onChange={(event) => {onFilterChange(event)}}>
+                                        <Select.Option value={"ThumbyColor"}>Thumby Color</Select.Option>
+                                        <Select.Option value={"Thumby"}>Thumby</Select.Option>
+                                    </Select>
                                 </Join>
                             </div>
 

@@ -17,8 +17,9 @@ class Game{
     //  `descriptionURL`: the game's description
     //           `media`: .png or .webm video to display
     //    `fileURLsList`: list of full URLs to all the files the game needs to run
-    constructor(name, descriptionURL, mediaURL, fileURLsList){
+    constructor(name, size, descriptionURL, mediaURL, fileURLsList){
         this.name = name;
+        this.size = size;
         this.descriptionURL = descriptionURL;
         this.mediaURL = mediaURL;
         this.fileURLsList = fileURLsList;
@@ -188,6 +189,10 @@ function Arcade(props){
 
 
     const onFilterChange = (event) => {
+        // Reset clicked game on typing since clicked
+        // game may become not visible anymore
+        setClickedGame(undefined);
+
         setFilter(event.target.value);
         setURLQuery("platform", event.target.value);
     }
@@ -278,10 +283,17 @@ function Arcade(props){
                 console.warn("WARNING: Did not process game because it did not contain `NAME=` line:", gameLines);
                 return;
             }
-
             let gameName = gameLines[0].substring(5);
+
+            // #3: Find the size line of the game
+            let gameSize = undefined;
+            gameLines.forEach(line => {
+                if(line.indexOf("SIZE=") != -1){
+                    gameSize = Number(line.substring(5));
+                }
+            });
             
-            // #3: Find the `arcade_description.txt` file (named exactly that). Do not
+            // #4: Find the `arcade_description.txt` file (named exactly that). Do not
             //     store or process any games that are missing it. Get the description
             //     otherwise
             let gameDescriptionURL = undefined;
@@ -296,7 +308,7 @@ function Arcade(props){
                 return;
             }
 
-            // #4: Find any `.png` or `.webm` file for use for the game `icon`. Do not
+            // #5: Find any `.png` or `.webm` file for use for the game `icon`. Do not
             //     store or process any games without it. If both are found, use the
             //     `.webm` over the `.png`.
             let gamePNGURL = undefined;
@@ -325,23 +337,24 @@ function Arcade(props){
                 gameMediaURL = gameVIDEOMURL;
             }
 
-            // #5: Now that the `NAME=`, `arcade_description.txt`, `.png`, and `.webm` lines are
+            // #6: Now that the `NAME=`, `arcade_description.txt`, `.png`, and `.webm` lines are
             //     all parsed/found. Filter the game URL text lines down to just the files needed
             //     to run the game
             let gameFileURLSList = gameLines.filter((line) => {
                 if(line.indexOf("NAME=")                  != -1 ||
                     line.indexOf("arcade_description.txt") != -1 ||
                     line.indexOf(".png")                   != -1 ||
-                    line.indexOf("webm")                   != -1){
+                    line.indexOf(".webm")                   != -1 ||
+                    line.indexOf(".mp4")                   != -1){
                     return false;
                 }else{
                     return true;
                 }
             });
 
-            // #6: Store the game info/URLs in a persistent location so we're
+            // #7: Store the game info/URLs in a persistent location so we're
             //     not fetching stuff from GitHub all the time
-            outputList.push(new Game(gameName, gameDescriptionURL, gameMediaURL, gameFileURLSList));
+            outputList.push(new Game(gameName, gameSize, gameDescriptionURL, gameMediaURL, gameFileURLSList));
         });
     }
 
@@ -414,26 +427,23 @@ function Arcade(props){
 
             // Connect to the device
             await pyboard.connect();
-            console.log("### a0");
 
             // Enter raw REPL mode
             await pyboard.enterRawRepl();
-            console.log("### 1a");
 
             // List the contents of the root directory
             const directoryContents = await pyboard.fsListdir('/');
             console.log('Directory contents:', directoryContents);
-            console.log("### a2");
 
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
                 const fileURL = clickedGame.fileURLsList[i];
                 const gameFile = await fetch(fileURL);
 
                 // Convert URL for either ThumbyColor or Thumby game to system file path
-                let gameFilePath = "";
-                gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Color-Games/maain/", "");
-                gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
-                gameFilePath = "Games/" + fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+                let gameFilePath = fileURL;
+                gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Color-Games/main/", "");
+                gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
+                gameFilePath = "Games/" + gameFilePath;
 
                 await pyboard.fsPut(new Uint8Array(await gameFile.arrayBuffer()), gameFilePath);
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
@@ -575,10 +585,15 @@ function Arcade(props){
 
                         <div className={(clickedGame != undefined) ? "min-w-[425px] w-[425px]" : "min-w-[0px] w-[0px]" + " h-full bg-base-300 flex flex-col overflow-hidden"}>
                             {/* BODY */}
-                            
                             <div className="flex flex-col w-full h-full bg-base-300">
                                 <div className="flex items-center justify-center w-full h-10">
                                     <p className="font-bold">{clickedGame == undefined ? "" : clickedGame.name}</p>
+
+                                    {
+                                        clickedGame == undefined || clickedGame.size == undefined ?
+                                            ""                                                    :
+                                            <p className="text-sm ml-1">({((clickedGame.size/1000).toFixed(1))}kB)</p>
+                                    }
                                 </div>
 
                                 {/* TEXT */}

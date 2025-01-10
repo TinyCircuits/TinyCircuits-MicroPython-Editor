@@ -1,6 +1,6 @@
-import {loadMicroPython} from "/micropython.mjs"
-import BusyWorkerReceiver from "/src/busy_worker_receiver";
-import dbgconsole from "/src/dbgconsole";
+import {loadMicroPython} from "./micropython.mjs"
+import BusyWorkerReceiver from "./busy_worker_receiver";
+import dbgconsole from "./dbgconsole";
 
 
 

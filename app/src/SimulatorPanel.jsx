@@ -197,7 +197,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
         if(sender.current == undefined){
             console.log("Getting worker ready!");
 
-            sender.current = new BusyWorkerSender("/simulator-worker.js", () => {
+            sender.current = new BusyWorkerSender("./simulator-worker.js", () => {
                 console.log("Simulator worker said it's ready!");
         
                 sender.current.registerBufferChannel("pressed_buttons", 2, undefined);

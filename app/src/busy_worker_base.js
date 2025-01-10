@@ -1,4 +1,4 @@
-import dbgconsole from "/src/dbgconsole";
+import dbgconsole from "./dbgconsole";
 
 // Common interface that BusyWorkerSender and BusyWorkerReceiver
 // both use
@@ -27,6 +27,7 @@ export default class BusyWorkerBase{
         this.worker = worker;
         this.worker.onmessage = this.basePostReceive.bind(this); 
         this.worker.onmessageerror = (message) => {console.error(message)};
+        this.worker.onerror = (event) => {console.error(event)};
     
         // When a message is received from the worker,
         // this is called after this class gets a chance

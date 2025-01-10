@@ -1,6 +1,6 @@
-import BusyWorkerBase from "/src/busy_worker_base";
-import BusyWorkerBufferChannel from "/src/busy_worker_buffer_channel";
-import dbgconsole from "/src/dbgconsole";
+import BusyWorkerBase from "./busy_worker_base";
+import BusyWorkerBufferChannel from "./busy_worker_buffer_channel";
+import dbgconsole from "./dbgconsole";
 
 
 // Use this on the worker

@@ -1,6 +1,6 @@
-import BusyWorkerBase from "/src/busy_worker_base";
-import BusyWorkerBufferChannel from "/src/busy_worker_buffer_channel";
-import dbgconsole from "/src/dbgconsole";
+import BusyWorkerBase from "./busy_worker_base";
+import BusyWorkerBufferChannel from "./busy_worker_buffer_channel";
+import dbgconsole from "./dbgconsole";
 
 
 // Use this on the main thread to setup the receiver worker
@@ -8,7 +8,13 @@ export default class BusyWorkerSender extends BusyWorkerBase{
     constructor(workerScriptPath, workerReadyCB = () => {}){
         // Setup base class
         super();
-        super.setup(new Worker(workerScriptPath, { type: "module" }), this.postReceive);
+
+        let worker = new Worker(
+            new URL(workerScriptPath, import.meta.url),
+            {type: 'module'}
+        );
+
+        super.setup(worker, this.postReceive);
 
         // For restarting
         this.workerScriptPath = workerScriptPath;

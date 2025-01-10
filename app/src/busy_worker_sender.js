@@ -2,6 +2,9 @@ import BusyWorkerBase from "./busy_worker_base";
 import BusyWorkerBufferChannel from "./busy_worker_buffer_channel";
 import dbgconsole from "./dbgconsole";
 
+// https://stackoverflow.com/a/76311399
+import simulatorWorker from './simulator-worker?worker'
+
 
 // Use this on the main thread to setup the receiver worker
 export default class BusyWorkerSender extends BusyWorkerBase{
@@ -9,12 +12,14 @@ export default class BusyWorkerSender extends BusyWorkerBase{
         // Setup base class
         super();
 
-        let worker = new Worker(
-            new URL(workerScriptPath, import.meta.url),
-            {type: 'module'}
-        );
+        // console.log(new URL(workerScriptPath, import.meta.url));
 
-        super.setup(worker, this.postReceive);
+        // let worker = new Worker(
+        //     new URL(workerScriptPath, import.meta.url),
+        //     {type: 'module'}
+        // );
+
+        super.setup(new simulatorWorker(), this.postReceive);
 
         // For restarting
         this.workerScriptPath = workerScriptPath;
@@ -46,6 +51,6 @@ export default class BusyWorkerSender extends BusyWorkerBase{
 
     restart(){
         this.worker.terminate();
-        super.setup(new Worker(this.workerScriptPath, { type: "module" }), this.postReceive);
+        super.setup(new simulatorWorker(), this.postReceive);
     }
 }

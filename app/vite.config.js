@@ -10,20 +10,20 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        login: resolve(__dirname, 'login/index.html'),
+        main: resolve(__dirname, 'code/index.html'),
+        login: resolve(__dirname, 'code/login/index.html'),
 
-        forgot: resolve(__dirname, 'login/forgot/index.html'),
-        confirm_password: resolve(__dirname, 'login/confirm/password/index.html'),
+        forgot: resolve(__dirname, 'code/login/forgot/index.html'),
+        confirm_password: resolve(__dirname, 'code/login/confirm/password/index.html'),
 
-        resend: resolve(__dirname, 'login/resend/index.html'),
-        confirm_email: resolve(__dirname, 'login/confirm/email/index.html'),
+        resend: resolve(__dirname, 'code/login/resend/index.html'),
+        confirm_email: resolve(__dirname, 'code/login/confirm/email/index.html'),
 
-        account: resolve(__dirname, 'account/index.html'),
-        arcade: resolve(__dirname, 'arcade/index.html'),
-        submit: resolve(__dirname, 'arcade/submit/index.html'),
+        account: resolve(__dirname, 'code/account/index.html'),
+        arcade: resolve(__dirname, 'code/arcade/index.html'),
+        submit: resolve(__dirname, 'code/arcade/submit/index.html'),
 
-        privacy: resolve(__dirname, 'privacy/index.html'),
+        privacy: resolve(__dirname, 'code/privacy/index.html'),
       },
     },
   },

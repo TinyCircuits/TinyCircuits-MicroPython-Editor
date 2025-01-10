@@ -93,32 +93,32 @@ function GameTile(props){
     const getThumbnail = () => {
         if(game.mediaURL.indexOf(".webm") != -1){
             return(
-                <div className="flex h-full">
-                    <video ref={display} autoPlay muted loop className="object-contain w-full h-auto">
+                <div className="flex h-full overflow-hidden">
+                    <video ref={display} autoPlay muted loop className="object-contain w-full h-auto rounded rounded-lg">
                         <source src="" type="video/webm"></source>
                     </video>
                 </div>
             );
         }else if(game.mediaURL.indexOf(".mp4") != -1){
                 return(
-                    <div className="flex h-full">
-                        <video ref={display} autoPlay muted loop className="object-contain w-full h-auto">
+                    <div className="flex h-full overflow-hidden">
+                        <video ref={display} autoPlay muted loop className="object-contain w-full h-auto rounded rounded-lg">
                             <source src="" type="video/mp4"></source>
                         </video>
                     </div>
                 );
         }else{
             return(
-                <img ref={display} src="" className="object-cover w-full h-auto">
+                <img ref={display} src="" className="object-cover w-full h-auto overflow-hidden rounded rounded-lg">
                 </img>
             );
         }
     }
 
     return(
-        <div ref={ref} onClick={onClick} className={'flex flex-col w-[170px] h-[190px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100 hover:outline-success ' + className}>
-            <div className="flex items-center w-full h-[20px] bg-base-300">
-                <p className="font-bold">{game.name}</p>
+        <div ref={ref} onClick={onClick} className={'flex flex-col w-[170px] h-[192px] bg-base-300 rounded rounded-lg m-auto outline outline-1 outline-base-100 hover:outline-success ' + className}>
+            <div className="flex items-center w-full h-[22px] bg-base-300">
+                <p className="ml-1 font-bold">{game.name}</p>
             </div>
             <div className="relative flex items-center justify-center w-full h-[170px]">
                 {getThumbnail()}
@@ -546,7 +546,7 @@ function Arcade(props){
                         <p className='text-lg font-bold ml-4'>Arcade</p>
                     </div>
                     <div className="w-full h-full flex items-center flex-row-reverse">
-                        <Button size="sm" color='info' tag="a" target="" rel="noopener" href="/" className='mr-4'>
+                        <Button size="sm" color='info' tag="a" target="" rel="noopener" href="/code/" className='mr-4'>
                             Editor
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
                                 <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>

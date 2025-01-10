@@ -187,7 +187,7 @@ const mp_stdin = () => {
 
 console.log("Loading simulator!");
 const mp = await loadMicroPython({stdout:mp_stdout, stderr:mp_stderr, stdin:mp_stdin, heapsize:((520*1000) + (2*1024*1024)), linebuffer:false});
-
+console.log("Simulator loaded!");
 
 // Communication link to main thread
 receiver = new BusyWorkerReceiver();

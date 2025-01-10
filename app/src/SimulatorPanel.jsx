@@ -191,12 +191,14 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
 
     useEffect(() => {
-        dbgconsole("Simulator panel init!");
+        console.log("Simulator panel init!");
 
         // Only do this once!
         if(sender.current == undefined){
-            sender.current = new BusyWorkerSender("./simulator-worker.js", () => {
-                dbgconsole("Simulator worker said it's ready!");
+            console.log("Getting worker ready!");
+
+            sender.current = new BusyWorkerSender("/simulator-worker.js", () => {
+                console.log("Simulator worker said it's ready!");
         
                 sender.current.registerBufferChannel("pressed_buttons", 2, undefined);
                 sender.current.registerBufferChannel("print_update", 0, onData);

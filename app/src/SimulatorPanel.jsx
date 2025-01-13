@@ -249,11 +249,12 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             
             // Setup for recording
             mediaStream.current = canvas.current.captureStream();
-            mediaRecorder.current = new MediaRecorder(mediaStream.current, {mimeType: "video/mp4"});
+            mediaRecorder.current = new MediaRecorder(mediaStream.current, {mimeType: "video/mp4;codecs=avc1"});
             recordedChunks.current = [];
 
             mediaRecorder.current.ondataavailable = (event) => {
                 recordedChunks.current.push(event.data);
+                console.log(event.data);
           
                 // after stop `dataavilable` event run one more time to push last chunk
                 if(mediaRecorder.current.state === 'recording'){

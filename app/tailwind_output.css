@@ -8913,12 +8913,12 @@ html:has(.drawer-open.drawer-open) {
   height: 170px;
 }
 
-.h-\[190px\] {
-  height: 190px;
+.h-\[192px\] {
+  height: 192px;
 }
 
-.h-\[20px\] {
-  height: 20px;
+.h-\[22px\] {
+  height: 22px;
 }
 
 .h-auto {
@@ -9907,10 +9907,6 @@ html:has(.drawer-open.drawer-open) {
 
 .\[--tab-border-color\:\$\{borderColor\}\] {
   --tab-border-color: ${borderColor};
-}
-
-.\[specialIndex\:specialEndIndex\] {
-  special-index: specialEndIndex;
 }
 
 /* https://github.com/saadeghi/daisyui/issues/3040 */

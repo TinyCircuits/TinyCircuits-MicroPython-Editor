@@ -341,10 +341,11 @@ function Arcade(props){
             //     all parsed/found. Filter the game URL text lines down to just the files needed
             //     to run the game
             let gameFileURLSList = gameLines.filter((line) => {
-                if(line.indexOf("NAME=")                  != -1 ||
+                if( line.indexOf("NAME=")                  != -1 ||
+                    line.indexOf("SIZE=")                  != -1 ||
                     line.indexOf("arcade_description.txt") != -1 ||
                     line.indexOf(".png")                   != -1 ||
-                    line.indexOf(".webm")                   != -1 ||
+                    line.indexOf(".webm")                  != -1 ||
                     line.indexOf(".mp4")                   != -1){
                     return false;
                 }else{
@@ -472,9 +473,11 @@ function Arcade(props){
 
         for(let i=0; i<clickedGame.fileURLsList.length; i++){
             const fileURL = clickedGame.fileURLsList[i];
-
             const gameFile = await fetch(fileURL);
-            let gameFilePath = fileURL.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/" + clickedGame.name + "/", "");
+
+            let gameFilePath = fileURL;
+                gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Color-Games/main/" + clickedGame.name + "/", "");
+                gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/" + clickedGame.name + "/", "");
             let gameFilePathSegments = gameFilePath.split("/");
 
             // Recursively build bath and write file

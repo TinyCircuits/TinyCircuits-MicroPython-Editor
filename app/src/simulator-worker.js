@@ -3,7 +3,6 @@ import BusyWorkerReceiver from "./busy_worker_receiver";
 import dbgconsole from "./dbgconsole";
 
 
-
 async function writeFilesystemFile(mp, fetchPath, filePath){
 
     // Create the path to the file

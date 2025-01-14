@@ -460,10 +460,25 @@ function Arcade(props){
                 }
             }
 
+            // Ask and install `lib` folder if downloading a Thumby game without that installed
             if(filter == "Thumby" && !foundLib && await requestModalRef.current.request("Thumby `lib` not installed, install it?", "Install", "No")){
-                
-            }
+                let manifestText = await (await fetch("/simulator/lib/manifest.txt")).text();
+                let manifestLines = manifestText.split(/\r\n|\r|\n/);
 
+                for(let i=0; i<manifestLines.length; i++){
+                    let line = manifestLines[i];
+
+                    if(line == ""){
+                        continue;
+                    }
+
+                    let path = line.replace("/simulator/", "");
+                    let data = new Uint8Array(await (await fetch(line)).arrayBuffer());
+
+                    console.log(path);
+                    await pyboard.fsPut(data, path);
+                }
+            }
 
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
                 const fileURL = clickedGame.fileURLsList[i];
@@ -475,6 +490,7 @@ function Arcade(props){
                 gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
                 gameFilePath = "Games/" + gameFilePath;
 
+                console.log(gameFilePath);
                 await pyboard.fsPut(new Uint8Array(await gameFile.arrayBuffer()), gameFilePath);
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
             }

@@ -430,22 +430,40 @@ function Arcade(props){
             await pyboard.enterRawRepl();
 
             // List the contents of the root directory
-            const directoryContents = await pyboard.fsListdir('Games');
-            console.log('Directory contents:', directoryContents);
+            const rootDirectoryContents = await pyboard.fsListdir('/');
+            const gameDirectoryContents = await pyboard.fsListdir('Games');
 
             // Go through all the names and look for an overwrite
-            for(let i=0; i<directoryContents.length; i++){
-                let element = directoryContents[i];
+            for(let i=0; i<gameDirectoryContents.length; i++){
+                let element = gameDirectoryContents[i];
                 let elementName = element.name.replaceAll("'", "");
 
                 if(elementName == clickedGame.name){
-                    if(!await requestModalRef.current.request()){
+                    if(!await requestModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
                         return;
                     }else{
                         break;
                     }
                 }
             }
+
+            // Go through all the names and look for a Thumby lib, ask to download if they would like
+            let foundLib = false;
+
+            for(let i=0; i<rootDirectoryContents.length; i++){
+                let element = rootDirectoryContents[i];
+                let elementName = element.name.replaceAll("'", "");
+
+                if(elementName == "lib"){
+                    foundLib = true;
+                    break;
+                }
+            }
+
+            if(filter == "Thumby" && !foundLib && await requestModalRef.current.request("Thumby `lib` not installed, install it?", "Install", "No")){
+                
+            }
+
 
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
                 const fileURL = clickedGame.fileURLsList[i];
@@ -522,7 +540,7 @@ function Arcade(props){
 
             try{
                 let handle = await directoryHandle.getDirectoryHandle(clickedGame.name);
-                if(await requestModalRef.current.request()){
+                if(await requestModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
                     computerDownloadClicked(handle);
                 }
             }catch(exception){
@@ -539,7 +557,7 @@ function Arcade(props){
     return (
         <Page className="bg-repeat">
             <PageModalContents>
-                <RequestModal ref={requestModalRef} title="Game folder already exists, overwrite it?" yesPrompt="Overwrite" noPrompt="Cancel"/>
+                <RequestModal ref={requestModalRef}/>
             </PageModalContents>
 
             <PageHeaderContents>

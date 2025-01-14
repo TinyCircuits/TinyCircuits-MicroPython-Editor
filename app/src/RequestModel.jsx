@@ -6,8 +6,9 @@ import FilesPanel from './FilesPanel';
 
 let RequestModal = forwardRef(function RequestModal(props, ref){
 
-    const {title, yesPrompt, noPrompt} = props;
-
+    const [title, setTitle] = useState("");
+    const [yesPrompt, setYesPrompt] = useState("");
+    const [noPrompt, setNoPrompt] = useState("");
     const customModalRef = useRef(null);
     const decision = useRef(null);
 
@@ -18,7 +19,11 @@ let RequestModal = forwardRef(function RequestModal(props, ref){
         close(){
             customModalRef.current.close();
         },
-        async request(){
+        async request(title, yes, no){
+            setTitle(title);
+            setYesPrompt(yes);
+            setNoPrompt(no);
+
             return new Promise((resolve, reject) => {
                 let checkDecision = () => {
                     if(decision.current == true){

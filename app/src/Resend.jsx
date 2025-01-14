@@ -1,6 +1,6 @@
 import './App.css'
 
-import './../tailwind_output.css'
+import './tailwind_output.css'
 import { Theme, Input, Button, Swap, Toggle, Link } from 'react-daisyui'
 import EmailValidator from 'email-validator'
 import User from './user'

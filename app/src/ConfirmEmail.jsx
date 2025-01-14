@@ -1,6 +1,6 @@
 import './App.css'
 
-import './../tailwind_output.css'
+import './tailwind_output.css'
 import { Theme, Button } from 'react-daisyui'
 import User from './user';
 import React, { useState } from 'react';

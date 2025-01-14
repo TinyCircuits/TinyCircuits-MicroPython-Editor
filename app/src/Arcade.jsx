@@ -9,6 +9,7 @@ import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModa
 import Footer from './Footer';
 import setupRoot from './root';
 import Pyboard from "./pyboard.js"
+import RequestModal from './RequestModel.jsx';
 
 
 // Class that hold information about each game on the Arcade
@@ -93,7 +94,7 @@ function GameTile(props){
     const getThumbnail = () => {
         if(game.mediaURL.indexOf(".webm") != -1){
             return(
-                <div className="flex h-full overflow-hidden">
+                <div className="flex h-full overflow-hidden arcade_media">
                     <video ref={display} autoPlay muted loop className="object-contain w-full h-auto rounded rounded-lg">
                         <source src="" type="video/webm"></source>
                     </video>
@@ -101,7 +102,7 @@ function GameTile(props){
             );
         }else if(game.mediaURL.indexOf(".mp4") != -1){
                 return(
-                    <div className="flex h-full overflow-hidden">
+                    <div className="flex h-full overflow-hidden arcade_media">
                         <video ref={display} autoPlay muted loop className="object-contain w-full h-auto rounded rounded-lg">
                             <source src="" type="video/mp4"></source>
                         </video>
@@ -109,7 +110,7 @@ function GameTile(props){
                 );
         }else{
             return(
-                <img ref={display} src="" className="object-cover w-full h-auto overflow-hidden rounded rounded-lg">
+                <img ref={display} src="" className="object-cover w-full h-auto overflow-hidden rounded rounded-lg arcade_media">
                 </img>
             );
         }
@@ -138,9 +139,9 @@ function Arcade(props){
 
     let thumbyColorGames = useRef([]);
     let thumbyGames = useRef([]);
+    let requestModalRef = useRef(undefined);
 
     let overwriteModelRef = useRef(undefined);
-    let lastChosenDirHandle = useRef(undefined);
 
     const setClickedGameWrapper = (game) => {
         if(clickedGame != undefined && clickedGame.name == game.name){
@@ -400,10 +401,6 @@ function Arcade(props){
                 }
             });
         })
-
-        
-
-        
     }, [])
 
 
@@ -433,8 +430,22 @@ function Arcade(props){
             await pyboard.enterRawRepl();
 
             // List the contents of the root directory
-            const directoryContents = await pyboard.fsListdir('/');
+            const directoryContents = await pyboard.fsListdir('Games');
             console.log('Directory contents:', directoryContents);
+
+            // Go through all the names and look for an overwrite
+            for(let i=0; i<directoryContents.length; i++){
+                let element = directoryContents[i];
+                let elementName = element.name.replaceAll("'", "");
+
+                if(elementName == clickedGame.name){
+                    if(!await requestModalRef.current.request()){
+                        return;
+                    }else{
+                        break;
+                    }
+                }
+            }
 
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
                 const fileURL = clickedGame.fileURLsList[i];
@@ -464,11 +475,7 @@ function Arcade(props){
     }
 
 
-    const computerDownloadClicked = async () => {
-        overwriteModelRef.current.close();
-
-        let directoryHandle = lastChosenDirHandle.current;
-
+    const computerDownloadClicked = async (directoryHandle) => {
         setDownloadingGame(true);
 
         for(let i=0; i<clickedGame.fileURLsList.length; i++){
@@ -514,11 +521,13 @@ function Arcade(props){
             const directoryHandle = await window.showDirectoryPicker();
 
             try{
-                lastChosenDirHandle.current = await directoryHandle.getDirectoryHandle(clickedGame.name);
-                overwriteModelRef.current.showModal();
+                let handle = await directoryHandle.getDirectoryHandle(clickedGame.name);
+                if(await requestModalRef.current.request()){
+                    computerDownloadClicked(handle);
+                }
             }catch(exception){
-                lastChosenDirHandle.current = await directoryHandle.getDirectoryHandle(clickedGame.name, {create:true});
-                computerDownloadClicked();
+                let handle = await directoryHandle.getDirectoryHandle(clickedGame.name, {create:true});
+                computerDownloadClicked(handle);
             }            
         }catch(error){
             // Handle errors, e.g. user cancellation
@@ -530,17 +539,7 @@ function Arcade(props){
     return (
         <Page className="bg-repeat">
             <PageModalContents>
-                {/* ### Choose platform modal ### */}
-                <CustomModal title="Game folder already exists, overwrite it?" outlineColor="base-content" ref={overwriteModelRef}>
-                    <div className="w-full h-full flex flex-row justify-evenly">
-                        <Button size="lg" variant='outline' onClick={computerDownloadClicked}>
-                            <p>Overwrite</p>
-                        </Button>
-                        <Button size="lg" variant='outline' onClick={() => {overwriteModelRef.current.close()}}>
-                            <p>Cancel</p>
-                        </Button>
-                    </div>
-                </CustomModal>
+                <RequestModal ref={requestModalRef} title="Game folder already exists, overwrite it?" yesPrompt="Overwrite" noPrompt="Cancel"/>
             </PageModalContents>
 
             <PageHeaderContents>

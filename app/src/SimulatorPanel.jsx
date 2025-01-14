@@ -248,6 +248,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             setRecording(true);
             
             // Setup for recording
+            // https://w3c.github.io/mediacapture-record/#example1
             mediaStream.current = canvas.current.captureStream();
             mediaRecorder.current = new MediaRecorder(mediaStream.current, {mimeType: "video/mp4;codecs=avc1"});
             recordedChunks.current = [];

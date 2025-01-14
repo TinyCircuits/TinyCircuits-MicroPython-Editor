@@ -6,7 +6,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { Button } from "react-daisyui";
 
 let CustomModal = forwardRef(function CustomModal(props, ref){
-    const {title, titleColor, outlineColor, btn, onBtnClick, children} = props;
+    const {title, titleColor, outlineColor, btn, onBtnClick, onCloseClick, children} = props;
 
     const [open, setOpen] = useState(false);
 
@@ -21,6 +21,9 @@ let CustomModal = forwardRef(function CustomModal(props, ref){
 
     const onClickToClose = (clickedElementID) => {
         if(clickedElementID == "modalBackdropID" || clickedElementID == "closeButtonID"){
+            if(onCloseClick){
+                onCloseClick();
+            }
             setOpen(false);
         }
     }

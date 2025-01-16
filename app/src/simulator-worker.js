@@ -116,6 +116,8 @@ async function run(path_to_run){
 
     // Change to directory of file being executed
     try{
+        console.log("Trying to run file in simulator...");
+
         await mp.runPythonAsync(`
 import sys
 import os
@@ -123,6 +125,7 @@ import engine_save
 engine_save._init_saves_dir("/Saves/` + run_dir_path + `")
 sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
+print("`+ path_to_run +`")
 execfile("` + path_to_run + `")
 `);
     }catch(error){

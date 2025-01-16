@@ -43,8 +43,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
 
     useImperativeHandle(ref, () => ({
-        async runSimulator(newRunFiles, nweRunPath){
-
+        async runSimulator(newRunFiles, newRunPath){
             // audioContext.current = new AudioContext({latencyHint:"playback", sampleRate:22050});
             // await audioContext.current.audioWorklet.addModule("audio-processor.js");
             // audioProcessorWorkletNode.current = new AudioWorkletNode(audioContext.current, "audio-processor");
@@ -59,7 +58,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                 dbgconsole("Asking for simulator fs...");
                 sender.current.mark("get_fs", (oldFileList) => {
                     filesList.current = [...oldFileList, ...newRunFiles];
-                    runPath.current = nweRunPath;
+                    runPath.current = newRunPath;
                     sender.current.restart();
                     resolve();
                 });

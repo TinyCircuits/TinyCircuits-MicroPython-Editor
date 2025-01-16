@@ -555,7 +555,6 @@ execfile("` + filePathToRun + `")
         let [files, filePathToRun] = await getRunFileAndCheckedData(openFiles);
 
         if(files != undefined){
-            // Switch UI
             [files, filePathToRun] = formatCheckedToSelected(files, filePathToRun, selectedRunPath);
             setActiveTerminalTabKey("Device");
             runDevice(files, filePathToRun);
@@ -612,18 +611,20 @@ execfile("` + filePathToRun + `")
             return;
         }
 
-        if(runPathSimulator == ""){
-            console.log("Waiting on simulator tree...");
-            setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
-            setRunAfterLocationSelect(() => runInSimulator);
-        }else{
-            // Only want the path, so get rid of file name in path is a file
-            if(pathCheckedToRun.isFolder == false){
-                runInSimulator(pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/")));
-            }else{
-                runInSimulator(pathCheckedToRun.path);
-            }
-        }
+        // if(runPathSimulator == ""){
+        console.log("Waiting on simulator tree...");
+        setRunLocationSelectTree(await simulatorRef.current.getTree());    // Set the tree to be rendered for selecting run location
+        setRunAfterLocationSelect(() => runInSimulator);
+        // }else{
+        //     console.error(pathCheckedToRun);
+
+        //     // Only want the path, so get rid of file name in path is a file
+        //     if(pathCheckedToRun.isFolder == false){
+        //         runInSimulator(pathCheckedToRun.path.substring(0, pathCheckedToRun.path.lastIndexOf("/")));
+        //     }else{
+        //         runInSimulator(pathCheckedToRun.path);
+        //     }
+        // }
     }
 
 

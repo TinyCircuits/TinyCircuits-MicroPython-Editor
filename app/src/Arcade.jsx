@@ -4,6 +4,7 @@ import { Input, Join, Theme, Button, Progress, Select } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import CustomModal from './CustomModal';
+import Alerts from './Alerts.jsx';
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
@@ -140,6 +141,7 @@ function Arcade(props){
     let thumbyColorGames = useRef([]);
     let thumbyGames = useRef([]);
     let requestModalRef = useRef(undefined);
+    let alertsRef = useRef(undefined);
 
     let overwriteModelRef = useRef(undefined);
 
@@ -478,6 +480,7 @@ function Arcade(props){
                     console.log(path);
                     await pyboard.fsPut(data, path);
                 }
+                alertsRef.current.add("Thumby `lib` installed successfully!");
             }
 
             for(let i=0; i<clickedGame.fileURLsList.length; i++){
@@ -496,6 +499,7 @@ function Arcade(props){
             }
 
             window.dispatchEvent(new CustomEvent("end_progress"));
+            alertsRef.current.add("`" + clickedGame.name + "`" + " installed successfully!");
 
             // Exit raw REPL mode
             await pyboard.exitRawRepl();
@@ -593,6 +597,8 @@ function Arcade(props){
             </PageHeaderContents>
 
             <PageBodyContents>
+                <Alerts ref={alertsRef}></Alerts>
+
                 <div className="relative w-full h-full flex justify-center items-center">
                     <div className="absolute w-full top-0 bottom-12 flex flex-row justify-center">
 

@@ -8651,6 +8651,10 @@ html:has(.drawer-open.drawer-open) {
   z-index: 10000;
 }
 
+.z-\[1000\] {
+  z-index: 1000;
+}
+
 .z-\[2000\] {
   z-index: 2000;
 }
@@ -8665,10 +8669,6 @@ html:has(.drawer-open.drawer-open) {
 
 .z-\[202\] {
   z-index: 202;
-}
-
-.z-\[1000\] {
-  z-index: 1000;
 }
 
 .m-2 {
@@ -8697,16 +8697,6 @@ html:has(.drawer-open.drawer-open) {
 .my-2 {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.my-6 {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.my-7 {
-  margin-top: 1.75rem;
-  margin-bottom: 1.75rem;
 }
 
 .my-8 {

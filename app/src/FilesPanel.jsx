@@ -13,6 +13,9 @@ function FilesPanel(props){
 
     // Converts file tree to structure that react-arborist can use
     const getData = (tree_parent, data_parent, checked, first=false) => {
+        let folders = [];
+        let files = [];
+
         if(first){
             // Only if checkmarks are wanted do empty all the checked paths
             if((props.checkmarks == true || props.checkmarks == undefined)){
@@ -72,9 +75,16 @@ function FilesPanel(props){
             }
 
             if((tree_child.content == undefined && (props.showFiles == true || props.showFiles == undefined)) || tree_child.content != undefined){
-                data_parent.push(entry);
+                if(tree_child.content != undefined){
+                    folders.push(entry);
+                }else{
+                    files.push(entry);
+                }
             }
         });
+
+        data_parent.push(...folders);
+        data_parent.push(...files);
 
         return data_parent;
     }

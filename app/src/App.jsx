@@ -243,10 +243,8 @@ function App(props){
             reportError("Serial not defined. You are likely not using a Chromium based browser. Please use a browser like Google Chrome or Microsoft Edge.");
         }else{
             try{
-                await serial.current.requestAccess(0x2E8A, 0x0005);
-
                 try{
-                    await serial.current.connect();
+                    await serial.current.connect([{ usbVendorId: 0x2E8A, usbProductId: 0x0003 }, { usbVendorId: 0x2E8A, usbProductId: 0x0005 }]);
                     
                     let date = new Date();
                     let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';

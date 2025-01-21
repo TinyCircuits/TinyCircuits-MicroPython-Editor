@@ -9,8 +9,9 @@ import Alerts from './Alerts.jsx';
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
 import Footer from './Footer';
 import setupRoot from './root';
-import Pyboard from "./pyboard.js"
 import RequestModal from './RequestModel.jsx';
+import WebSerialOverride from './WebSerialOverride.js';
+import MpRawModeOverride from './MpRawModeOverride.js';
 
 
 // Class that hold information about each game on the Arcade
@@ -420,20 +421,19 @@ function Arcade(props){
     const thumbyDownloadClickHandler = async () => {
         console.log("Started");
 
-        const pyboard = new Pyboard();
+        const serial = new WebSerialOverride((connected) => {});
+        let rawMode = undefined;
 
         try {
             setDownloadingGame(true);
 
-            // Connect to the device
-            await pyboard.connect();
-
-            // Enter raw REPL mode
-            await pyboard.enterRawRepl();
+            await serial.connect([{ usbVendorId: 0x2E8A, usbProductId: 0x0003 }, { usbVendorId: 0x2E8A, usbProductId: 0x0005 }]);
+            rawMode = await MpRawModeOverride.begin(serial);
 
             // List the contents of the root directory
-            const rootDirectoryContents = await pyboard.fsListdir('/');
-            const gameDirectoryContents = await pyboard.fsListdir('Games');
+            await rawMode.makePath("Games");
+            const rootDirectoryContents = await rawMode.listDir('/');
+            const gameDirectoryContents = await rawMode.listDir('Games');
 
             // Go through all the names and look for an overwrite
             for(let i=0; i<gameDirectoryContents.length; i++){
@@ -478,7 +478,8 @@ function Arcade(props){
                     let data = new Uint8Array(await (await fetch(line)).arrayBuffer());
 
                     console.log(path);
-                    await pyboard.fsPut(data, path);
+                    await rawMode.makePath(path);
+                    await rawMode.writeFile(path, data);
                 }
                 alertsRef.current.add("Thumby `lib` installed successfully!");
             }
@@ -493,22 +494,23 @@ function Arcade(props){
                 gameFilePath = gameFilePath.replace("https://raw.githubusercontent.com/TinyCircuits/TinyCircuits-Thumby-Games/master/", "");
                 gameFilePath = "Games/" + gameFilePath;
 
-                console.log(gameFilePath);
-                await pyboard.fsPut(new Uint8Array(await gameFile.arrayBuffer()), gameFilePath);
+                // console.log(gameFilePath);
+                await rawMode.makePath(gameFilePath);
+                await rawMode.writeFile(gameFilePath, new Uint8Array(await gameFile.arrayBuffer()));
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: i / clickedGame.fileURLsList.length}}));
             }
 
             window.dispatchEvent(new CustomEvent("end_progress"));
             alertsRef.current.add("`" + clickedGame.name + "`" + " installed successfully!");
-
-            // Exit raw REPL mode
-            await pyboard.exitRawRepl();
         } catch (error) {
             console.error('Error:', error);
         } finally {
             // Close the connection
             setDownloadingGame(false);
-            await pyboard.close();
+
+            // Exit raw REPL mode
+            if(rawMode) await rawMode.end();
+            await serial.disconnect();
         }
     }
 

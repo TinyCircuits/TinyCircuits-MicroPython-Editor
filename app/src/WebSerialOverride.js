@@ -5,11 +5,6 @@ class WebSerialOverride extends WebSerial{
     constructor(setIsSerialConnected){
         super();
         this.setIsSerialConnected = setIsSerialConnected;
-        
-        // Flag that is managed at this layer to prevent
-        // disconnect callback from calling `disconnect()`
-        // after already called
-        this.disconnected = true;
     }
 
     async delay(ms){
@@ -24,15 +19,12 @@ class WebSerialOverride extends WebSerial{
     // since it shows all connected devices
     // when we only want to show Thumby Color
     // RP2350 devices
-    async requestAccess(vendorID, productID){
-        this.port = await this.serial.requestPort({filters: [{usbVendorId: vendorID, usbProductID: productID}]});
+    async requestAccess(filters){
+        super.port = await this.serial.requestPort({ filters });
         this.setIsSerialConnected(true);
 
-        // Not disconnected anymore, set
-        this.disconnected = false;
-
         try{
-            const pi = this.port.getInfo()
+            const pi = super.port.getInfo()
             this.info = {
                 vid: pi.usbVendorId.toString(16).padStart(4, '0'),
                 pid: pi.usbProductId.toString(16).padStart(4, '0'),
@@ -42,27 +34,49 @@ class WebSerialOverride extends WebSerial{
         }
     }
 
-    async disconnect(){
-        // Don't do anything if already disconnected
-        if(this.disconnected){
+    connected(){
+        if(super.port && super.port.readable && super.port.writable){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    async connect(filters){
+        if(this.connected()){
             return;
         }
 
-        // Now disconnected
-        this.disconnected = true;
-
-        try{
-            await this.reader.releaseLock();
-            await this.writer.releaseLock();
-        }catch(error){
-            console.error(error);
+        const ports = await navigator.serial.getPorts({ filters });
+        if (ports.length > 0) {
+            super.port = ports[0];
+            console.log('Connecting to previously paired device...');
+        } else {
+            await this.requestAccess(filters);
+            console.log('Connecting to selected device...');
         }
 
-        await this.port.close();
+        
+        await super.connect();
+        this.port.addEventListener('disconnect', this.disconnect.bind(this));
+    }
 
+
+    async disconnect(){
+        console.log("Disconnecting...");
+
+        if (this.reader) {
+            await this.reader.releaseLock();
+        }
+        if (this.writer) {
+            await this.writer.releaseLock();
+        }
+        if (this.port) {
+            await this.port.close();
+        }
+        this.port = null;
         this.reader = null;
         this.writer = null;
-        this.port = null;
         
         this.setIsSerialConnected(false);
     }

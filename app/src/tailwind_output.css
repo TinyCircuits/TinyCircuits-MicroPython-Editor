@@ -8655,10 +8655,6 @@ html:has(.drawer-open.drawer-open) {
   z-index: 1000;
 }
 
-.z-\[2000\] {
-  z-index: 2000;
-}
-
 .z-\[200\] {
   z-index: 200;
 }
@@ -8694,11 +8690,6 @@ html:has(.drawer-open.drawer-open) {
   margin-right: 0.75rem;
 }
 
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -8706,10 +8697,6 @@ html:has(.drawer-open.drawer-open) {
 
 .mb-2 {
   margin-bottom: 0.5rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
 }
 
 .mb-8 {
@@ -8724,16 +8711,8 @@ html:has(.drawer-open.drawer-open) {
   margin-left: 0.5rem;
 }
 
-.ml-3 {
-  margin-left: 0.75rem;
-}
-
 .ml-4 {
   margin-left: 1rem;
-}
-
-.ml-6 {
-  margin-left: 1.5rem;
 }
 
 .mr-1 {
@@ -8744,16 +8723,8 @@ html:has(.drawer-open.drawer-open) {
   margin-right: 0.5rem;
 }
 
-.mr-3 {
-  margin-right: 0.75rem;
-}
-
 .mr-4 {
   margin-right: 1rem;
-}
-
-.mr-6 {
-  margin-right: 1.5rem;
 }
 
 .mt-2 {
@@ -8990,10 +8961,6 @@ html:has(.drawer-open.drawer-open) {
   width: 18rem;
 }
 
-.w-80 {
-  width: 20rem;
-}
-
 .w-96 {
   width: 24rem;
 }
@@ -9207,10 +9174,6 @@ html:has(.drawer-open.drawer-open) {
 
 .rounded {
   border-radius: 0.25rem;
-}
-
-.rounded-3xl {
-  border-radius: 1.5rem;
 }
 
 .rounded-box {
@@ -9902,30 +9865,12 @@ html:has(.drawer-open.drawer-open) {
   transition-duration: 150ms;
 }
 
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.duration-200 {
-  transition-duration: 200ms;
-}
-
-.duration-1000 {
-  transition-duration: 1000ms;
-}
-
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-
-.ease-in {
-  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
 
 .\[--tab-bg\:\$\{bgColor\}\] {
@@ -10445,14 +10390,6 @@ html:has(.drawer-open.drawer-open) {
 .hover\:bg-base-300:hover {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)));
-}
-
-.hover\:outline:hover {
-  outline-style: solid;
-}
-
-.hover\:outline-1:hover {
-  outline-width: 1px;
 }
 
 .hover\:outline-success:hover {

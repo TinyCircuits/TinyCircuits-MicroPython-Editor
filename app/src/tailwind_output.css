@@ -8655,6 +8655,10 @@ html:has(.drawer-open.drawer-open) {
   z-index: 1000;
 }
 
+.z-\[2000\] {
+  z-index: 2000;
+}
+
 .z-\[200\] {
   z-index: 200;
 }

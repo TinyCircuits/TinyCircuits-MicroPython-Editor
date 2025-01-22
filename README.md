@@ -45,12 +45,5 @@ NOTE on 404: https://github.com/pocketbase/pocketbase/discussions/3767
 
 
 # Pages
-* /
-* /login/
-* /login/forgot/
-* /login/confirm/password/
-* /login/resend/
-* /login/confirm/email/
+* /code/
 * /arcade/
-* /arcade/submit/
-* /account/

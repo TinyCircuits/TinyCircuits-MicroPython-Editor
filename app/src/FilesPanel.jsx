@@ -190,11 +190,18 @@ function FilesPanel(props){
         treeRef.current.list.current._outerRef.style.setProperty("scrollbar-width", "thin");
     }, []);
 
+    // Update tree when prop changes
+    useEffect(() => {
+        if(props.allFoldersOpen){
+            treeRef.current.openAll();
+        }else{
+            treeRef.current.closeAll();
+        }
+    }, [props.allFoldersOpen]);
     
     return (
         <div className='w-full h-full' ref={ref}>
-            <Tree ref={treeRef} data={getData(props.tree, [], false, true)} height={height} width={width}
-                  onClick={handleClick}>
+            <Tree ref={treeRef} data={getData(props.tree, [], false, true)} height={height} width={width} onClick={handleClick} openByDefault={false}>
                 {Node}
             </Tree>
         </div>

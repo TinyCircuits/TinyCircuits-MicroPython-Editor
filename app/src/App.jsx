@@ -34,6 +34,7 @@ import{
 import { createRoot } from 'react-dom/client'
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents } from './Page.jsx'
+import SettingsIcon from './SettingsIcon.jsx'
 
 
 function App(props){
@@ -72,6 +73,7 @@ function App(props){
 
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
+    const [allFoldersOpen, setAllFoldersOpen] = useState(false);
     
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
@@ -370,6 +372,20 @@ function App(props){
                 <div className="flex-1">
                     {getTitle()}
                 </div>
+
+                <Button size='xs' color='neutral' title='Toggle all folders open or closed' onClick={() => {setAllFoldersOpen(!allFoldersOpen)}}>
+                    {
+                        allFoldersOpen ?
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                            <path d="M3.75 3A1.75 1.75 0 0 0 2 4.75v3.26a3.235 3.235 0 0 1 1.75-.51h12.5c.644 0 1.245.188 1.75.51V6.75A1.75 1.75 0 0 0 16.25 5h-4.836a.25.25 0 0 1-.177-.073L9.823 3.513A1.75 1.75 0 0 0 8.586 3H3.75ZM3.75 9A1.75 1.75 0 0 0 2 10.75v4.5c0 .966.784 1.75 1.75 1.75h12.5A1.75 1.75 0 0 0 18 15.25v-4.5A1.75 1.75 0 0 0 16.25 9H3.75Z" />
+                        </svg>
+                                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                            <path d="M4.75 3A1.75 1.75 0 0 0 3 4.75v2.752l.104-.002h13.792c.035 0 .07 0 .104.002V6.75A1.75 1.75 0 0 0 15.25 5h-3.836a.25.25 0 0 1-.177-.073L9.823 3.513A1.75 1.75 0 0 0 8.586 3H4.75ZM3.104 9a1.75 1.75 0 0 0-1.673 2.265l1.385 4.5A1.75 1.75 0 0 0 4.488 17h11.023a1.75 1.75 0 0 0 1.673-1.235l1.384-4.5A1.75 1.75 0 0 0 16.896 9H3.104Z" />
+                        </svg>  
+                    }
+                </Button>
+
                 <div className="w-14 flex justify-center items-center">
                     <p>RUN</p>
                 </div>
@@ -758,6 +774,8 @@ execfile("` + filePathToRun + `")
                                 <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
                             </svg>
                         </Button>
+
+                        <SettingsIcon className='mr-4'/>
                     </div>
                 </div>
             </PageHeaderContents>
@@ -778,8 +796,8 @@ execfile("` + filePathToRun + `")
                                     <div className="pl-1 w-full h-8 bg-base-200 flex items-center font-bold text-nowrap select-none">
                                         {getFilesPanelTitle()}
                                     </div>
-                                    
-                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current}/>
+
+                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen}/>
                                 </Panel>
                             </PanelGroup>
 

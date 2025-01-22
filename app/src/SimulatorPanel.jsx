@@ -3,7 +3,8 @@ import SimulatorCanvas from "./SimulatorCanvas.jsx"
 import BusyWorkerSender from "./busy_worker_sender.js";
 import dbgconsole from "./dbgconsole";
 import { Button, Select } from "react-daisyui";
-
+import keybinds from "./Keybinds.js";
+import KeybindsModal from "./KeybindsModal.jsx";
 
 
 const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
@@ -24,6 +25,7 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
     // Refs
     let canvas = useRef(undefined);
     let encoder = useRef(new TextEncoder());
+    let keybindsModalRef = useRef(undefined);
 
     // Communication link to simulator worker thread
     let sender = useRef(undefined);
@@ -87,45 +89,37 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             return;
         }
 
+        console.log("Key down!");
+
         let value = sender.current.getu16("pressed_buttons", 0);
 
-        switch(e.key){
-            case 'w':        // DPAD UP
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_UP);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 'a':        // DPAD LEFT
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_LEFT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 's':        // DPAD DOWN
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_DOWN);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 'd':        // DPAD RIGHT
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_RIGHT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case '.':        // A
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_A);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case ',':        // B
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_B);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case "Shift":    // BUMPER LEFT
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_BUMPER_LEFT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case ' ':        // BUMPER RIGHT
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_BUMPER_RIGHT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case "Enter":    // MENU
-                sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_MENU);
-                sender.current.mark("pressed_buttons", false);
-            break;
+        if(keybinds.check("up", e.key)){                    // DPAD UP
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_UP);
+            sender.current.mark("pressed_buttons", false);  
+        }else if(keybinds.check("left", e.key)){            // DPAD LEFT
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_LEFT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("down", e.key)){            // DPAD DOWN
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_DOWN);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("right", e.key)){           // DPAD RIGHT
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_DPAD_RIGHT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("a", e.key)){               // A
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_A);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("b", e.key)){               // B
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_B);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("left_bumper", e.key)){     // BUMPER LEFT
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_BUMPER_LEFT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("right_bumper", e.key)){    // BUMPER RIGHT
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_BUMPER_RIGHT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("menu", e.key)){            // MENU
+            sender.current.setu16("pressed_buttons", 0, value | BUTTON_CODE_MENU);
+            sender.current.mark("pressed_buttons", false);
         }
     }
 
@@ -135,45 +129,37 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
             return;
         }
 
+        console.log("Key up!");
+
         let value = sender.current.getu16("pressed_buttons", 0);
 
-        switch(e.key){
-            case 'w':        // DPAD UP
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_UP);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 'a':        // DPAD LEFT
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_LEFT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 's':        // DPAD DOWN
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_DOWN);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case 'd':        // DPAD RIGHT
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_RIGHT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case '.':        // A
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_A);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case ',':        // B
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_B);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case "Shift":    // BUMPER LEFT
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_BUMPER_LEFT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case ' ':        // BUMPER RIGHT
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_BUMPER_RIGHT);
-                sender.current.mark("pressed_buttons", false);
-            break;
-            case "Enter":    // MENU
-                sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_MENU);
-                sender.current.mark("pressed_buttons", false);
-            break;
+        if(keybinds.check("up", e.key)){                    // DPAD UP
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_UP);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("left", e.key)){            // DPAD LEFT
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_LEFT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("down", e.key)){            // DPAD DOWN
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_DOWN);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("right", e.key)){           // DPAD RIGHT
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_DPAD_RIGHT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("a", e.key)){               // A
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_A);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("b", e.key)){               // B
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_B);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("left_bumper", e.key)){     // BUMPER LEFT
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_BUMPER_LEFT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("right_bumper", e.key)){    // BUMPER RIGHT
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_BUMPER_RIGHT);
+            sender.current.mark("pressed_buttons", false);
+        }else if(keybinds.check("menu", e.key)){            // MENU
+            sender.current.setu16("pressed_buttons", 0, value & ~BUTTON_CODE_MENU);
+            sender.current.mark("pressed_buttons", false);
         }
     }
 
@@ -298,6 +284,8 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
 
     return(
         <div ref={this} className="w-full h-full flex justify-center bg-base-200">
+            <KeybindsModal ref={keybindsModalRef}/>
+
             <div className="w-min h-full flex flex-col justify-center items-center">
                 <SimulatorCanvas ref={canvas}/>
                 <div className="w-full h-16 flex justify-center items-center">
@@ -322,17 +310,21 @@ const SimulatorPanel = forwardRef(function SimulatorPanel(props, ref){
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
                             <path fillRule="evenodd" d="M1 8a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 8.07 3h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 16.07 6H17a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8Zm13.5 3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM10 14a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
                         </svg>
-                        Screenshot
                     </Button>
 
                     <Button color="secondary" size="sm" className="ml-1" onClick={handleRecording} title="Start or stop recording the simulator. Video auto downloads when recording is stopped">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
                             <path d="M3.25 4A2.25 2.25 0 0 0 1 6.25v7.5A2.25 2.25 0 0 0 3.25 16h7.5A2.25 2.25 0 0 0 13 13.75v-7.5A2.25 2.25 0 0 0 10.75 4h-7.5ZM19 4.75a.75.75 0 0 0-1.28-.53l-3 3a.75.75 0 0 0-.22.53v4.5c0 .199.079.39.22.53l3 3a.75.75 0 0 0 1.28-.53V4.75Z" />
                         </svg>
-                        Record
                         <div className={"w-4 h-4 rounded-full " + (recording ? "bg-red-600" : "bg-gray-700")}>
 
                         </div>
+                    </Button>
+
+                    <Button color="secondary" size="sm" className="mx-2" onClick={() => {keybindsModalRef.current.showModal()}} title="Configure key binds">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-keyboard-fill" viewBox="0 0 16 16">
+                            <path d="M0 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm13 .25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5a.25.25 0 0 0-.25.25M2.25 8a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 3 8.75v-.5A.25.25 0 0 0 2.75 8zM4 8.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 5 8.75v-.5A.25.25 0 0 0 4.75 8h-.5a.25.25 0 0 0-.25.25M6.25 8a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 7 8.75v-.5A.25.25 0 0 0 6.75 8zM8 8.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 9 8.75v-.5A.25.25 0 0 0 8.75 8h-.5a.25.25 0 0 0-.25.25M13.25 8a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zm0 2a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zm-3-2a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h1.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zm.75 2.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5a.25.25 0 0 0-.25.25M11.25 6a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zM9 6.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5A.25.25 0 0 0 9.75 6h-.5a.25.25 0 0 0-.25.25M7.25 6a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 8 6.75v-.5A.25.25 0 0 0 7.75 6zM5 6.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 6 6.75v-.5A.25.25 0 0 0 5.75 6h-.5a.25.25 0 0 0-.25.25M2.25 6a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h1.5A.25.25 0 0 0 4 6.75v-.5A.25.25 0 0 0 3.75 6zM2 10.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25h-.5a.25.25 0 0 0-.25.25M4.25 10a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h5.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25z"/>
+                        </svg>
                     </Button>
                 </div>
             </div>

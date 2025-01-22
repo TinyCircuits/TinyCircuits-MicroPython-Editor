@@ -52,7 +52,7 @@ function SelectLocationModal(props){
     return(
         <CustomModal title="Select RUN Location Folder:" titleColor="base-content" btn="Run" onBtnClick={onRUN} outlineColor="base-content" ref={modalRef}>
             <div className="w-full h-full bg-base-200">
-                <FilesPanel tree={runLocationSelectTree} showRoot={true} checkmarks={false} showFiles={false} collapsible={false} onFolderSelected={onFolderSelected}/>
+                <FilesPanel tree={runLocationSelectTree} showRoot={true} checkmarks={false} showFiles={false} collapsible={false} onFolderSelected={onFolderSelected} allFoldersOpen={true}/>
             </div>
             <div className="h-8 flex items-center mt-2">
                 <p className="text-nowrap font-bold">Selected RUN Path:</p>

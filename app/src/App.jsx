@@ -246,20 +246,20 @@ function App(props){
                 try{
                     await serial.current.connect([{ usbVendorId: 0x2E8A, usbProductId: 0x0003 }, { usbVendorId: 0x2E8A, usbProductId: 0x0005 }]);
                     
-                    let date = new Date();
-                    let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';
-                    console.log(datetime);
+//                     let date = new Date();
+//                     let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';
+//                     console.log(datetime);
 
-                    MpRawMode.begin(serial.current).then(async (raw_mode) => {
+//                     MpRawMode.begin(serial.current).then(async (raw_mode) => {
 
-                        await raw_mode.exec(`
-import engine_main
-import engine_time
-engine_time.datetime(` + datetime + `)
-                        `, 0, false);
+//                         await raw_mode.exec(`
+// import engine_main
+// import engine_time
+// engine_time.datetime(` + datetime + `)
+//                         `, 0, false);
 
-                        raw_mode.end();
-                    });
+//                         raw_mode.end();
+//                     });
 
                 }catch(error){
                     // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort/open#exceptions
@@ -330,12 +330,15 @@ engine_time.datetime(` + datetime + `)
     }
 
     const openDeviceFiles = () => {
-        connectSerial().then(() => {
+        connectSerial().then(async () => {
             let files = new DeviceFiles(serial.current, setTree);
             setDeviceFiles(files);
             setMainFiles(files);
 
+            console.log("Opening device files...");
+            await serial.current.reset();
             files.openFiles().then(() => {
+                console.log("Opened device files!");
                 choosePlatformModalRef.current?.close();
 
                 // Set this so that the files panel header renders with the correct platform
@@ -489,7 +492,8 @@ engine_time.datetime(` + datetime + `)
 
             let run_dir_path = filePathToRun.substring(0, filePathToRun.lastIndexOf("/"));
 
-            await raw_mode.exec(`
+            console.log("Running...");
+            await serial.current.write(`
 import sys
 import os
 import engine_save
@@ -497,10 +501,9 @@ engine_save._init_saves_dir("/Saves/` + run_dir_path + `")
 sys.path.append("` + run_dir_path + `")
 os.chdir("` + run_dir_path + `")
 execfile("` + filePathToRun + `")
-`, 0, true);
-
-            // let file_data = await raw_mode.readFile(path);
-            // raw_mode.end();
+`);
+            await serial.current.write('\x04')         // Ctrl-D: execute
+            await raw_mode.end();
         });
     }
 
@@ -565,11 +568,14 @@ execfile("` + filePathToRun + `")
             return;
         }
 
+        console.log("Resetting to prepare to run...");
         await serial.current.reset();
+        console.log("Reset!");
 
         // If the user chose files from the computer and the path has not
         // been set yet, ask the user to select a path on the device to run
         // the files at
+        console.log("Preparing to run...");
         if(runPathDevice == "" && choseComputer.current){
             await deviceFiles.openFiles();                      // Update internal tree
             setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
@@ -720,9 +726,6 @@ execfile("` + filePathToRun + `")
                             </Button>
                             <Input value={runPathDevice} className='w-24' disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             </Input>
-                            <Button onClick={() => setRunAfterLocationSelect(() => runOnDevice)} disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                                ...
-                            </Button>
                         </Join>
 
                         <Join>
@@ -731,9 +734,6 @@ execfile("` + filePathToRun + `")
                             </Button>
                             <Input value={runPathSimulator} className='w-24' disabled={choseComputer.current == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             </Input>
-                            <Button onClick={() => setRunAfterLocationSelect(() => runInSimulator)} disabled={choseComputer.current == undefined ? true : false} size='sm' style={{borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
-                                ...
-                            </Button>
                         </Join>
                     </div>
 

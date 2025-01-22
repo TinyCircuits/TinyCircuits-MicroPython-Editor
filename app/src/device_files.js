@@ -14,7 +14,9 @@ class DeviceFiles{
     // Call this to open file directory chooser on computer
     openFiles = async () => {
         return new Promise(async (resolve, reject) => {
+            console.log("Open files: Attempting to enter raw mode...");
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
+                console.log("Open files: Entered raw mode!");
                 raw_mode.walkFs().then((tree) => {
                     this.tree = tree;
                     if(this.setTree != undefined) this.setTree(this.tree);

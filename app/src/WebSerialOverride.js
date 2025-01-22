@@ -21,8 +21,7 @@ class WebSerialOverride extends WebSerial{
     // RP2350 devices
     async requestAccess(filters){
         super.port = await this.serial.requestPort({ filters });
-        this.setIsSerialConnected(true);
-
+        
         try{
             const pi = super.port.getInfo()
             this.info = {
@@ -56,8 +55,8 @@ class WebSerialOverride extends WebSerial{
             console.log('Connecting to selected device...');
         }
 
-        
         await super.connect();
+        this.setIsSerialConnected(true);
         this.port.addEventListener('disconnect', this.disconnect.bind(this));
     }
 
@@ -90,21 +89,32 @@ class WebSerialOverride extends WebSerial{
     // Call this to get the device back into a soft
     // rebooted mode
     async reset(){
+        console.log("reset: Starting transaction...");
         let endTransaction = await this.startTransaction();
+        console.log("reset: Transaction started!");
 
         await this.write("\x03");   // Interrupt any program
-        if(await this.readUntil(">", 500) == undefined){
-            await this.readUntil(">>>", 500);
+
+        try{
+            await this.readUntil(">", 500)
+        }catch(ex){
+            console.warn(ex);
+        }
+
+        try{
+            await this.readUntil(">>>", 500)
+        }catch(ex){
+            console.warn(ex);
         }
 
         await this.write("\x02");   // Exit raw mode if in it
-        await this.readUntil(">>>", 3000);
+        await this.readUntil(">>>", 850);
 
         await this.write("\x04");   // Soft reboot
-        await this.readUntil("Engine", 500);
+        await this.readUntil("Engine", 850);
 
         await this.write("\x03");   // Interrupt main
-        await this.readUntil(">>>", 500);
+        // await this.readUntil(">>>", 850);
 
         endTransaction();
     }

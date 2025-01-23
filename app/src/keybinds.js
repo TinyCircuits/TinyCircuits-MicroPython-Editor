@@ -1,8 +1,20 @@
 import { createContext } from "react";
 
+export const KeybindDirections = {
+    UP:          "up",
+    DOWN:        "down",
+    LEFT:        "left",
+    RIGHT:       "right",
+    A:           "a",
+    B:           "b",
+    LEFT_BUMPER: "left_bumper",
+    RIGHT_BUMPER: "right_bumper",
+    MENU:         "menu"
+}
+
 class Keybinds{
     constructor(){
-        const defaultKeybinds = {
+        this.defaultKeybinds = {
             "up":          "w",
             "down":        "s",
             "left":        "a",
@@ -16,10 +28,10 @@ class Keybinds{
 
         this.keybinds = localStorage.getItem("keybinds");
 
-        if(this.keybinds == null){
-            this.keybinds = defaultKeybinds;
+        if(this.keybinds == null || this.keybinds == "undefined"){
+            this.keybinds = this.defaultKeybinds;
         }else{
-            this.keybinds = JSON.parse(keybinds);
+            this.keybinds = JSON.parse(this.keybinds);
         }
     }
 
@@ -30,9 +42,19 @@ class Keybinds{
         return directionKey == key;
     }
 
+    get(direction){
+        console.log("Getting", direction, "key");
+        return this.keybinds[direction];
+    }
+
     // Set the key for a direction and store
     set(direction, key){
         this.keybinds[direction] = key;
+        localStorage.setItem("keybinds", JSON.stringify(this.keybinds));
+    }
+
+    reset(){
+        this.keybinds = this.defaultKeybinds;
         localStorage.setItem("keybinds", JSON.stringify(this.keybinds));
     }
 }

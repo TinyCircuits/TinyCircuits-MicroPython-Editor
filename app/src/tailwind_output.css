@@ -8918,14 +8918,6 @@ html:has(.drawer-open.drawer-open) {
   height: 100%;
 }
 
-.h-20 {
-  height: 5rem;
-}
-
-.h-0 {
-  height: 0px;
-}
-
 .min-h-0 {
   min-height: 0px;
 }

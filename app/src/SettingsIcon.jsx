@@ -4,12 +4,17 @@ import { Theme, Dropdown, Indicator } from 'react-daisyui'
 import { useState, useEffect } from 'react';
 
 function SettingsIcon(props){
-    const {className} = props;                    // Passed properties
+    const {className, deviceUpdatable} = props;                    // Passed properties
 
     return(
         <Theme dataTheme="dim" className={className}>
             <Indicator>
-                {/* <Indicator.Item className='badge badge-secondary badge-xs'/> */}
+                {
+                    deviceUpdatable ?
+                        <Indicator.Item className='badge badge-secondary badge-xs'/>
+                                    :
+                        <></>
+                }
                 <Dropdown horizontal='left'>
                     <Dropdown.Toggle>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -19,7 +24,15 @@ function SettingsIcon(props){
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu className="w-40 z-[2000] bg-base-300">
-                        <Dropdown.Item onClick={() => {}}>Update</Dropdown.Item>
+                        <Indicator>
+                            {
+                                deviceUpdatable ?
+                                    <Indicator.Item className='badge badge-secondary badge-xs'/>
+                                                :
+                                    <></>
+                            }
+                            <Dropdown.Item onClick={() => {}}>Update</Dropdown.Item>
+                        </Indicator>
                         <Dropdown.Item onClick={() => {}}>Sync RTC Time</Dropdown.Item>
                         <Dropdown.Item onClick={() => {}}>Factory Reset</Dropdown.Item>
                     </Dropdown.Menu>

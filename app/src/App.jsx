@@ -74,6 +74,7 @@ function App(props){
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
     const [allFoldersOpen, setAllFoldersOpen] = useState(false);
+    const [deviceUpdatable, setDeviceUpdatable] = useState(false);
     
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
@@ -775,7 +776,7 @@ execfile("` + filePathToRun + `")
                             </svg>
                         </Button>
 
-                        <SettingsIcon className='mr-4'/>
+                        <SettingsIcon className='mr-4' deviceUpdatable={deviceUpdatable}/>
                     </div>
                 </div>
             </PageHeaderContents>

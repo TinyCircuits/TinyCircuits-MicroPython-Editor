@@ -3,7 +3,7 @@ import SimulatorCanvas from "./SimulatorCanvas.jsx"
 import BusyWorkerSender from "./busy_worker_sender.js";
 import dbgconsole from "./dbgconsole";
 import { Button, Select } from "react-daisyui";
-import keybinds from "./Keybinds.js";
+import keybinds from "./keybinds.js";
 import KeybindsModal from "./KeybindsModal.jsx";
 
 

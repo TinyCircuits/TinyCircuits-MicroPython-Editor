@@ -32,4 +32,5 @@ pocketbase
 # Build
 /pb_public/
 simulator
+firmware
 assets

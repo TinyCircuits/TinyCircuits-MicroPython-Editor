@@ -1,4 +1,4 @@
-import dbgconsole from "./dbgconsole";
+import dbgconsole from "../dbgconsole";
 
 // Common interface that BusyWorkerSender and BusyWorkerReceiver
 // both use

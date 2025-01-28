@@ -1,5 +1,3 @@
-import './App.css'
-import './tailwind_output.css'
 import { Theme, Dropdown, Indicator } from 'react-daisyui'
 import { useState, useEffect } from 'react';
 

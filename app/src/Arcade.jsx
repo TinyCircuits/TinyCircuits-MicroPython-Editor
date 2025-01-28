@@ -1,17 +1,17 @@
-import './App.css'
-import './tailwind_output.css'
+import './css/App.css'
+import './css/tailwind_output.css'
 import { Input, Join, Theme, Button, Progress, Select } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import CustomModal from './CustomModal';
-import Alerts from './Alerts.jsx';
+import CustomModal from './components/CustomModal.jsx'
+import Alerts from './components/Alerts.jsx';
 
-import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './Page';
-import Footer from './Footer';
-import setupRoot from './root';
-import RequestModal from './RequestModel.jsx';
-import WebSerialOverride from './WebSerialOverride.js';
-import MpRawModeOverride from './MpRawModeOverride.js';
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './components/Page';
+import Footer from './components/Footer';
+import setupRoot from './js/root.js'
+import RequestModal from './components/RequestModel.jsx';
+import WebSerialOverride from './js/WebSerialOverride.js';
+import MpRawModeOverride from './js/MpRawModeOverride.js';
 
 
 // Class that hold information about each game on the Arcade

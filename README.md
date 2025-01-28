@@ -1,8 +1,6 @@
 # TinyCircuits-MicroPython-Editor
 Web IDE focused on editing, running, and uploading MicroPython code on and to TinyCircuits' devices.
 
-**NOTICE: Still in early development, most features do not work! Even the basics! (10/08/2024)**
-
 # Libraries
 * Framework: [ReactJS](https://react.dev/)
 * Editor: [CodeMirror](https://codemirror.net/) + [ReactJS](https://react.dev/) = [React CodeMirror](https://uiwjs.github.io/react-codemirror/)
@@ -22,11 +20,15 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
     * https://www.joshwcomeau.com/react/why-react-re-renders/
     * https://www.joshwcomeau.com/react/usememo-and-usecallback/
 
+# Setup
+1. Run the `build.py` script in https://github.com/TinyCircuits/Thumby-Color-Website
+2. Copy contents of `Thumby-Color-Website/site/simulator` to `app/public/simulator`
+3. Copy contents of `Thumby-Color-Website/site/firmware` to `app/public/firmware`
 
 # Running without backend:
 1. `cd app`
 2. `npm run dev`
-3. `npx tailwindcss -i ./src/tailwind_input.css -o ./src/tailwind_output.css --watch`
+3. `npx tailwindcss -i ./src/css/tailwind_input.css -o ./src/css/tailwind_output.css --watch`
 4. Access: `http://localhost:5173/`
 
 
@@ -34,7 +36,7 @@ Web IDE focused on editing, running, and uploading MicroPython code on and to Ti
 1. `./pocketbase serve`
 2. `cd app`
 3. `npm run build_watch`
-4. `npx tailwindcss -i ./src/tailwind_input.css -o ./src/tailwind_output.css --watch`
+4. `npx tailwindcss -i ./src/css/tailwind_input.css -o ./src/css/tailwind_output.css --watch`
 5. Access `http://localhost:8090/`
 
 NOTE on 404: https://github.com/pocketbase/pocketbase/discussions/3767

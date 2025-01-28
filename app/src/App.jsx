@@ -1,26 +1,26 @@
 import { useState, useRef, Children, useCallback, useEffect} from 'react'
-import './App.css'
+import './css/App.css'
+import './css/tailwind_output.css'
 
-import './tailwind_output.css'
 import { Theme, Button, Modal, Progress, Input, Join} from 'react-daisyui'
-import FilesPanel from './FilesPanel.jsx'
-import TabPanel from './TabPanel.jsx'
-import TerminalPanel from './TerminalPanel.jsx'
-import SimulatorPanel from './SimulatorPanel.jsx'
-import AddPanel from './AddPanel.jsx'
-import CodePanel from './CodePanel.jsx'
-import CustomModal from './CustomModal.jsx'
+import FilesPanel from './components/FilesPanel.jsx'
+import TabPanel from './components/TabPanel.jsx'
+import TerminalPanel from './components/TerminalPanel.jsx'
+import SimulatorPanel from './components/SimulatorPanel.jsx'
+import AddPanel from './components/AddPanel.jsx'
+import CodePanel from './components/CodePanel.jsx'
+import CustomModal from './components/CustomModal.jsx'
 import { MpRawMode } from 'ViperIDE/src/rawmode.js'
-import SelectLocationModal from './SelectLocationModal.jsx'
-import User from './user.js'
+import MpRawModeOverride from './js/MpRawModeOverride.js'
+import SelectLocationModal from './components/SelectLocationModal.jsx'
 
 import React from 'react';
 
-import ComputerFiles from './computer_files.js'
-import DeviceFiles from './device_files.js'
-import WebSerialOverride from './WebSerialOverride.js'
-import Footer from './Footer.jsx'
-import setupRoot from './root.js'
+import ComputerFiles from './js/computer_files.js'
+import DeviceFiles from './js/device_files.js'
+import WebSerialOverride from './js/WebSerialOverride.js'
+import Footer from './components/Footer.jsx'
+import setupRoot from './js/root.js'
 
 
 import{
@@ -33,13 +33,17 @@ import{
 } from "react-resizable-panels";
 import { createRoot } from 'react-dom/client'
 
-import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents } from './Page.jsx'
-import SettingsIcon from './SettingsIcon.jsx'
+import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents } from './components/Page.jsx'
+import SettingsIcon from './components/SettingsIcon.jsx'
 
+export const Platform = {
+    NONE: 0,
+    COMPUTER: 1,
+    THUMBY_COLOR: 2,
+    THUMBY: 3
+};
 
 function App(props){
-    let user = useRef(new User());
-
     const [tree, setTree] = useState([]);
     const [pathCheckedToRun, setPathCheckedToRun] = useState({path:"", isFolder:false});   // The path that was checked to run, can be a folder or file
     let allCheckedPaths = useRef([]);                               // A list of all the paths checked to run under `pathCheckedToRun` (including it)   
@@ -50,7 +54,7 @@ function App(props){
     let [deviceFiles, setDeviceFiles] = useState(undefined);
     let [mainFiles, setMainFiles] = useState(undefined);
 
-    let choseComputer = useRef(undefined);
+    let [platform, setPlatform] = useState(Platform.NONE);
 
     // The active tab key
     const [activeEditorTabKey, setActiveEditorTabKey] = useState(0);
@@ -122,11 +126,11 @@ function App(props){
         setIsSerialConnected(value);
 
         // Reset all of these so that the editor is reset
-        if(value == false && (choseComputer.current == false)){
+        if(value == false && (platform == Platform.THUMBY_COLOR || platform == Platform.THUMBY)){
             editorValues.current = {};
             setTree([]);
             setEditorTabsData([addTab]);
-            choseComputer.current = undefined;
+            setPlatform(Platform.NONE);
         }
 
         // Reset this no matter what
@@ -321,7 +325,7 @@ function App(props){
             choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
-            choseComputer.current = true;
+            setPlatform(Platform.COMPUTER);
 
             // Get rid of any editor tabs that existed before
             setEditorTabsData([addTab]);
@@ -338,14 +342,33 @@ function App(props){
             setDeviceFiles(files);
             setMainFiles(files);
 
+            // Detect the platform
+            let rawMode = await MpRawModeOverride.begin(serial.current);
+            let platform = await rawMode.platform();
+            let date_version = await rawMode.date_version();
+            rawMode.end();
+
+            setPlatform(platform);
+
+            if(platform == Platform.THUMBY_COLOR){
+                // Split the string into date and time parts
+                const [datePart, timePart] = date_version.split("_");
+
+                // Extract individual components from date and time
+                const [year, month, day] = datePart.split("-");
+                const [hours, minutes, seconds] = timePart.split(":");
+
+                let date = new Date(year, month - 1, day, hours, minutes, seconds);
+                
+            }else{
+
+            }
+
             console.log("Opening device files...");
             await serial.current.reset();
             files.openFiles().then(() => {
                 console.log("Opened device files!");
                 choosePlatformModalRef.current?.close();
-
-                // Set this so that the files panel header renders with the correct platform
-                choseComputer.current = false;
 
                 // Get rid of any editor tabs that existed before
                 setEditorTabsData([addTab]);
@@ -359,12 +382,14 @@ function App(props){
 
     const getFilesPanelTitle = () => {
         const getTitle = () => {
-            if(choseComputer.current == undefined){
+            if(platform == Platform.NONE){
                 return "Files";
-            }else if(choseComputer.current){
+            }else if(platform == Platform.COMPUTER){
                 return "Files: Computer";
-            }else{
-                return "Files: Device";
+            }else if(platform == Platform.THUMBY_COLOR){
+                return "Files: Thumby Color";
+            }else if(platform == Platform.THUMBY){
+                return "Files: Thumby";
             }
         }
 
@@ -495,7 +520,7 @@ function App(props){
             // Only if the file system panel has computer files
             // open do we want to upload the files to the device
             // before running
-            if(choseComputer.current == true){
+            if(platform == Platform.COMPUTER){
                 for(let ifx=0; ifx<files.length; ifx++){
                     console.log(files[ifx]);
                     let fileDirPath = files[ifx].path.substring(0, files[ifx].path.lastIndexOf("/"));
@@ -567,7 +592,7 @@ execfile("` + filePathToRun + `")
         // and upload them, otherwise we don't (does not make
         // sense to open files on device if we are running
         // on the device)
-        let openFiles = choseComputer.current == true;
+        let openFiles = platform == Platform.COMPUTER;
 
         let [files, filePathToRun] = await getRunFileAndCheckedData(openFiles);
 
@@ -593,7 +618,7 @@ execfile("` + filePathToRun + `")
         // been set yet, ask the user to select a path on the device to run
         // the files at
         console.log("Preparing to run...");
-        if(runPathDevice == "" && choseComputer.current){
+        if(runPathDevice == "" && platform == Platform.COMPUTER){
             await deviceFiles.openFiles();                      // Update internal tree
             setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runOnDevice);
@@ -735,21 +760,21 @@ execfile("` + filePathToRun + `")
                         </Button>
 
                         <Join>
-                            <Button onClick={handleSerialConnectButton} disabled={(choseComputer.current == undefined) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                            <Button onClick={handleSerialConnectButton} disabled={(platform == Platform.NONE) ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                                 {isSerialConnected == false ? <p>Connect</p> : <p>Disconnect</p>}
                             </Button>
-                            <Button onClick={onRunOnDevice} disabled={(choseComputer.current == undefined || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            <Button onClick={onRunOnDevice} disabled={(platform == Platform.NONE || isSerialConnected == false) ? true : false} size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                                 Run
                             </Button>
-                            <Input value={runPathDevice} className='w-24' disabled={(choseComputer.current == undefined || isSerialConnected == false || choseComputer == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            <Input value={runPathDevice} className='w-24' disabled={(platform == Platform.NONE || isSerialConnected == false) ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             </Input>
                         </Join>
 
                         <Join>
-                            <Button onClick={onRunInSimulator} disabled={choseComputer.current == undefined ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
+                            <Button onClick={onRunInSimulator} disabled={platform == Platform.NONE ? true : false} className="ml-2" size='sm' color="primary" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px"}}>
                                 Simulate
                             </Button>
-                            <Input value={runPathSimulator} className='w-24' disabled={choseComputer.current == undefined ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
+                            <Input value={runPathSimulator} className='w-24' disabled={platform == Platform.NONE ? true : false} size="sm" style={{borderTopRightRadius:"0px", borderBottomRightRadius:"0px", borderTopLeftRadius:"0px", borderBottomLeftRadius:"0px"}}>
                             </Input>
                         </Join>
                     </div>
@@ -834,8 +859,6 @@ execfile("` + filePathToRun + `")
                                 <PanelResizeHandle className="h-1 bg-base-300" />
 
                                 <Panel className="bg-base-100" defaultSize={28.2} minSize={2} maxSize={98} onResize={() => document.dispatchEvent(new Event("terminal-panel-resized"))}>
-                                    {/* <PanelHeader title="Terminal" /> */}
-                                    {/* <TerminalPanel ref={xtermRef} serial={serial} /> */}
                                     <TabPanel tabsData={terminalTabsData} setTabsData={setTerminalTabsData} draggable={false} closeable={false} activeTabKey={activeTerminalTabKey} setActiveTabKey={setActiveTerminalTabKey}/>
                                 </Panel>
                             </PanelGroup>

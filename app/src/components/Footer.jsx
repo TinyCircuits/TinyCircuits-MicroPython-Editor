@@ -1,6 +1,3 @@
-import './App.css'
-import './tailwind_output.css'
-
 import { Link } from 'react-daisyui';
 
 function Footer(props){
@@ -9,7 +6,7 @@ function Footer(props){
 
     return(
         <div className="flex-1 flex flex-row-reverse items-center">
-            <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V01.27.2025.0</p>
+            <p className="font-extralight text-sm mr-1">TinyCircuits MicroPython Editor: ALPHA V01.28.2025.0</p>
         </div>
     )
 }

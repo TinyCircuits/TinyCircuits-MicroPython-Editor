@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import { Button, Modal, Input, Checkbox, Join} from 'react-daisyui'
-import CustomModal from './CustomModal';
-import keybinds, { KeybindDirections } from './keybinds.js';
+import CustomModal from './CustomModal.jsx';
+import keybinds, { KeybindDirections } from '../js/keybinds.js';
 
 function Key(props){
     const {title, direction} = props;

@@ -1,5 +1,5 @@
 import { MpRawMode } from "ViperIDE/src/rawmode";
-
+import { Platform } from "../App";
 
 class MpRawModeOverride extends MpRawMode{
 
@@ -68,7 +68,37 @@ class MpRawModeOverride extends MpRawMode{
         }
     }
 
-    
+    async platform(){
+        const cmd = `import sys\nprint(sys.implementation._machine)`;
+        const output = await this.exec(cmd);
+
+        if(output.indexOf("RP2350") != -1){
+            return Platform.THUMBY_COLOR;
+        }else if(output.indexOf("RP2040") != -1){
+            return Platform.THUMBY;
+        }else{
+            return Platform.NONE;
+        }
+    }
+
+    async date_version(){
+        const cmd = `
+try:
+    import engine_main
+    import engine
+    print(engine.firmware_date())
+except:
+    try:
+        import thumby 
+        print(thumby.__version__)
+    except:
+        print("00-00-00_00:00:00")
+`;
+        let output = await this.exec(cmd);
+        output = output.split(/\r\n|\r|\n/);
+
+        return output[output.length-2];
+    }
 }
 
 export default MpRawModeOverride;

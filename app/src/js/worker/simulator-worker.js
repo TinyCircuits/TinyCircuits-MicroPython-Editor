@@ -1,6 +1,6 @@
 import {loadMicroPython} from "../micropython.mjs"
-import BusyWorkerReceiver from "./busy_worker_receiver";
-import dbgconsole from "../dbgconsole";
+import BusyWorkerReceiver from "./busy_worker_receiver.js";
+import dbgconsole from "../dbgconsole.js";
 
 
 async function writeFilesystemFile(mp, fetchPath, filePath){

@@ -81,7 +81,7 @@ class MpRawModeOverride extends MpRawMode{
         }
     }
 
-    async date_version(){
+    async dateVersion(){
         const cmd = `
 try:
     import engine_main
@@ -98,6 +98,18 @@ except:
         output = output.split(/\r\n|\r|\n/);
 
         return output[output.length-2];
+    }
+
+    async showEditorConnected(platform){
+        const cmd = `
+import engine_main
+import engine_draw
+
+engine_draw.clear(0)
+engine_draw.text(None, "Connected to\\n   Editor\\n\\n     :)\\n\\n Turn OFF &\\n ON to reset", 0xffff, 27, 38, 1, 1, 1.0)
+engine_draw.update()
+`;
+        await this.exec(cmd);
     }
 }
 

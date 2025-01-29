@@ -21,6 +21,7 @@ import DeviceFiles from './js/device_files.js'
 import WebSerialOverride from './js/WebSerialOverride.js'
 import Footer from './components/Footer.jsx'
 import setupRoot from './js/root.js'
+import getDate from './js/utils/date.js'
 
 
 import{
@@ -31,10 +32,10 @@ import{
     PanelGroup,
     PanelResizeHandle,
 } from "react-resizable-panels";
-import { createRoot } from 'react-dom/client'
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents } from './components/Page.jsx'
 import SettingsIcon from './components/SettingsIcon.jsx'
+import UpdateModal from './components/UpdateModal.jsx'
 
 export const Platform = {
     NONE: 0,
@@ -66,6 +67,7 @@ function App(props){
     const [errorMsgDetails, setErrorMsgDetails] = useState("No error details, you shouldn't see this...");
 
     const errorModalRef = useRef(null);
+    const updateModalRef = useRef(null);
     const choosePlatformModalRef = useRef(null);
     const xtermRefDevice = useRef(null);
     const xtermRefSimulator = useRef(null);
@@ -78,7 +80,9 @@ function App(props){
     const [runAfterLocationSelect, setRunAfterLocationSelect] = useState(undefined);    // Set this to show the location select model
     const [runLocationSelectTree, setRunLocationSelectTree] = useState(undefined);
     const [allFoldersOpen, setAllFoldersOpen] = useState(false);
+
     const [deviceUpdatable, setDeviceUpdatable] = useState(false);
+    const [detectedDeviceVersion, setDetectedDeviceVersion] = useState("");
     
     // Whenever a path is checked to run or not run,
     // need to clear the run location that was set
@@ -345,21 +349,23 @@ function App(props){
             // Detect the platform
             let rawMode = await MpRawModeOverride.begin(serial.current);
             let platform = await rawMode.platform();
-            let date_version = await rawMode.date_version();
+            let date_version = await rawMode.dateVersion();
+            await rawMode.showEditorConnected(platform);
             rawMode.end();
 
             setPlatform(platform);
 
             if(platform == Platform.THUMBY_COLOR){
-                // Split the string into date and time parts
-                const [datePart, timePart] = date_version.split("_");
+                let versions = await (await fetch("/firmware/versions.json")).json();
 
-                // Extract individual components from date and time
-                const [year, month, day] = datePart.split("-");
-                const [hours, minutes, seconds] = timePart.split(":");
-
-                let date = new Date(year, month - 1, day, hours, minutes, seconds);
+                const latest_fimrware_date = getDate(versions[0]["date"]);
+                const firmware_date = getDate(date_version);
                 
+                setDetectedDeviceVersion(date_version);
+
+                if(firmware_date < latest_fimrware_date){
+                    setDeviceUpdatable(true);
+                }
             }else{
 
             }
@@ -714,6 +720,7 @@ execfile("` + filePathToRun + `")
         <Page>
             <PageModalContents>
                 <SelectLocationModal pathCheckedToRun={pathCheckedToRun} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect} runLocationSelectTree={runLocationSelectTree}/>
+                <UpdateModal platform={platform} detectedDeviceVersion={detectedDeviceVersion} ref={updateModalRef}/>
 
                 {/* ### Error modal ### */}
                 <CustomModal title="ERROR:" titleColor="error" outlineColor="error" ref={errorModalRef}>
@@ -794,14 +801,14 @@ execfile("` + filePathToRun + `")
                     </div>
 
                     <div className="h-full flex-1 flex flex-row items-center justify-end">
+                        <SettingsIcon className='mr-4' connected={isSerialConnected} deviceUpdatable={deviceUpdatable} onUpdateClick={() => {updateModalRef.current.showModal()}}/>
+                        
                         <Button size="sm" color='info' tag="a" target="_blank" rel="noopener" href="/code/arcade/" className='mr-4'>
                             Arcade
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
                                 <path fillRule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/>
                             </svg>
                         </Button>
-
-                        <SettingsIcon className='mr-4' deviceUpdatable={deviceUpdatable}/>
                     </div>
                 </div>
             </PageHeaderContents>

@@ -6,9 +6,9 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { Button } from "react-daisyui";
 
 let CustomModal = forwardRef(function CustomModal(props, ref){
-    const {title, titleColor, outlineColor, btn, onBtnClick, onCloseClick, children} = props;
+    const {title, titleColor, outlineColor, btn, onBtnClick, onCloseClick, children, show} = props;
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(show == undefined ? false : show);
 
     useImperativeHandle(ref, () => ({
         showModal(){

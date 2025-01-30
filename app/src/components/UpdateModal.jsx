@@ -65,10 +65,6 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
     return(
         <CustomModal ref={customModalRef} title={"Update " + title()}>
             <div className="flex flex-col items-center justify-center">
-                <div className="w-full flex-1">
-                    <span>Click the <b>Update</b> button to update to the latest software, or choose a different version:</span>
-                </div>
-
                 <div className="w-fit flex-1 flex flex-col items-center justify-center bg-base-200 p-2 rounded rounded-lg">
                     <div>
                         <span><b>Current device version:</b></span>

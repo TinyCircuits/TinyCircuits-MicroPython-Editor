@@ -68,32 +68,73 @@ class MpRawModeOverride extends MpRawMode{
         }
     }
 
+    async deleteFileOrDir(path){
+        let cmd = `
+import os
+def rm(d):  # Remove file or tree
+    try:
+        if os.stat(d)[0] & 0x4000:  # Dir
+            for f in os.ilistdir(d):
+                if f[0] not in ('.', '..'):
+                    rm('/'.join((d, f[0])))  # File or Dir
+            os.rmdir(d)
+        else:  # File
+            os.remove(d)
+    except Exception as e:
+        raise Exception('rm_failed ' + str(e))
+rm('${path}')
+`;
+        await this.exec(cmd);
+    }
+
     async platform(){
-        const cmd = `import sys\nprint(sys.implementation._machine)`;
+        // const cmd = `import sys\nprint(sys.implementation._machine)`;
+        const cmd = `
+try:
+    import engine
+    print("THUMBY_COLOR")
+except:
+    try:
+        import thumby
+        print("THUMBY")
+    except:
+        print("NONE")
+`
         const output = await this.exec(cmd);
 
-        if(output.indexOf("RP2350") != -1){
+        if(output.indexOf("THUMBY_COLOR") != -1){
             return Platform.THUMBY_COLOR;
-        }else if(output.indexOf("RP2040") != -1){
+        }else if(output.indexOf("THUMBY") != -1){
             return Platform.THUMBY;
         }else{
             return Platform.NONE;
         }
     }
 
-    async dateVersion(){
-        const cmd = `
+    async dateVersion(platform){
+        let cmd = undefined;
+
+        if(platform == Platform.THUMBY_COLOR){
+            cmd = `
 try:
     import engine_main
     import engine
     print(engine.firmware_date())
 except:
-    try:
-        import thumby 
-        print(thumby.__version__)
-    except:
-        print("00-00-00_00:00:00")
+    print("00-00-00_00:00:00")
 `;
+        }else if(platform == Platform.THUMBY){
+            cmd = `
+try:
+    import thumby 
+    print(thumby.__version__)
+except:
+    print("0.0")
+`;
+        }else{
+
+        }
+
         let output = await this.exec(cmd);
         output = output.split(/\r\n|\r|\n/);
 
@@ -105,10 +146,21 @@ except:
 import engine_main
 import engine_draw
 
-engine_draw.clear(0)
-engine_draw.text(None, "Connected to\\n   Editor\\n\\n     :)\\n\\n Turn OFF &\\n ON to reset", 0xffff, 27, 38, 1, 1, 1.0)
-engine_draw.update()
+try:
+    engine_draw.clear(0)
+    engine_draw.text(None, "Connected to\\n   Editor\\n\\n     :)\\n\\n Turn OFF &\\n ON to reset", 0xffff, 27, 38, 1, 1, 1.0)
+    engine_draw.update()
+except:
+    pass
 `;
+        await this.exec(cmd);
+    }
+
+    async bootloader(){
+        const cmd = `
+import machine
+machine.bootloader()
+`
         await this.exec(cmd);
     }
 }

@@ -6,7 +6,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { Button } from "react-daisyui";
 
 let CustomModal = forwardRef(function CustomModal(props, ref){
-    const {title, titleColor, outlineColor, btn, onBtnClick, onCloseClick, children, show} = props;
+    const {title, titleColor, outlineColor, btn, onBtnClick, onCloseClick, children, show, allowClose} = props;
 
     const [open, setOpen] = useState(show == undefined ? false : show);
 
@@ -20,6 +20,10 @@ let CustomModal = forwardRef(function CustomModal(props, ref){
     }), []);
 
     const onClickToClose = (clickedElementID) => {
+        if(!allowClose){
+            return;
+        }
+
         if(clickedElementID == "modalBackdropID" || clickedElementID == "closeButtonID"){
             if(onCloseClick){
                 onCloseClick();
@@ -61,7 +65,7 @@ let CustomModal = forwardRef(function CustomModal(props, ref){
                     {/* Footer/Buttons */}
                     <div className={"w-full h-16 flex items-center justify-end outline outline-1 rounded rounded-b-lg " + getOutlineColor()}>
                         {(btn != "" && btn != undefined) ? <Button color="primary" className="mx-2" onClick={(event) => {if(onBtnClick != undefined) onBtnClick()}}>{btn}</Button> : <></>}
-                        <Button className="mr-2" onClick={() => onClickToClose("closeButtonID")}>Close</Button>
+                        {(allowClose == undefined || allowClose == true) ? <Button className="mr-2" onClick={() => onClickToClose("closeButtonID")}>Close</Button> : <></>}
                     </div>
                 </div>
             );

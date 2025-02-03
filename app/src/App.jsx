@@ -349,19 +349,20 @@ function App(props){
             // Detect the platform
             let rawMode = await MpRawModeOverride.begin(serial.current);
             let platform = await rawMode.platform();
-            let date_version = await rawMode.dateVersion();
+            let dateVersion = await rawMode.dateVersion(platform);
             await rawMode.showEditorConnected(platform);
             rawMode.end();
 
+            console.warn(dateVersion);
             setPlatform(platform);
 
             if(platform == Platform.THUMBY_COLOR){
                 let versions = await (await fetch("/firmware/versions.json")).json();
 
                 const latest_fimrware_date = getDate(versions[0]["date"]);
-                const firmware_date = getDate(date_version);
+                const firmware_date = getDate(dateVersion);
                 
-                setDetectedDeviceVersion(date_version);
+                setDetectedDeviceVersion(dateVersion);
 
                 if(firmware_date < latest_fimrware_date){
                     setDeviceUpdatable(true);
@@ -720,7 +721,7 @@ execfile("` + filePathToRun + `")
         <Page>
             <PageModalContents>
                 <SelectLocationModal pathCheckedToRun={pathCheckedToRun} runAfterLocationSelect={runAfterLocationSelect} setRunAfterLocationSelect={setRunAfterLocationSelect} runLocationSelectTree={runLocationSelectTree}/>
-                <UpdateModal platform={platform} detectedDeviceVersion={detectedDeviceVersion} ref={updateModalRef}/>
+                <UpdateModal serial={serial.current} platform={platform} detectedDeviceVersion={detectedDeviceVersion} ref={updateModalRef}/>
 
                 {/* ### Error modal ### */}
                 <CustomModal title="ERROR:" titleColor="error" outlineColor="error" ref={errorModalRef}>

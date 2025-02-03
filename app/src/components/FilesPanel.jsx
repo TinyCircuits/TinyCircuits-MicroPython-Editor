@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react'
-import { Checkbox } from 'react-daisyui'
+import { useRef, useEffect, useState } from 'react'
+import { Button, Checkbox } from 'react-daisyui'
 import { Tree } from 'react-arborist'
 import useResizeObserver from 'use-resize-observer'
 
@@ -139,10 +139,22 @@ function FilesPanel(props){
 
 
     function Node({ node, style, dragHandle }){
+        const [dropdownOpen, setDropdownOpen] = useState(false);
+
+        const handleDropdown = (event) => {
+            event.preventDefault();
+            setDropdownOpen(!dropdownOpen);
+        }
+
         /* This node instance can do many things. See the API reference. */
         return (
-            <div style={style} ref={dragHandle} onClick={() => node.isInternal && node.toggle()}>
+            <div className='relative' style={style} ref={dragHandle} onClick={() => node.isInternal && node.toggle()} onContextMenu={handleDropdown}>
                 {getRow(node)}
+                <div className={'absolute w-fit h-fit flex flex-col z-[10000] ' + (dropdownOpen ? "visible" : "invisible")}>
+                    <Button size="sm" fullWidth={true} className='rounded-none'>Upload to device</Button>
+                    <Button size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
+                    <Button size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
+                </div>
             </div>
         );
     }
@@ -150,6 +162,10 @@ function FilesPanel(props){
 
     const handleClick = (mouseEvent) => {
         let node = treeRef.current.focusedNode;
+
+        if(node == null){
+            return;
+        }
 
         let isNodeFolder = node.children != null;
 

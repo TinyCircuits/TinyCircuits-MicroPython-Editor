@@ -48,11 +48,11 @@ export default class BusyWorkerReceiver extends BusyWorkerBase{
     }
 
 
-    check(channelName){
+    check(channelName, reset=true){
         let channel = this.channels[channelName];
 
         if(channel.view.getUint8(0) == 1){
-            channel.view.setUint8(0, 0);    // Reset
+            if(reset) channel.view.setUint8(0, 0);    // Reset
             return channel.onReceiveCB();
         }
     }

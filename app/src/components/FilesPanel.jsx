@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 import { Button, Checkbox } from 'react-daisyui'
 import { Tree } from 'react-arborist'
 import useResizeObserver from 'use-resize-observer'
+import { Platform } from '../App';
 
 
 
@@ -146,14 +147,49 @@ function FilesPanel(props){
             setDropdownOpen(!dropdownOpen);
         }
 
+        const uploadClick = (path) => {
+            console.log("Upload:", path);
+        }
+
+        const renameClick = (path) => {
+            console.log("Rename:", path);
+        }
+
+        const deleteClick = (path) => {
+            console.log("Delete:", path);
+        }
+
+        useEffect(() => {
+            const handleMouseDown = (event) => {
+                const id = event.target.id;
+
+                if(node.id + ":upload_btn" == id){
+                    uploadClick(node.id);
+                }else if(node.id + ":rename_btn" == id){
+                    renameClick(node.id);
+                }else if(node.id + ":delete_btn" == id){
+                    deleteClick(node.id);
+                }
+
+                setDropdownOpen(false);
+            }
+
+            document.addEventListener("mousedown", handleMouseDown);
+
+            // Cleanup
+            return () => {
+                document.removeEventListener("mousedown", handleMouseDown);
+            };
+        }, [])
+
         /* This node instance can do many things. See the API reference. */
         return (
             <div className='relative' style={style} ref={dragHandle} onClick={() => node.isInternal && node.toggle()} onContextMenu={handleDropdown}>
                 {getRow(node)}
-                <div className={'absolute w-fit h-fit flex flex-col z-[10000] ' + (dropdownOpen ? "visible" : "invisible")}>
-                    <Button size="sm" fullWidth={true} className='rounded-none'>Upload to device</Button>
-                    <Button size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
-                    <Button size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
+                <div className={'absolute w-fit h-fit flex flex-col z-[10000] bg-base-200 ' + (dropdownOpen ? "visible" : "invisible")}>
+                    <Button id={node.id + ":upload_btn"} size="sm" fullWidth={true} className='rounded-none' disabled={props.isSerialConnected == false || props.platform == Platform.THUMBY || props.platform == Platform.THUMBY_COLOR}>Upload to device</Button>
+                    <Button id={node.id + ":rename_btn"} size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
+                    <Button id={node.id + ":delete_btn"} size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
                 </div>
             </div>
         );

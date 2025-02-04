@@ -2,7 +2,7 @@ import { Theme, Dropdown, Indicator } from 'react-daisyui'
 import { useState, useEffect } from 'react';
 
 function SettingsIcon(props){
-    const {className, connected, deviceUpdatable, onUpdateClick} = props;                    // Passed properties
+    const {className, connected, deviceUpdatable, onUpdateClick, deviceSyncRTCClick} = props;                    // Passed properties
 
     return(
         <Theme dataTheme="dim" className={className}>
@@ -31,10 +31,10 @@ function SettingsIcon(props){
                                                         :
                                             <></>
                                     }
-                                    <Dropdown.Item onClick={onUpdateClick}>Update</Dropdown.Item>
+                                    <Dropdown.Item onClick={onUpdateClick} title="Brings up dialog to update device">Update</Dropdown.Item>
                                 </Indicator>
-                                <Dropdown.Item onClick={() => {}}>Sync RTC Time</Dropdown.Item>
-                                <Dropdown.Item onClick={() => {}}>Factory Reset</Dropdown.Item>
+                                <Dropdown.Item onClick={deviceSyncRTCClick} title="Syncs the device's RTC to the current time">Sync RTC Time</Dropdown.Item>
+                                {/* <Dropdown.Item onClick={() => {}}>Factory Reset</Dropdown.Item> */}
                             </Dropdown.Menu>
                                     :
                             <></>

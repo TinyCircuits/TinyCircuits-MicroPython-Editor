@@ -1,7 +1,7 @@
 import CustomModal from "./CustomModal";
 import { Platform } from "../App";
 import { forwardRef, useRef, useImperativeHandle, useState, useEffect } from "react";
-import { Select, Button } from "react-daisyui";
+import { Select, Button, Progress } from "react-daisyui";
 import MpRawModeOverride from "../js/MpRawModeOverride";
 
 
@@ -11,6 +11,7 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
     const [versions, setVersions] = useState([]);   // Consists of [{"date":, "commit_id":, "changelog":}, ...]
     const [selectedVersion, setSelectedVersion] = useState({"date":"", "commit_id":"", "changelog":""});
     const [step, setStep] = useState(0);
+    const [filesProgress, setFilesProgress] = useState(0);
 
     const title = () => {
         if(platform == Platform.THUMBY_COLOR){
@@ -22,6 +23,8 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
 
     useImperativeHandle(ref, () => ({
         showModal(){
+            setStep(0);
+            setFilesProgress(0);
             customModalRef.current.showModal();
         },
         close(){
@@ -93,7 +96,9 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
 
                 await raw_mode.makePath(filePath);
                 await raw_mode.writeFile(filePath, fileData);
+                setFilesProgress(i/fileManifestPaths.length);
             }
+            setFilesProgress(1);
 
             setStep(3);
             await raw_mode.bootloader();
@@ -101,7 +106,6 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
     }
 
     useEffect(() => {
-        setStep(0);
         setupVersions();
     }, []);
 
@@ -172,8 +176,8 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
 
     const step1 = () => {
         return(
-            <div key={0} className="flex flex-col items-center justify-center">
-                <span className="font-bold text-lg">Updating, do not unplug!</span>
+            <div key={0} className="flex flex-col my-1">
+                <span className="font-bold text-lg mx-auto mb-4">Updating, do not unplug!</span>
                 <span className="font-bold">Step 1: Deleting old files...</span>
             </div>
         )
@@ -181,24 +185,25 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
     
     const step2 = () => {
         return(
-            <div key={1} className="flex flex-col items-center justify-center">
-                <span className="font-bold">Step 2: Uploading new files...</span>
+            <div key={1} className="flex flex-row items-center my-1">
+                <span className="font-bold whitespace-nowrap flex-nowrap flex-1">Step 2: Uploading new files:</span>
+                <Progress value={filesProgress} className="flex-1 mx-2"/>
             </div>
         )
     }
 
     const step3 = () => {
         return(
-            <div key={2} className="flex flex-col items-center justify-center">
-                <span className="font-bold">Step 3: Press the button below and select the 'RP2350' or 'RP2' folder in the file manager!</span>
-                <Button color="primary" onClick={dropUF2} disabled={step != 3}>Select Device</Button>
+            <div key={2} className="flex flex-col w-fit my-1">
+                <span className="font-bold">Step 3: Click 'Select Device' and select the 'RP2350' or 'RP2' folder in the file manager!</span>
+                <Button color="primary" onClick={dropUF2} disabled={step != 3} className="mt-1">Select Device</Button>
             </div>
         )
     }
 
     const step4 = () => {
         return(
-            <div key={3} className="flex flex-col items-center justify-center">
+            <div key={3} className="my-1">
                 <span className="font-bold">Step 4: Uploading firmware update...</span>
             </div>
         )
@@ -206,8 +211,8 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
 
     const step5 = () => {
         return(
-            <div key={4} className="flex flex-col items-center justify-center">
-                <span className="font-bold">Update complete! You can now close this dialog!</span>
+            <div key={4} className="my-1">
+                <span className="font-bold mt-2 text-success">Update complete! You can now close this dialog!</span>
             </div>
         )
     }
@@ -217,7 +222,11 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
 
         steps = steps.slice(0, step);
 
-        return steps;
+        return (
+            <div className="w-full h-fit">
+                {steps}
+            </div>
+        );
     }
 
 

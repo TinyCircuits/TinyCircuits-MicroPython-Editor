@@ -245,7 +245,7 @@ self.main_call = () => {
 
 // This JS function is called from C code in the engine
 self.get_pressed_buttons = () => {
-    return receiver.check("pressed_buttons");
+    return receiver.check("pressed_buttons", false);
 }
 
 // This JS function is called from C code in the engine

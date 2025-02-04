@@ -20,7 +20,7 @@ let CustomModal = forwardRef(function CustomModal(props, ref){
     }), []);
 
     const onClickToClose = (clickedElementID) => {
-        if(!allowClose){
+        if(allowClose == false){
             return;
         }
 

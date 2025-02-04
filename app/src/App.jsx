@@ -124,22 +124,8 @@ function App(props){
     const [editorTabsData, setEditorTabsData] = useState([addTab]);
     let editorValues = useRef({});  // Use ref so that rerender does not happen when saving editor states
 
-
     const [isSerialConnected, setIsSerialConnected] = useState(false);
-    const setIsSerialConnectedWrapper = (value) => {
-        setIsSerialConnected(value);
 
-        // Reset all of these so that the editor is reset
-        if(value == false && (platform == Platform.THUMBY_COLOR || platform == Platform.THUMBY)){
-            editorValues.current = {};
-            setTree([]);
-            setEditorTabsData([addTab]);
-            setPlatform(Platform.NONE);
-        }
-
-        // Reset this no matter what
-        setRunPathDevice("");
-    }
 
     let serial = useRef(undefined);
 
@@ -246,8 +232,31 @@ function App(props){
 
     function onSerialDisconnect(){
         console.log("Serial disconnect")
+
         serial.current.disconnect();
+        setIsSerialConnected(false);
+
+        // Reset this no matter what
+        setRunPathDevice("");
+
+        xtermRefDevice.current.write("\r\n--- DISCONNECTED ---");
     }
+
+    // Whenever serial state changes, potentially remove file tree
+    useEffect(() => {
+        if(isSerialConnected){
+            return;
+        }
+
+        // Reset all of these so that the editor is reset
+        if(platform == Platform.THUMBY || platform == Platform.THUMBY_COLOR){
+            editorValues.current = {};
+            setTree([]);
+            setEditorTabsData([addTab]);
+            setPlatform(Platform.NONE);
+        }
+
+    }, [isSerialConnected])
 
     const connectSerial = async () => {
         if(serial.current == undefined){
@@ -256,22 +265,6 @@ function App(props){
             try{
                 try{
                     await serial.current.connect([{ usbVendorId: 0x2E8A, usbProductId: 0x0003 }, { usbVendorId: 0x2E8A, usbProductId: 0x0005 }]);
-                    
-//                     let date = new Date();
-//                     let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';
-//                     console.log(datetime);
-
-//                     MpRawMode.begin(serial.current).then(async (raw_mode) => {
-
-//                         await raw_mode.exec(`
-// import engine_main
-// import engine_time
-// engine_time.datetime(` + datetime + `)
-//                         `, 0, false);
-
-//                         raw_mode.end();
-//                     });
-
                 }catch(error){
                     // https://developer.mozilla.org/en-US/docs/Web/API/SerialPort/open#exceptions
                     if(error.name == "InvalidStateError"){
@@ -353,7 +346,6 @@ function App(props){
             await rawMode.showEditorConnected(platform);
             rawMode.end();
 
-            console.warn(dateVersion);
             setPlatform(platform);
 
             if(platform == Platform.THUMBY_COLOR){
@@ -640,6 +632,26 @@ execfile("` + filePathToRun + `")
     }
 
 
+    const deviceSyncRTCClick = () => {MpRawModeOverride
+        let date = new Date();
+        let datetime = '(' + date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate() + ',' + date.getHours() + ',' + date.getMinutes() + ',' + date.getSeconds() + ')';
+        console.log(datetime);
+
+        MpRawMode.begin(serial.current).then(async (raw_mode) => {
+            window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: 0.5}}));
+
+            await raw_mode.exec(`
+import engine_main
+import engine_time
+engine_time.datetime(` + datetime + `)
+            `, 0, false);
+            await raw_mode.end();
+
+            window.dispatchEvent(new CustomEvent("end_progress"));
+        });
+    }
+
+
     const runInSimulator = async (selectedRunPath) => {
         setRunPathSimulator(selectedRunPath);
 
@@ -706,7 +718,7 @@ execfile("` + filePathToRun + `")
 
         try{
             if(serial.current == undefined){
-                serial.current = new WebSerialOverride((value) => {setIsSerialConnectedWrapper(value)});
+                serial.current = new WebSerialOverride((value) => {setIsSerialConnected(value)});
                 serial.current.receiveCallback = onSerialData;
                 serial.current.activityCallback = onSerialActivity;
                 serial.current.disconnectCallback = onSerialDisconnect;
@@ -802,8 +814,8 @@ execfile("` + filePathToRun + `")
                     </div>
 
                     <div className="h-full flex-1 flex flex-row items-center justify-end">
-                        <SettingsIcon className='mr-4' connected={isSerialConnected} deviceUpdatable={deviceUpdatable} onUpdateClick={() => {updateModalRef.current.showModal()}}/>
-                        
+                        <SettingsIcon className='mr-4' connected={isSerialConnected} deviceUpdatable={deviceUpdatable} onUpdateClick={() => {updateModalRef.current.showModal()}} deviceSyncRTCClick={deviceSyncRTCClick}/>
+
                         <Button size="sm" color='info' tag="a" target="_blank" rel="noopener" href="/code/arcade/" className='mr-4'>
                             Arcade
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-right" viewBox="0 0 16 16">
@@ -831,7 +843,7 @@ execfile("` + filePathToRun + `")
                                         {getFilesPanelTitle()}
                                     </div>
 
-                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen}/>
+                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
                                 </Panel>
                             </PanelGroup>
 

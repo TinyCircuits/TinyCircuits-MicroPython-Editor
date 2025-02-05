@@ -6,6 +6,8 @@ import CustomModal from './CustomModal';
 let InputModal = forwardRef(function InputModal(props, ref){
 
     const [title, setTitle] = useState("");
+    const [subtitle, setSubtitle] = useState("");
+    const [btnText, setBtnText] = useState("");
     const [placeHolder, setPlaceHolder] = useState("");
     const [value, setValue] = useState("");
     const valueRef = useRef("");
@@ -23,8 +25,10 @@ let InputModal = forwardRef(function InputModal(props, ref){
         close(){
             customModalRef.current.close();
         },
-        ask(title, defaultValue){
+        ask(title, subtitle, btnText, defaultValue){
             setTitle(title);
+            setSubtitle(subtitle);
+            setBtnText(btnText);
             setPlaceHolder(placeHolder);
             setValue(defaultValue);
 
@@ -51,12 +55,12 @@ let InputModal = forwardRef(function InputModal(props, ref){
 
 
     return(
-        <CustomModal title={title} ref={customModalRef} onCloseClick={() => {complete.current = false}} btn="Rename" onBtnClick={() => {complete.current = true}}>
+        <CustomModal title={title} ref={customModalRef} onCloseClick={() => {complete.current = false}} btn={btnText} onBtnClick={() => {complete.current = true}}>
             <div className="w-full h-full flex flex-row justify-evenly">
                 <div className="flex w-full component-preview items-center mb-4 justify-center gap-2 font-sans">
                     <div className="form-control w-full max-w-xs">
                         <label className="label">
-                            <span className="label-text">Input a new name:</span>
+                            <span className="label-text">{subtitle}</span>
                         </label>
                         <Input placeholder={placeHolder} value={value} onChange={(event) => {setValue(event.target.value)}}/>
                     </div>

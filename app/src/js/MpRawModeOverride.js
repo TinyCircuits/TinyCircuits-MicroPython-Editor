@@ -179,6 +179,15 @@ if renamed is False:
 `
         await this.exec(cmd);
     }
+
+    async newFile(path){
+        console.log(path)
+        const cmd = `
+f = open("` + path + `", "w")
+f.close()
+`
+        await this.exec(cmd);
+    }
 }
 
 export default MpRawModeOverride;

@@ -152,9 +152,21 @@ function FilesPanel(props){
             console.log("Upload:", path);
         }
 
+        const newFile = async (path) => {
+            const name = await inputModalRef.current.ask("New File Name", "Type file name:", "Confirm", "script.py");
+            await props.files.newFile(path, name);
+            await props.files.openFiles(true);
+        }
+
+        const newFolder = async (path) => {
+            const name = await inputModalRef.current.ask("New Folder Name", "Type folder name:", "Confirm", "New Folder");
+            await props.files.newFolder(path, name);
+            await props.files.openFiles(true);
+        }
+
         const renameClick = async (path) => {
             console.log("Rename:", path);
-            const newName = await inputModalRef.current.ask("Rename", path.split("/").pop());
+            const newName = await inputModalRef.current.ask("Rename", "Type a new name:", "Rename", path.split("/").pop());
 
             let oldPath = path;
             let newPath = path.split("/");
@@ -180,6 +192,10 @@ function FilesPanel(props){
 
                 if(node.id + ":upload_btn" == id){
                     uploadClick(node.id);
+                }else if(node.id + ":newfile_btn" == id){
+                    newFile(node.id);
+                }else if(node.id + ":newfolder_btn" == id){
+                    newFolder(node.id);
                 }else if(node.id + ":rename_btn" == id){
                     renameClick(node.id);
                 }else if(node.id + ":delete_btn" == id){
@@ -202,9 +218,11 @@ function FilesPanel(props){
             <div className='relative' style={style} ref={dragHandle} onClick={() => node.isInternal && node.toggle()} onContextMenu={handleDropdown}>
                 {getRow(node)}
                 <div className={'absolute w-fit h-fit flex flex-col z-[10000] bg-base-200 ' + (dropdownOpen ? "visible" : "invisible")}>
-                    <Button id={node.id + ":upload_btn"} size="sm" fullWidth={true} className='rounded-none' disabled={props.isSerialConnected == false || props.platform == Platform.THUMBY || props.platform == Platform.THUMBY_COLOR}>Upload to device</Button>
-                    <Button id={node.id + ":rename_btn"} size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
-                    <Button id={node.id + ":delete_btn"} size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
+                    <Button id={node.id + ":upload_btn"}    size="sm" fullWidth={true} className='rounded-none' disabled={props.isSerialConnected == false || props.platform == Platform.THUMBY || props.platform == Platform.THUMBY_COLOR}>Upload to device</Button>
+                    <Button id={node.id + ":newfile_btn"}   size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf}>New File</Button>
+                    <Button id={node.id + ":newfolder_btn"} size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf}>New Folder</Button>
+                    <Button id={node.id + ":rename_btn"}    size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
+                    <Button id={node.id + ":delete_btn"}    size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
                 </div>
             </div>
         );

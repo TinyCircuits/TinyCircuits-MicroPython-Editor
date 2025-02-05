@@ -104,6 +104,16 @@ class ComputerFiles{
         await writable.close();
     }
 
+    newFile = async (path, name) => {
+        const [foundName, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+        await foundHandle.getFileHandle(name, {create:true});
+    }
+
+    newFolder = async (path, name) => {
+        const [foundName, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+        await foundHandle.getDirectoryHandle(name, {create:true});
+    }
+
     #find = async (fullPath, rebuiltPath, parentDirHandle) => {
         for await (const [name, handle] of parentDirHandle.entries()){
             const checkPath = rebuiltPath + (rebuiltPath == "" ? "" : "/") + name;

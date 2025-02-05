@@ -58,6 +58,22 @@ class DeviceFiles{
         });
     }
 
+    newFile = async (path, name) => {
+        MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
+            path = path + (path == "" ? "" : "/") + name;
+            await raw_mode.newFile(path);
+            await raw_mode.end();
+        });
+    }
+
+    newFolder = async (path, name) => {
+        MpRawMode.begin(this.serial).then(async (raw_mode) => {
+            path = path + (path == "" ? "" : "/") + name;
+            await raw_mode.makePath(path);
+            await raw_mode.end();
+        });
+    }
+
     rename = async (oldPath, newPath) => {
         MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
             await raw_mode.rename(oldPath, newPath);

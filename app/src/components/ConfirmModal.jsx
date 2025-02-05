@@ -4,7 +4,7 @@ import CustomModal from './CustomModal';
 import FilesPanel from './FilesPanel';
 
 
-let RequestModal = forwardRef(function RequestModal(props, ref){
+let ConfirmModal = forwardRef(function ConfirmModal(props, ref){
 
     const [title, setTitle] = useState("");
     const [yesPrompt, setYesPrompt] = useState("");
@@ -19,7 +19,7 @@ let RequestModal = forwardRef(function RequestModal(props, ref){
         close(){
             customModalRef.current.close();
         },
-        async request(title, yes, no){
+        request(title, yes, no){
             setTitle(title);
             setYesPrompt(yes);
             setNoPrompt(no);
@@ -61,4 +61,4 @@ let RequestModal = forwardRef(function RequestModal(props, ref){
 });
 
 
-export default RequestModal;
+export default ConfirmModal;

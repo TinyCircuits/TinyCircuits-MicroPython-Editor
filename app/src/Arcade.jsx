@@ -3,13 +3,12 @@ import './css/tailwind_output.css'
 import { Input, Join, Theme, Button, Progress, Select } from 'react-daisyui'
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import CustomModal from './components/CustomModal.jsx'
 import Alerts from './components/Alerts.jsx';
 
 import Page, {PageHeaderContents, PageBodyContents, PageFooterContents, PageModalContents} from './components/Page';
 import Footer from './components/Footer';
 import setupRoot from './js/root.js'
-import RequestModal from './components/RequestModel.jsx';
+import ConfirmModal from './components/ConfirmModal.jsx';
 import WebSerialOverride from './js/WebSerialOverride.js';
 import MpRawModeOverride from './js/MpRawModeOverride.js';
 
@@ -141,7 +140,7 @@ function Arcade(props){
 
     let thumbyColorGames = useRef([]);
     let thumbyGames = useRef([]);
-    let requestModalRef = useRef(undefined);
+    let confirmModalRef = useRef(undefined);
     let alertsRef = useRef(undefined);
 
     let overwriteModelRef = useRef(undefined);
@@ -441,7 +440,7 @@ function Arcade(props){
                 let elementName = element.name.replaceAll("'", "");
 
                 if(elementName == clickedGame.name){
-                    if(!await requestModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
+                    if(!await confirmModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
                         return;
                     }else{
                         break;
@@ -463,7 +462,7 @@ function Arcade(props){
             }
 
             // Ask and install `lib` folder if downloading a Thumby game without that installed
-            if(filter == "Thumby" && !foundLib && await requestModalRef.current.request("Thumby `lib` not installed, install it?", "Install", "No")){
+            if(filter == "Thumby" && !foundLib && await confirmModalRef.current.request("Thumby `lib` not installed, install it?", "Install", "No")){
                 let manifestText = await (await fetch("/simulator/lib/manifest.txt")).text();
                 let manifestLines = manifestText.split(/\r\n|\r|\n/);
 
@@ -562,7 +561,7 @@ function Arcade(props){
 
             try{
                 let handle = await directoryHandle.getDirectoryHandle(clickedGame.name);
-                if(await requestModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
+                if(await confirmModalRef.current.request("Game folder already exists, overwrite it?", "Overwrite", "Cancel")){
                     computerDownloadClicked(handle);
                 }
             }catch(exception){
@@ -579,7 +578,7 @@ function Arcade(props){
     return (
         <Page className="bg-repeat">
             <PageModalContents>
-                <RequestModal ref={requestModalRef}/>
+                <ConfirmModal ref={confirmModalRef}/>
             </PageModalContents>
 
             <PageHeaderContents>

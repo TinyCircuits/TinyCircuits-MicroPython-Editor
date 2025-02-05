@@ -9051,6 +9051,10 @@ html:has(.drawer-open.drawer-open) {
   max-width: 40%;
 }
 
+.max-w-xs {
+  max-width: 20rem;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -9526,6 +9530,10 @@ html:has(.drawer-open.drawer-open) {
 
 .pl-1 {
   padding-left: 0.25rem;
+}
+
+.font-sans {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 .text-3xl {

@@ -3,13 +3,14 @@ import { Button, Checkbox } from 'react-daisyui'
 import { Tree } from 'react-arborist'
 import useResizeObserver from 'use-resize-observer'
 import { Platform } from '../App';
-
+import InputModal from './InputModal';
 
 
 function FilesPanel(props){
 
     const { ref, width, height } = useResizeObserver();
     let treeRef = useRef();
+    let inputModalRef = useRef(undefined);
 
     // Converts file tree to structure that react-arborist can use
     const getData = (tree_parent, data_parent, checked, first=false) => {
@@ -151,20 +152,26 @@ function FilesPanel(props){
             console.log("Upload:", path);
         }
 
-        const renameClick = (path) => {
+        const renameClick = async (path) => {
             console.log("Rename:", path);
+            const newName = await inputModalRef.current.ask("Rename", path.split("/").pop());
+
+            let oldPath = path;
+            let newPath = path.split("/");
+            newPath.pop();
+            newPath.push(newName);
+            newPath = newPath.join("/");
+
+            console.log("Rename:", oldPath, newPath);
+
+            await props.files.rename(oldPath, newPath);
+            await props.files.openFiles(true);
         }
 
         const deleteClick = async (path) => {
             console.log("Delete:", path);
-            await props.files.deleteFile(path);
-            await props.files.openFiles(true, (percent) => {
-                if(percent < 1.0){
-                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
-                }else{
-                    window.dispatchEvent(new CustomEvent("end_progress"));
-                }
-            });
+            await props.files.delete(path);
+            await props.files.openFiles(true);
         }
 
         useEffect(() => {
@@ -259,6 +266,7 @@ function FilesPanel(props){
     
     return (
         <div className='w-full h-full' ref={ref}>
+            <InputModal ref={inputModalRef}/>
             <Tree ref={treeRef} data={getData(props.tree, [], false, true)} height={height} width={width} onClick={handleClick} openByDefault={false}>
                 {Node}
             </Tree>

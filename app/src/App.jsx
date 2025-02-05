@@ -314,19 +314,18 @@ function App(props){
     }
 
     const openComputerFiles = () => {
-        let files = new ComputerFiles(setTree);
-        setComputerFiles(files);
-        setMainFiles(files);
-
-        const progressCB = (percent) => {
+        let files = new ComputerFiles(setTree, (percent) => {
             if(percent < 1.0){
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
             }else{
                 window.dispatchEvent(new CustomEvent("end_progress"));
             }
-        };
+        });
 
-        files.openFiles(false, progressCB).then(() => {
+        setComputerFiles(files);
+        setMainFiles(files);
+
+        files.openFiles(false).then(() => {
             choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
@@ -343,7 +342,14 @@ function App(props){
 
     const openDeviceFiles = () => {
         connectSerial().then(async () => {
-            let files = new DeviceFiles(serial.current, setTree);
+            let files = new DeviceFiles(serial.current, setTree, (percent) => {
+                if(percent < 1.0){
+                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
+                }else{
+                    window.dispatchEvent(new CustomEvent("end_progress"));
+                }
+            });
+
             setDeviceFiles(files);
             setMainFiles(files);
 

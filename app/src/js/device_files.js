@@ -2,10 +2,11 @@ import { MpRawMode } from 'ViperIDE/src/rawmode';
 import MpRawModeOverride from './MpRawModeOverride';
 
 class DeviceFiles{
-    constructor(serial, setTree){
+    constructor(serial, setTree, progressCB = (percent) => {}){
         this.serial = serial;
         this.tree = undefined;
         this.setTree = setTree;
+        this.progressCB = progressCB;
     }
 
     getTree = () => {
@@ -13,21 +14,21 @@ class DeviceFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async (refresh=false, progressCB = (percent) => {}) => {
+    openFiles = async (refresh=false) => {
         return new Promise(async (resolve, reject) => {
             console.log("Open files: Attempting to enter raw mode...");
-            progressCB(0.01);
+            this.progressCB(0.01);
 
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
                 console.log("Open files: Entered raw mode!");
-                progressCB(0.1);
+                this.progressCB(0.1);
 
                 raw_mode.walkFs().then(async (tree) => {
                     this.tree = tree;
                     if(this.setTree != undefined) this.setTree(this.tree);
-                    progressCB(0.8);
+                    this.progressCB(0.8);
                     await raw_mode.end();
-                    progressCB(1.0);
+                    this.progressCB(1.0);
                     resolve();
                 }).catch((error) => {
                     console.error(error);
@@ -57,11 +58,14 @@ class DeviceFiles{
         });
     }
 
-    renameFile = async (old_path, new_path) => {
-
+    rename = async (oldPath, newPath) => {
+        MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
+            await raw_mode.rename(oldPath, newPath);
+            await raw_mode.end();
+        });
     }
 
-    deleteFile = async (path) => {
+    delete = async (path) => {
         MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
             await raw_mode.deleteFileOrDir(path);
             await raw_mode.end();

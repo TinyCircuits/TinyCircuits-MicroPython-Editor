@@ -8,7 +8,7 @@ class MpRawModeOverride extends MpRawMode{
     }
 
     static async begin(port, soft_reboot=false) {
-        const res = new MpRawModeOverride(port)
+        const res = new MpRawModeOverride(port);
         await res.enterRawRepl(soft_reboot)
         try {
             await res.exec(`import sys,os`)
@@ -164,11 +164,20 @@ machine.bootloader()
         await this.exec(cmd);
     }
 
-    async rename(old_path, new_path){
+    async rename(oldPath, newPath){
         const cmd = `
 import os
-os.rename("`+ old_path + `", "` + new_path +`")
+renamed = False
+try:
+    os.stat("`+ newPath +`")
+except:
+    os.rename("`+ oldPath + `", "` + newPath +`")
+    renamed = True
+
+if renamed is False:
+    raise Exception('Rename ERROR: Could not rename, path already exists!')
 `
+        await this.exec(cmd);
     }
 }
 

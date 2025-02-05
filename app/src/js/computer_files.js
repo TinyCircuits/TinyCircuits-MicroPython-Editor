@@ -1,9 +1,10 @@
 class ComputerFiles{
-    constructor(setTree){
+    constructor(setTree, progressCB = (percent) => {}){
         this.dir_handle = undefined;
         this.tree = undefined;
         this.full_path_files = undefined;   // A dictionary where full file paths are keys and file handles are values
         this.setTree = setTree;
+        this.progressCB = progressCB;
     }
 
     getTree = () => {
@@ -49,7 +50,7 @@ class ComputerFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async (refresh=false, progressCB = (percent) => {}) => {
+    openFiles = async (refresh=false) => {
         return new Promise((resolve, reject) => {
             // Define what to do when the user does choose a directory
             let chose_directory_success = async (result) => {
@@ -60,17 +61,17 @@ class ComputerFiles{
                 let content = [];
                 this.tree.push({name:this.dir_handle.name, path:this.dir_handle.name, content:content});
                 
-                progressCB(0.6);
+                this.progressCB(0.6);
 
                 this.full_path_files = {};
                 this.build_tree(this.dir_handle, content, "").then(() => {
                     this.setTree(this.tree);
                     resolve();
-                    progressCB(1.0);
+                    this.progressCB(1.0);
                 }).catch((error) => {
                     console.error(error);
                     reject();
-                    progressCB(1.0);
+                    this.progressCB(1.0);
                 });
             }
 
@@ -78,10 +79,10 @@ class ComputerFiles{
             let chose_directory_fail = (result) => {
                 console.error(result);
                 reject();
-                progressCB(1.0);
+                this.progressCB(1.0);
             }
 
-            progressCB(0.01);
+            this.progressCB(0.01);
 
             // Show the user the OS directory picker
             if(refresh){
@@ -103,30 +104,86 @@ class ComputerFiles{
         await writable.close();
     }
 
-    renameFile = async (old_path, new_path) => {
+    #find = async (fullPath, rebuiltPath, parentDirHandle) => {
+        for await (const [name, handle] of parentDirHandle.entries()){
+            const checkPath = rebuiltPath + (rebuiltPath == "" ? "" : "/") + name;
 
-    }
+            if(fullPath == checkPath){
+                return [name, handle, parentDirHandle];
+            }else if(handle.kind == "directory"){
+                const [name, found, parent] = await this.#find(fullPath, checkPath, handle);
 
-    deleteFile = async (path) => {
-        const parts = path.split("/");
-
-        console.warn(parts);
-
-        const dirSeek = async (parentDirHandle, parts, rebuiltPath) => {
-
-            for await (const [name, handle] of parentDirHandle.entries()){
-                const checkPath = rebuiltPath + (rebuiltPath == "" ? "" : "/") + name;
-                
-                if(path == checkPath){
-                    await parentDirHandle.removeEntry(name, {recursive:true});
-                    return;
-                }else if(handle.kind == "directory"){
-                    await dirSeek(handle, parts, checkPath);
+                if(name != undefined){
+                    return [name, found, parent];
                 }
             }
         }
 
-        await dirSeek(this.dir_handle, parts, "");
+        return [undefined, undefined, undefined];
+    }
+
+    rename = async (oldPath, newPath) => {
+        // Find info about the element being renamed
+        const [name, foundHandle, foundParentHandle] = await this.#find(oldPath, "", this.dir_handle);
+        
+        if(name == undefined){
+            throw new Error("ComputerFiles rename ERROR: Could not find '" + oldPath + "' for renaming!");
+        }
+
+        if((await this.#find(newPath, "", this.dir_handle))[0] != undefined){
+            throw new Error("ComputerFiles rename ERROR: Path '" + newPath + "' already exists, could not rename!");
+        }
+
+        const newName = newPath.split("/").pop();
+
+        // If the element being renamed is a file, simple copy and delete.
+        // If it's a directory, complex recursive copy and delete
+        if(foundHandle.kind == "file"){
+            const oldFile = await foundHandle.getFile();
+            const newFile = await foundParentHandle.getFileHandle(newName, {create:true});
+
+            const fileData = await oldFile.arrayBuffer();
+            
+            const writable = await newFile.createWritable();
+            await writable.write(fileData);
+            await writable.close();
+
+            await this.delete(oldPath);
+        }else if(foundHandle.kind == "directory"){
+            let newFoundParentHandle = await foundParentHandle.getDirectoryHandle(newName, {create:true});
+
+            const copy = async (lastName, oldHandleParent, newHandleParent) => {
+                for await (const [name, handle] of oldHandleParent.entries()){
+                    if(lastName == name){
+                        continue;
+                    }
+
+                    if(handle.kind == "file"){
+                        const oldFile = await handle.getFile();
+                        const newFile = await newHandleParent.getFileHandle(name, {create:true});
+
+                        const fileData = await oldFile.arrayBuffer();
+                        
+                        const writable = await newFile.createWritable();
+                        await writable.write(fileData);
+                        await writable.close();
+                    }else if(handle.kind == "directory"){
+                        await copy(name, handle, await newHandleParent.getDirectoryHandle(name, {create:true}));
+                    }
+                }
+            }
+
+            await copy(newName, foundHandle, newFoundParentHandle);
+            await this.delete(oldPath);
+        }
+    }
+
+    delete = async (path) => {
+        const [name, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+
+        if(name != undefined){
+            await foundParentHandle.removeEntry(name, {recursive:true});
+        }
     }
 }
 

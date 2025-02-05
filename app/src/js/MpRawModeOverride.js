@@ -81,7 +81,7 @@ def rm(d):  # Remove file or tree
         else:  # File
             os.remove(d)
     except Exception as e:
-        raise Exception('rm_failed ' + str(e))
+        raise Exception('rm_failed: ' + str(e) + " " + d)
 rm('${path}')
 `;
         await this.exec(cmd);
@@ -162,6 +162,13 @@ import machine
 machine.bootloader()
 `
         await this.exec(cmd);
+    }
+
+    async rename(old_path, new_path){
+        const cmd = `
+import os
+os.rename("`+ old_path + `", "` + new_path +`")
+`
     }
 }
 

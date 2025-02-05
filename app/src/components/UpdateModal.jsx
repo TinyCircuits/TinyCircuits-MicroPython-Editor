@@ -90,7 +90,7 @@ let UpdateModal = forwardRef(function UpdateModal(props, ref){
                 const filePath = fetchPath.replace(baseFilePath, "");
                 const fileData = await (await fetch(fetchPath)).arrayBuffer();
 
-                if(filePath.length == 0 || filePath == ""){
+                if(filePath.length == 0 || filePath == "" || filePath == "manifest.txt"){
                     continue;
                 }
 

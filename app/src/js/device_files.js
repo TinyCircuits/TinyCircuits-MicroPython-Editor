@@ -1,4 +1,5 @@
 import { MpRawMode } from 'ViperIDE/src/rawmode';
+import MpRawModeOverride from './MpRawModeOverride';
 
 class DeviceFiles{
     constructor(serial, setTree){
@@ -12,15 +13,21 @@ class DeviceFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async () => {
+    openFiles = async (refresh=false, progressCB = (percent) => {}) => {
         return new Promise(async (resolve, reject) => {
             console.log("Open files: Attempting to enter raw mode...");
+            progressCB(0.01);
+
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
                 console.log("Open files: Entered raw mode!");
-                raw_mode.walkFs().then((tree) => {
+                progressCB(0.1);
+
+                raw_mode.walkFs().then(async (tree) => {
                     this.tree = tree;
                     if(this.setTree != undefined) this.setTree(this.tree);
-                    raw_mode.end();
+                    progressCB(0.8);
+                    await raw_mode.end();
+                    progressCB(1.0);
                     resolve();
                 }).catch((error) => {
                     console.error(error);
@@ -34,8 +41,7 @@ class DeviceFiles{
         return new Promise(async (resolve, reject) => {
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
                 let file_data = await raw_mode.readFile(path);
-                raw_mode.end();
-
+                await raw_mode.end();
                 resolve(file_data)
             });
         });
@@ -45,9 +51,20 @@ class DeviceFiles{
         return new Promise(async (resolve, reject) => {
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
                 await raw_mode.writeFile(path, valueToSave, 1024);
-                raw_mode.end();
+                await raw_mode.end();
                 resolve();
             });
+        });
+    }
+
+    renameFile = async (old_path, new_path) => {
+
+    }
+
+    deleteFile = async (path) => {
+        MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
+            await raw_mode.deleteFileOrDir(path);
+            await raw_mode.end();
         });
     }
 }

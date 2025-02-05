@@ -24,7 +24,7 @@ class ComputerFiles{
             // Get the file or directory handle from iterator
             // and build path
             let handle = entry.value;
-            let full_path = path + "/" + handle.name;
+            let full_path = (path == "" ? "" : path + "/") + handle.name;   // Change from `/dir` to `dir` when `path == ""` initially
 
             // Add file or directory entry to current list, and
             // search directories recursively
@@ -49,7 +49,7 @@ class ComputerFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async () => {
+    openFiles = async (refresh=false, progressCB = (percent) => {}) => {
         return new Promise((resolve, reject) => {
             // Define what to do when the user does choose a directory
             let chose_directory_success = async (result) => {
@@ -60,13 +60,17 @@ class ComputerFiles{
                 let content = [];
                 this.tree.push({name:this.dir_handle.name, path:this.dir_handle.name, content:content});
                 
+                progressCB(0.6);
+
                 this.full_path_files = {};
-                this.build_tree(this.dir_handle, content, this.dir_handle.name).then(() => {
+                this.build_tree(this.dir_handle, content, "").then(() => {
                     this.setTree(this.tree);
                     resolve();
+                    progressCB(1.0);
                 }).catch((error) => {
                     console.error(error);
                     reject();
+                    progressCB(1.0);
                 });
             }
 
@@ -74,10 +78,17 @@ class ComputerFiles{
             let chose_directory_fail = (result) => {
                 console.error(result);
                 reject();
+                progressCB(1.0);
             }
 
+            progressCB(0.01);
+
             // Show the user the OS directory picker
-            showDirectoryPicker().then(chose_directory_success, chose_directory_fail);
+            if(refresh){
+                chose_directory_success(this.dir_handle);
+            }else{
+                showDirectoryPicker().then(chose_directory_success, chose_directory_fail);
+            }
         });
     }
 
@@ -90,6 +101,32 @@ class ComputerFiles{
         const writable = await this.full_path_files[path].createWritable();
         await writable.write(valueToSave);
         await writable.close();
+    }
+
+    renameFile = async (old_path, new_path) => {
+
+    }
+
+    deleteFile = async (path) => {
+        const parts = path.split("/");
+
+        console.warn(parts);
+
+        const dirSeek = async (parentDirHandle, parts, rebuiltPath) => {
+
+            for await (const [name, handle] of parentDirHandle.entries()){
+                const checkPath = rebuiltPath + (rebuiltPath == "" ? "" : "/") + name;
+                
+                if(path == checkPath){
+                    await parentDirHandle.removeEntry(name, {recursive:true});
+                    return;
+                }else if(handle.kind == "directory"){
+                    await dirSeek(handle, parts, checkPath);
+                }
+            }
+        }
+
+        await dirSeek(this.dir_handle, parts, "");
     }
 }
 

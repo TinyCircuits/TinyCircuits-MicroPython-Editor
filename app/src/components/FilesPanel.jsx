@@ -155,8 +155,16 @@ function FilesPanel(props){
             console.log("Rename:", path);
         }
 
-        const deleteClick = (path) => {
+        const deleteClick = async (path) => {
             console.log("Delete:", path);
+            await props.files.deleteFile(path);
+            await props.files.openFiles(true, (percent) => {
+                if(percent < 1.0){
+                    window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
+                }else{
+                    window.dispatchEvent(new CustomEvent("end_progress"));
+                }
+            });
         }
 
         useEffect(() => {

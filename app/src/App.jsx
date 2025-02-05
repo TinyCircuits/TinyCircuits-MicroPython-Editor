@@ -318,7 +318,15 @@ function App(props){
         setComputerFiles(files);
         setMainFiles(files);
 
-        files.openFiles().then(() => {
+        const progressCB = (percent) => {
+            if(percent < 1.0){
+                window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
+            }else{
+                window.dispatchEvent(new CustomEvent("end_progress"));
+            }
+        };
+
+        files.openFiles(false, progressCB).then(() => {
             choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
@@ -843,7 +851,7 @@ engine_time.datetime(` + datetime + `)
                                         {getFilesPanelTitle()}
                                     </div>
 
-                                    <FilesPanel tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
+                                    <FilesPanel files={mainFiles} tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
                                 </Panel>
                             </PanelGroup>
 

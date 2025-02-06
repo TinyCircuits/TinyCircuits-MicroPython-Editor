@@ -23,8 +23,12 @@ class DeviceFiles{
                 console.log("Open files: Entered raw mode!");
                 this.progressCB(0.1);
 
-                raw_mode.walkFs().then(async (tree) => {
-                    this.tree = tree;
+                raw_mode.walkFs().then(async (content) => {
+                    this.tree = [];
+                    this.tree.push({name:"/", path:"/", content:content});
+                    
+                    // this.tree = tree;
+
                     if(this.setTree != undefined) this.setTree(this.tree);
                     this.progressCB(0.8);
                     await raw_mode.end();

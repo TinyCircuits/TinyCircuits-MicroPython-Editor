@@ -13,26 +13,9 @@ function FilesPanel(props){
     let inputModalRef = useRef(undefined);
 
     // Converts file tree to structure that react-arborist can use
-    const getData = (tree_parent, data_parent, checked, first=false) => {
+    const getData = (tree_parent, data_parent, checked) => {
         let folders = [];
         let files = [];
-
-        if(first){
-            // Only if checkmarks are wanted do empty all the checked paths
-            if((props.checkmarks == true || props.checkmarks == undefined)){
-                while(props.allCheckedPaths.length > 0){
-                    props.allCheckedPaths.pop();
-                }
-            }
-
-            if(props.showRoot == true){
-                let rootChildren = [];
-                let root = {id:"/", name:"/", checked:false, children:rootChildren};
-                data_parent.push(root);
-                getData(tree_parent, rootChildren, checked, false);
-                return data_parent;
-            }
-        }
 
         if(tree_parent == undefined){
             return data_parent;
@@ -41,8 +24,15 @@ function FilesPanel(props){
         tree_parent.forEach(tree_child => {
             // Get the last part of the path for the name
             let path = tree_child.path;
-            let split_path = path.split('/');
-            let name = split_path[split_path.length-1];
+            
+            let name = undefined;
+
+            if(path == "/"){
+                name = "/";
+            }else{
+                let split_path = path.split('/');
+                name = split_path[split_path.length-1];
+            }
 
             // Start the entry that will go in the parent child list
             let entry = {id:tree_child.path, name:name, checked:checked};
@@ -219,10 +209,10 @@ function FilesPanel(props){
                 {getRow(node)}
                 <div className={'absolute w-fit h-fit flex flex-col z-[10000] bg-base-200 ' + (dropdownOpen ? "visible" : "invisible")}>
                     <Button id={node.id + ":upload_btn"}    size="sm" fullWidth={true} className='rounded-none' disabled={props.isSerialConnected == false || props.platform == Platform.THUMBY || props.platform == Platform.THUMBY_COLOR}>Upload to device</Button>
-                    <Button id={node.id + ":newfile_btn"}   size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf}>New File</Button>
-                    <Button id={node.id + ":newfolder_btn"} size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf}>New Folder</Button>
-                    <Button id={node.id + ":rename_btn"}    size="sm" fullWidth={true} className='rounded-none'>Rename</Button>
-                    <Button id={node.id + ":delete_btn"}    size="sm" fullWidth={true} className='rounded-none' color='error'>Delete</Button>
+                    <Button id={node.id + ":newfile_btn"}   size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf || props.platform == Platform.NONE}>New File</Button>
+                    <Button id={node.id + ":newfolder_btn"} size="sm" fullWidth={true} className='rounded-none' disabled={node.isLeaf || props.platform == Platform.NONE}>New Folder</Button>
+                    <Button id={node.id + ":rename_btn"}    size="sm" fullWidth={true} className='rounded-none' disabled={node.id == "/"}>Rename</Button>
+                    <Button id={node.id + ":delete_btn"}    size="sm" fullWidth={true} className='rounded-none' disabled={node.id == "/"} color='error'>Delete</Button>
                 </div>
             </div>
         );
@@ -281,11 +271,17 @@ function FilesPanel(props){
             treeRef.current.closeAll();
         }
     }, [props.allFoldersOpen]);
+
+    useEffect(() => {
+        if(treeRef.current.firstNode != null){
+            treeRef.current.firstNode.open();
+        }
+    }, [props.tree]);
     
     return (
         <div className='w-full h-full' ref={ref}>
             <InputModal ref={inputModalRef}/>
-            <Tree ref={treeRef} data={getData(props.tree, [], false, true)} height={height} width={width} onClick={handleClick} openByDefault={false}>
+            <Tree ref={treeRef} data={getData(props.tree, [], false)} height={height} width={width} onClick={handleClick} openByDefault={false}>
                 {Node}
             </Tree>
         </div>

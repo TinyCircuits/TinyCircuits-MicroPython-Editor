@@ -857,7 +857,7 @@ engine_time.datetime(` + datetime + `)
                                         {getFilesPanelTitle()}
                                     </div>
 
-                                    <FilesPanel files={mainFiles} tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
+                                    <FilesPanel showRoot={true} files={mainFiles} tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
                                 </Panel>
                             </PanelGroup>
 

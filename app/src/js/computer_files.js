@@ -59,12 +59,13 @@ class ComputerFiles{
                 // Add the directly selected folder to the tree (root)
                 this.tree = [];
                 let content = [];
-                this.tree.push({name:this.dir_handle.name, path:this.dir_handle.name, content:content});
-                
+                this.tree.push({name:"/", path:"/", content:content});
+
                 this.progressCB(0.6);
 
                 this.full_path_files = {};
                 this.build_tree(this.dir_handle, content, "").then(() => {
+                // this.build_tree(this.dir_handle, this.tree, "").then(() => {
                     this.setTree(this.tree);
                     resolve();
                     this.progressCB(1.0);

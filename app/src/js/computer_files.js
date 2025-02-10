@@ -1,9 +1,8 @@
 class ComputerFiles{
-    constructor(setTree, progressCB = (percent) => {}){
+    constructor(progressCB = (percent) => {}){
         this.dir_handle = undefined;
         this.tree = undefined;
         this.full_path_files = undefined;   // A dictionary where full file paths are keys and file handles are values
-        this.setTree = setTree;
         this.progressCB = progressCB;
     }
 
@@ -50,7 +49,7 @@ class ComputerFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async (refresh=false) => {
+    openFiles = async (setTree, refresh=false) => {
         return new Promise((resolve, reject) => {
             // Define what to do when the user does choose a directory
             let chose_directory_success = async (result) => {
@@ -66,7 +65,7 @@ class ComputerFiles{
                 this.full_path_files = {};
                 this.build_tree(this.dir_handle, content, "").then(() => {
                 // this.build_tree(this.dir_handle, this.tree, "").then(() => {
-                    this.setTree(this.tree);
+                    setTree(this.tree);
                     resolve();
                     this.progressCB(1.0);
                 }).catch((error) => {
@@ -106,23 +105,23 @@ class ComputerFiles{
     }
 
     newFile = async (path, name) => {
-        const [foundName, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+        const [foundName, foundHandle, foundParentHandle] = await this.find(path, "", this.dir_handle);
         await foundHandle.getFileHandle(name, {create:true});
     }
 
     newFolder = async (path, name) => {
-        const [foundName, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+        const [foundName, foundHandle, foundParentHandle] = await this.find(path, "", this.dir_handle);
         await foundHandle.getDirectoryHandle(name, {create:true});
     }
 
-    #find = async (fullPath, rebuiltPath, parentDirHandle) => {
+    find = async (fullPath, rebuiltPath, parentDirHandle) => {
         for await (const [name, handle] of parentDirHandle.entries()){
             const checkPath = rebuiltPath + (rebuiltPath == "" ? "" : "/") + name;
 
             if(fullPath == checkPath){
                 return [name, handle, parentDirHandle];
             }else if(handle.kind == "directory"){
-                const [name, found, parent] = await this.#find(fullPath, checkPath, handle);
+                const [name, found, parent] = await this.find(fullPath, checkPath, handle);
 
                 if(name != undefined){
                     return [name, found, parent];
@@ -135,13 +134,13 @@ class ComputerFiles{
 
     rename = async (oldPath, newPath) => {
         // Find info about the element being renamed
-        const [name, foundHandle, foundParentHandle] = await this.#find(oldPath, "", this.dir_handle);
+        const [name, foundHandle, foundParentHandle] = await this.find(oldPath, "", this.dir_handle);
         
         if(name == undefined){
             throw new Error("ComputerFiles rename ERROR: Could not find '" + oldPath + "' for renaming!");
         }
 
-        if((await this.#find(newPath, "", this.dir_handle))[0] != undefined){
+        if((await this.find(newPath, "", this.dir_handle))[0] != undefined){
             throw new Error("ComputerFiles rename ERROR: Path '" + newPath + "' already exists, could not rename!");
         }
 
@@ -190,7 +189,7 @@ class ComputerFiles{
     }
 
     delete = async (path) => {
-        const [name, foundHandle, foundParentHandle] = await this.#find(path, "", this.dir_handle);
+        const [name, foundHandle, foundParentHandle] = await this.find(path, "", this.dir_handle);
 
         if(name != undefined){
             await foundParentHandle.removeEntry(name, {recursive:true});

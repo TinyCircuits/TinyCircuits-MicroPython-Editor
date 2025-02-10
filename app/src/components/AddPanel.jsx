@@ -7,7 +7,9 @@ function AddPanel(props){
 
             <div className="w-2/5 bg-base-300 flex flex-row items-center justify-between p-8 outline outline-base-100 outline-neutral rounded-lg overflow-hidden">
                 
-                <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.addNewFile}>
+                Nothing here yet...
+
+                {/* <Button size="lg" color="primary" style={{width:"100px", height:"100px"}} onClick={props.addNewFile}>
                     New File
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
                         <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
@@ -46,7 +48,7 @@ function AddPanel(props){
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-file-earmark-fill" viewBox="0 0 16 16">
                         <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2z"/>
                     </svg>
-                </Button>
+                </Button> */}
             </div>
 
         </div>

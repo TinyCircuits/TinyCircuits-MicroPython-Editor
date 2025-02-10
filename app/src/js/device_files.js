@@ -2,10 +2,9 @@ import { MpRawMode } from 'ViperIDE/src/rawmode';
 import MpRawModeOverride from './MpRawModeOverride';
 
 class DeviceFiles{
-    constructor(serial, setTree, progressCB = (percent) => {}){
+    constructor(serial, progressCB = (percent) => {}){
         this.serial = serial;
         this.tree = undefined;
-        this.setTree = setTree;
         this.progressCB = progressCB;
     }
 
@@ -14,7 +13,7 @@ class DeviceFiles{
     }
 
     // Call this to open file directory chooser on computer
-    openFiles = async (refresh=false) => {
+    openFiles = async (setTree, refresh=false) => {
         return new Promise(async (resolve, reject) => {
             console.log("Open files: Attempting to enter raw mode...");
             this.progressCB(0.01);
@@ -29,7 +28,7 @@ class DeviceFiles{
                     
                     // this.tree = tree;
 
-                    if(this.setTree != undefined) this.setTree(this.tree);
+                    if(setTree != undefined) setTree(this.tree);
                     this.progressCB(0.8);
                     await raw_mode.end();
                     this.progressCB(1.0);
@@ -52,10 +51,10 @@ class DeviceFiles{
         });
     }
 
-    saveFile = (path, valueToSave) => {
+    saveFile = (path, data) => {
         return new Promise(async (resolve, reject) => {
             MpRawMode.begin(this.serial).then(async (raw_mode) => {
-                await raw_mode.writeFile(path, valueToSave, 1024);
+                await raw_mode.writeFile(path, data, 1024);
                 await raw_mode.end();
                 resolve();
             });
@@ -64,7 +63,10 @@ class DeviceFiles{
 
     newFile = async (path, name) => {
         MpRawModeOverride.begin(this.serial).then(async (raw_mode) => {
-            path = path + (path == "" ? "" : "/") + name;
+            if(name != undefined){
+                path = path + (path == "" ? "" : "/") + name;
+            }
+
             await raw_mode.newFile(path);
             await raw_mode.end();
         });

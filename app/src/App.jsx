@@ -105,7 +105,7 @@ function App(props){
     const openDeviceFile = async () => {
         console.log("Open device file");
 
-        await deviceFiles.openFiles();                      // Update internal tree
+        await deviceFiles.openFiles(setTree);               // Update internal tree
         setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
     }
 
@@ -295,7 +295,14 @@ function App(props){
             connectSerial().then(() => {
                 // Need this for if location to run computer files needs
                 // selected
-                let files = new DeviceFiles(serial.current, undefined);
+                let files = new DeviceFiles(serial.current, (percent) => {
+                    if(percent < 1.0){
+                        window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
+                    }else{
+                        window.dispatchEvent(new CustomEvent("end_progress"));
+                    }
+                });
+
                 setDeviceFiles(files);
             })
         }else{
@@ -314,7 +321,7 @@ function App(props){
     }
 
     const openComputerFiles = () => {
-        let files = new ComputerFiles(setTree, (percent) => {
+        let files = new ComputerFiles((percent) => {
             if(percent < 1.0){
                 window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
             }else{
@@ -325,7 +332,7 @@ function App(props){
         setComputerFiles(files);
         setMainFiles(files);
 
-        files.openFiles(false).then(() => {
+        files.openFiles(setTree, false).then(() => {
             choosePlatformModalRef.current?.close();
 
             // Set this so that the files panel header renders with the correct platform
@@ -342,7 +349,7 @@ function App(props){
 
     const openDeviceFiles = () => {
         connectSerial().then(async () => {
-            let files = new DeviceFiles(serial.current, setTree, (percent) => {
+            let files = new DeviceFiles(serial.current, (percent) => {
                 if(percent < 1.0){
                     window.dispatchEvent(new CustomEvent("set_progress", {detail: {progress: percent}}));
                 }else{
@@ -379,7 +386,7 @@ function App(props){
 
             console.log("Opening device files...");
             await serial.current.reset();
-            files.openFiles().then(() => {
+            files.openFiles(setTree).then(() => {
                 console.log("Opened device files!");
                 choosePlatformModalRef.current?.close();
 
@@ -412,7 +419,13 @@ function App(props){
                     {getTitle()}
                 </div>
 
-                <Button size='xs' color='neutral' title='Toggle all folders open or closed' onClick={() => {setAllFoldersOpen(!allFoldersOpen)}}>
+                <Button size='xs' color='neutral' title='Refresh the filesystem' className='mr-1' onClick={() => {if(mainFiles != undefined) mainFiles.openFiles(setTree, true)}} disabled={platform == Platform.NONE}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                        <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clipRule="evenodd" />
+                    </svg>
+                </Button>
+
+                <Button size='xs' color='neutral' title='Toggle all folders open or closed' onClick={() => {setAllFoldersOpen(!allFoldersOpen)}} disabled={platform == Platform.NONE}>
                     {
                         allFoldersOpen ?
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -425,7 +438,7 @@ function App(props){
                     }
                 </Button>
 
-                <div className="w-14 flex justify-center items-center">
+                <div className={"w-14 flex justify-center items-center " + (platform == Platform.NONE ? "opacity-30" : "")}>
                     <p>RUN</p>
                 </div>
             </div>
@@ -632,7 +645,7 @@ execfile("` + filePathToRun + `")
         // the files at
         console.log("Preparing to run...");
         if(runPathDevice == "" && platform == Platform.COMPUTER){
-            await deviceFiles.openFiles();                      // Update internal tree
+            await deviceFiles.openFiles(setTree);               // Update internal tree
             setRunLocationSelectTree(deviceFiles.getTree());    // Set the tree to be rendered for selecting run location
             setRunAfterLocationSelect(() => runOnDevice);
         }else{
@@ -857,7 +870,7 @@ engine_time.datetime(` + datetime + `)
                                         {getFilesPanelTitle()}
                                     </div>
 
-                                    <FilesPanel showRoot={true} files={mainFiles} tree={tree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
+                                    <FilesPanel showRoot={true} mainFiles={mainFiles} deviceFiles={deviceFiles} computerFiles={computerFiles} tree={tree} setTree={setTree} addCodeEditor={addCodeEditor} pathCheckedToRun={pathCheckedToRun} setPathCheckedToRun={setPathCheckedToRunWrapper} allCheckedPaths={allCheckedPaths.current} allFoldersOpen={allFoldersOpen} platform={platform} isSerialConnected={isSerialConnected}/>
                                 </Panel>
                             </PanelGroup>
 
